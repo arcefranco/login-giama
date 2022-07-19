@@ -3,6 +3,7 @@ import  db  from "./database";
 import cors from 'cors'
 import morgan from "morgan";
 import UserRouter from "./routes/userRoutes";
+import GerentesRouter from './routes/gerentesRoutes'
 const app = express();
 db.sequelize; 
 
@@ -22,6 +23,7 @@ app.use((req, res, next) => {
   });
 
 app.use('/login', UserRouter)
+app.use('/gerentes', GerentesRouter)
 
 app.listen(3001, () => {
     console.log(`Our app is running on port 3001`);

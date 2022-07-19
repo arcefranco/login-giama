@@ -3,10 +3,10 @@ import { createHash } from "crypto";
 import { QueryTypes } from "sequelize";
 
 
-const users = db.sequelize
+const dbGiama = db.sequelize
 
 export const getAllUsers = async (req, res) => {
-    const allUsers = await users.query("SELECT * FROM usuarios")
+    const allUsers = await dbGiama.query("SELECT * FROM usuarios")
     res.send(allUsers)
 }
 
@@ -14,22 +14,20 @@ export const login = async (req, res) => {
     
     const {login} = req.body
     const {password} = req.body
-    const user = await users.query('SELECT * FROM usuarios WHERE login = ?',
+    const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
     {
       replacements: [login],
       type: QueryTypes.SELECT
     }
   );
+ 
 
-
-
+if (user[0]) {
 if (!login || !password) {   
     res.status(400).send({
         status: false,
         message: "Email & password are requiered"
     });
-}else if(!user){
-    res.status(400).send('User does not exist')
 }
 
 const pwdsalt = password + user[0].salt
@@ -49,7 +47,7 @@ const verifyPass = (pwdsalt) => {
 
 if(verifyPass(pwdsalt) === user[0].password_hash){
 
-     res.status(201).send({
+     res.status(200).send({
         id: user[0].ID,
         username: user[0].login,
       
@@ -60,4 +58,15 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
         message: "Invalid credentials"
     })
 }
+}else {
+  
+    res.status(400).send('User does not exist')
+  
+}
+}
+
+export const getGerentes = async (req, res) => {
+    const allGerentes = await dbGiama.query("SELECT * FROM gerentes")
+    res.send(allGerentes)
+
 }
