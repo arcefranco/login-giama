@@ -39,7 +39,7 @@ const verifyPass = (pwdsalt) => {
     var sha256 = createHash("sha256");
     sha256.update(storedSaltBytes, "utf8");
     var result = sha256.digest("base64");
-    
+     
     return result
 
 }
@@ -47,9 +47,17 @@ const verifyPass = (pwdsalt) => {
 
 if(verifyPass(pwdsalt) === user[0].password_hash){
 
+    const roles = await dbGiama.query('SELECT rl_codigo FROM usuarios_has_roles WHERE us_login = ?',
+    {
+      replacements: [login],
+      type: QueryTypes.SELECT
+    }
+  );
+
      res.status(200).send({
         id: user[0].ID,
         username: user[0].login,
+        roles: roles
       
     })
 
