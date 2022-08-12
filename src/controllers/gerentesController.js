@@ -7,4 +7,4 @@ export const getGerentes = async (req, res) => {
     const allGerentes = await dbGiama.query("SELECT * FROM gerentes")
     res.send(allGerentes)
 
-}
+}  

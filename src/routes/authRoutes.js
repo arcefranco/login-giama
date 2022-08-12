@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { forgotPassword, resetPassword } from "../controllers/authController";
+import { verifyToken } from "../middlewares/verifyToken";
+import { forgotPassword, tokenStatus, updatePass} from "../controllers/authController";
+
 const AuthRouter = Router()
 
 AuthRouter.route('/forgot').post(forgotPassword)
-AuthRouter.route('/reset-password/:id/:token').get(resetPassword)
+AuthRouter.get('/tokenStatus/:id/:token', verifyToken, tokenStatus)
+AuthRouter.route('/updatePass').post(updatePass)
 
 export default AuthRouter
