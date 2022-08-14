@@ -6,7 +6,7 @@ const dbGiama = db.sequelize
 const JWT_SECRET = 'MY_SECRET'
 
 
-export const verifyToken = async (req, res, next) => {
+export const verifyToken = async (req, res, next) => { //Este middleware verifica el estado del token enviado a la ruta
     const {id, token} = req.params
     if(!id) {
       res.send('Invalid ID')

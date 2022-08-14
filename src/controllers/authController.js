@@ -1,60 +1,43 @@
 import db from "../database";
 const jwt = require('jsonwebtoken')
-const nodemailer = require('nodemailer')
+import { sendEmail } from "../helpers/email/sendEmail";
 import { createPass } from "../helpers/createPass";
 import { QueryTypes } from "sequelize";
+
 
 const dbGiama = db.sequelize
 const JWT_SECRET = 'MY_SECRET'
 
 export const forgotPassword = async (req, res) => {
- const {login} = req.body
+ const {login} = req.body //Tomo el nombre de usuario y lo busco en la DB
  const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
  {
    replacements: [login],
    type: QueryTypes.SELECT
  }
-);
-console.log(user) 
+); 
 if(user.length === 0){
     res.send({message: 'Usuario no registrado!'})
 }
+const userDb = user[0]
+const {emailtest, ID} = userDb
 
 const secret = JWT_SECRET + user[0].password_hash
 const payload = {
     email: user[0].emailtest,
     id: user[0].ID
 }
-const token = jwt.sign(payload, secret, {expiresIn: '3h'})
+const token = jwt.sign(payload, secret, {expiresIn: '3h'}) //Una vez que lo encuentro, genero el token
 
+sendEmail(emailtest, ID, token)
 
-const transporter = nodemailer.createTransport({
-  host: "mail.giama.com.ar",
-  port: 25, 
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: 'info@giama.com.ar',
-    pass: 'Q)9~X-?(5~,o' 
-  },
-  tls: {
-    secure: false,
-    ignoreTLS: true,
-    rejectUnauthorized: false 
-}
-});
-let info = await transporter.sendMail({ 
-  from: 'info@giama.com.ar', // sender address 
-  to: user[0].emailtest, // list of receivers
-  subject: "Forgot Password", // Subject line
-  html: '<p>Click <a href="http://localhost:3000/reset-password/' + user[0].ID + '/' + token + '">here</a> to reset your password</p>', // html body
-});
-res.send({message: `Te enviamos un correo a ${user[0].emailtest} para recuperar tu contraseña!`, username: user[0].login})
+res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contraseña!`, username: userDb.login})
 }
 
 
 
 
-export const tokenStatus = async (req, res) => {
+export const tokenStatus = async (req, res) => { //Para enviar el estado del token de recupero de contraseña al front
 
    try {
     res.send({
@@ -68,7 +51,7 @@ export const tokenStatus = async (req, res) => {
 
 }
 
-export const updatePass = async (req, res) => {
+export const updatePass = async (req, res) => { //Recibo su nueva contraseña y segun su id lo encuentro la DB 
 
   const {newPass, confirmPass, id} = req.body
   if(newPass !== confirmPass) {
@@ -79,7 +62,7 @@ export const updatePass = async (req, res) => {
   }
   const newPassResult = await createPass(id, newPass)
 
-  const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?',
+  const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?', //Es necesario preguntar dos veces si existe el usuario?
 {
   replacements: [id],
   type: QueryTypes.SELECT
@@ -88,7 +71,7 @@ export const updatePass = async (req, res) => {
 
 if(user.length) {
   
- await dbGiama.query('UPDATE usuarios SET password_hash = ? WHERE ID = ?',
+ await dbGiama.query('UPDATE usuarios SET password_hash = ? WHERE ID = ?', 
   {
     replacements: [newPassResult, id],
     type: QueryTypes.UPDATE

@@ -3,7 +3,8 @@ import { createHash } from "crypto";
 import { QueryTypes } from "sequelize";
 const dbGiama = db.sequelize
 
-export const createPass = async (id, password) => {
+export const createPass = async (id, password) => { //Esta funcion solo funciona para crear contraseña si el usuario ya tiene el salt 
+  //en la DB *Cambiar a createPassWithSalt
 
 
 const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?',
