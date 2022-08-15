@@ -1,5 +1,6 @@
 import db from "../database";
 import { createHash } from "crypto";
+const jwt = require('jsonwebtoken')
 import { QueryTypes } from "sequelize";
 
 
@@ -53,11 +54,15 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
       type: QueryTypes.SELECT
     }
   );
+  const token = jwt.sign({ id: user[0].ID}, 'JWT_SECRET', {
+    expiresIn: 86400, // 24 hours
+  });
 
      res.status(200).send({
         id: user[0].ID,
         username: user[0].login,
-        roles: roles
+        roles: roles,
+        token: token
       
     })
 
