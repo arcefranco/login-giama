@@ -55,10 +55,10 @@ export const updatePass = async (req, res) => { //Recibo su nueva contraseña y 
 
   const {newPass, confirmPass, id} = req.body
   if(newPass !== confirmPass) {
-    res.send({message: 'Passwords dont match', status: false})
+   return res.json({message: 'Las contraseñas no coinciden', status: false})
   }
   if(!id) {
-    res.send({message: 'Not user provided', status: false})  
+   return res.json({message: 'Not user provided', status: false})  
   }
   const newPassResult = await createPass(id, newPass)
 
@@ -77,9 +77,9 @@ if(user.length) {
     type: QueryTypes.UPDATE
   }
  ); 
- res.send({message: 'Password updated!', status: true})
+return res.send({message: 'Password updated!', status: true})
 }else{
-  res.send({message: 'User does not exist', status: false})
+return res.json({message: 'User does not exist', status: false})
 }
 
 }
