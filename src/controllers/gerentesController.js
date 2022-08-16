@@ -1,4 +1,4 @@
-import { QueryTypes } from "sequelize/types";
+import { QueryTypes } from "sequelize";
 import db from "../database";
 
 const dbGiama = db.sequelize
