@@ -1,3 +1,4 @@
+
 import sequelize from "sequelize";
 import { Sequelize, QueryTypes, DataTypes } from "sequelize";
 import db from "../database";
