@@ -87,3 +87,14 @@ export const getGerentes = async (req, res) => {
     res.send(allGerentes)
 
 }
+
+export const postGerentes = async (req, res, error) => {
+  const {gerentes} = req.body;
+  // const {}
+  const postGerente = await dbGiama.query("INSERT INTO gerentes (Nombre, Activo) VALUES (?)",
+  {
+      replacements: [gerentes],
+      type:QueryTypes.INSERT,
+  })
+  res.send(postGerente)
+}
