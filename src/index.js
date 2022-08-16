@@ -5,6 +5,7 @@ import morgan from "morgan";
 import UserRouter from "./routes/userRoutes";
 import GerentesRouter from './routes/gerentesRoutes'
 import resetRouter from "./routes/resetRoutes";
+const passport = require('passport')
 const app = express();
 db.sequelize; 
 
@@ -22,6 +23,7 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
     next();
   });
+app.use(passport.initialize());
 
 app.use('/login', UserRouter)
 app.use('/gerentes', GerentesRouter)

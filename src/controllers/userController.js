@@ -54,7 +54,11 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
       type: QueryTypes.SELECT
     }
   );
-  const token = jwt.sign({ id: user[0].ID}, 'JWT_SECRET', {
+  const payload = {
+    id: user[0].ID,
+    iat: Date.now()
+  }
+  const token = jwt.sign(payload, 'JWT_SECRET', {
     expiresIn: 86400, // 24 hours
   });
 
