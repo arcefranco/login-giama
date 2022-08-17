@@ -17,7 +17,7 @@ export const getUsuarioById = async (req, res) => {
    type: QueryTypes.SELECT
  }
 );
-res.send(usuarios)
+res.send(usuarios) 
 }
 
 export const getAllUsuarios = async (req, res) => {
@@ -30,29 +30,40 @@ export const getAllUsuarios = async (req, res) => {
  }
 
 export const createUsuario = async (req, res) => {
-    const {name, login, password, confirmPassword, Vendedor, Supervisor, 
+    let {Nombre, login, password, confirmPassword, Vendedor, Supervisor, 
         TeamLeader, Gerente, UsuarioAnura, us_activo, us_bloqueado, scoringAsignado, newUserBoolean, email } = req.body
 
+        if(!Nombre || !login || !password || !confirmPassword) {
+            return res.status(400).send({status: false, data: 'Faltan campos'})
+        }
+        if(password !== confirmPassword){
+            return res.status(400).send({status: false, data: 'Las contraseñas deben coincidir'})
+        }
         const pwdsalt = password + 'c06zYjccmk1Tc9knYunSN5fP6ytpwwoO+SDZZBT5ZqU='
 
         const storedSaltBytes = new Buffer.from(pwdsalt, 'utf-8');
         var sha256 = createHash("sha256");
         sha256.update(storedSaltBytes, "utf8");
         const passwordhash = sha256.digest("base64");
-
-
+        
+        UsuarioAnura = parseInt(UsuarioAnura)
+        TeamLeader = parseInt(TeamLeader.split(' ')[0])
+        Gerente = parseInt(Gerente.split(' ')[0])
+        Supervisor = parseInt(Supervisor.split(' ')[0])
+        Vendedor = parseInt(Vendedor.split(' ')[0])
 
     try {
        const newUser = await dbGiama.query("INSERT INTO usuarios (login, salt, password_hash, Nombre, CodigoVendedor, CodigoSucursal, CodigoTeamLeader, CodigoGerente, UsuarioAnura, us_activo, us_bloqueado, VerSoloScoringAsignado, emailtest, newuserBoolean) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", {
-            replacements: [login, "c06zYjccmk1Tc9knYunSN5fP6ytpwwoO+SDZZBT5ZqU=", passwordhash, name, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, newUserBoolean? newUserBoolean: 1],
+            replacements: [login, "c06zYjccmk1Tc9knYunSN5fP6ytpwwoO+SDZZBT5ZqU=", passwordhash, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, newUserBoolean? newUserBoolean: 1],
             type: QueryTypes.INSERT
           }
          );
-          res.send(newUser)
+         
+           return res.send({status: true, data: newUser}) 
         
     } catch (error) {
-        console.log(error)
-        res.status(400).send(error)
+        console.log('error en la DB: ', error)
+        return res.status(400).send({status: false, data: `error al insertar en base de datos: ${error}`})
     }
 }
 
