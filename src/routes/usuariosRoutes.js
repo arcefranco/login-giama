@@ -3,7 +3,7 @@ import { createUsuario, getAllTeamLeaders, getAllGerentes, getAllSupervisores, g
 
 const usuariosRoutes = Router()
 
-usuariosRoutes.route('/').get(getUsuarioById)
+usuariosRoutes.route('/id').post(getUsuarioById)
 usuariosRoutes.route('/todos').get(getAllUsuarios)
 usuariosRoutes.route('/').post(createUsuario)
 
