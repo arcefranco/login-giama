@@ -61,7 +61,7 @@ export const updatePass = async (req, res) => { //Recibo su nueva contraseña y 
    return res.json({message: 'Not user provided', status: false})  
   }
   const newPassResult = await createPass(id, newPass)
-
+  const {passHashed, newSalt} = newPassResult
   const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?', //Es necesario preguntar dos veces si existe el usuario?
 {
   replacements: [id],
@@ -71,9 +71,9 @@ export const updatePass = async (req, res) => { //Recibo su nueva contraseña y 
 
 if(user.length) {
   
- await dbGiama.query('UPDATE usuarios SET password_hash = ? WHERE ID = ?', 
+ await dbGiama.query('UPDATE usuarios SET password_hash = ?, salt = ? WHERE ID = ?', 
   {
-    replacements: [newPassResult, id],
+    replacements: [passHashed, newSalt, id],
     type: QueryTypes.UPDATE
   }
  ); 
