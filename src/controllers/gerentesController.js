@@ -12,15 +12,24 @@ export const getGerentes = async (req, res) => {
 }
 export const postGerentes = async (req, res, error) => {
      const {gerentes} = req.body;
-    // const {Nombre}  = req.body.Nombre;
-    // const {Activo} = req.body.Nombre;
+     console.log(req.body)
+    // const Nombre  = req.body.Nombre;
+    // const Activo = req.body.Activo;
     // const {}
-    const postGerente = await Gerente.create({
+try{    await Gerente.create({
         Nombre: req.body.Nombre, 
         Activo: req.body.Activo, 
-    })
-    res.send(postGerente)
-}
+    }),
+    res.json({
+        "message":"Gerente creado"
+    });
+    }catch(err){
+        console.log(err)
+    } }
+
+    
+    // res.send(postGerente, "Gerente creado en base de datos")
+   
 
 // export const postGerentes = async (req, res, error) => {
 //     const {gerentes} = req.body;
@@ -45,5 +54,23 @@ export const updateGerentes = async (req, res) => {
     res.send(updateGerentes)
 }
 
+export const deleteGerentes = async (req, res, error) => {
+    const {gerentes} = req.body;
+    console.log(req.body)
+   // const Nombre  = req.body.Nombre;
+   // const Activo = req.body.Activo;
+   // const {}
+try{    await Gerente.destroy({
+      where: {Codigo: req.body.Codigo,} 
+        
+   }),
+   res.json({
+       "message":"Gerente borrado"
+   });
+   }catch(err){
+       console.log(err)
+   } }
 
+   
+ 
  
