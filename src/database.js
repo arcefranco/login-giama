@@ -11,7 +11,7 @@ sequelize.authenticate().then(() => {
 .catch(err => {
     console.log('DB ERROR: ', err)
 })
-
+ 
 const db = {}
 
 db.Sequelize = Sequelize
