@@ -88,32 +88,33 @@ export const updateUsuario = async (req, res) => {
                  replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
                  type: QueryTypes.UPDATE
                }
-              );
+              ); 
               
                 return res.send({status: true, data: 'Usuario actualizado correctamente!'}) 
              
          } catch (error) {
              console.log('error en la DB: ', error)
-             return res.status(400).send({status: false, data: `error al insertar en base de datos: ${error}`})
+             return res.status(400).send({status: false, data: 'error en la DB, probablemente el nombre de usuario esté en uso'})
          }
 }
 
 export const deleteUsuario = async(req, res) => {
-    const {id} = req.body.id 
+    console.log('body', req.body)
+    const {id} = req.body.Codigo 
     if(!id){
-       return res.status(400).send({status: false, message: 'Ningun id provisto'})
+       return res.status(400).send({status: false, data: 'Ningun id provisto'})
     }
 
     try {
         await dbGiama.query("DELETE FROM usuarios WHERE ID = ?", {
             replacements: [id],
             type: QueryTypes.DELETE
-            
+             
         })
-       return res.send({status: true, message: 'Usuario eliminado correctamente'})
+       return res.send({status: true, data: 'Usuario eliminado correctamente'})
     } catch (error) {
-       return res.status(400).send({status: false, message: `error al eliminar en base de datos: ${error}` })
-    }
+       return res.status(400).send({status: false, data: `error al eliminar en base de datos: ${error}` })
+    } 
 }
 
 export const getAllVendedores = async (req, res) => {
