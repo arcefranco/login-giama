@@ -99,6 +99,26 @@ export const deleteGerentes = async (req, res, error) => {
         }
 }
 
+<<<<<<< HEAD
+=======
+export const deleteGerentes = async (req, res, error) => {
+    const {gerentes} = req.body;
+    console.log(req.body)
+   // const Nombre  = req.body.Nombre;
+   // const Activo = req.body.Activo;
+   // const {}
+try{    await Gerente.destroy({
+      where: {Codigo: req.body.Codigo,} 
+        
+   }),
+   res.json({
+       "message":"Gerente borrado"
+   });
+   }catch(err){
+       console.log(err)
+   } }
+
+>>>>>>> 34f216f31a06654ae63beea65309cb56a56ab077
    
  
  

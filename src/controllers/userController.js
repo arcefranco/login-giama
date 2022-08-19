@@ -30,10 +30,16 @@ if (!login || !password) {
         message: "Email & password are requiered"
     });
 }
-
+if(user[0].newuserBoolean === 1) {
+  return res.send({
+    newUser: true,
+    message: 'Tenes que actualizar tu contraseña'
+  })
+}
 const pwdsalt = password + user[0].salt
 
 
+   
 const verifyPass = (pwdsalt) => {
     
     const storedSaltBytes = new Buffer.from(pwdsalt, 'utf-8');
@@ -45,9 +51,10 @@ const verifyPass = (pwdsalt) => {
 
 }
 
+console.log(verifyPass(pwdsalt))
 
 if(verifyPass(pwdsalt) === user[0].password_hash){
-
+ console.log('something with roles')
     const roles = await dbGiama.query('SELECT rl_codigo FROM usuarios_has_roles WHERE us_login = ?',
     {
       replacements: [login],
@@ -65,6 +72,7 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
      res.status(200).send({
         id: user[0].ID,
         username: user[0].login,
+        newUser: user[0].newuserBoolean,
         roles: roles,
         token: token
       
