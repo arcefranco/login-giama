@@ -5,7 +5,10 @@ const sequelize = new Sequelize('pa7', 'franco', 'password',{
 });
 
  const  Gerente = sequelize.define('gerentes', {
-       Nombre: {
+        Codigo: {
+            type:DataTypes.STRING,
+        },
+        Nombre: {
            type:DataTypes.STRING,
            allowNull:false
        },
