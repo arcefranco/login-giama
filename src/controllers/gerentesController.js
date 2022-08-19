@@ -38,31 +38,7 @@ try{    await Gerente.create({
     } }
 
     
-    // res.send(postGerente, "Gerente creado en base de datos")
-   
-
-// export const postGerentes = async (req, res, error) => {
-//     const {gerentes} = req.body;
-//     const {Nombre}  = req.body.Nombre;
-//     const {Activo} = req.body.Activo;
-//     // const {}
-//     const postGerente = await dbGiama.query("INSERT INTO gerentes (Nombre, Activo) VALUES (Nombre = ?, Activo = ?)",
-//     {
-//         replacements: [Nombre, Activo],
-//         type:QueryTypes.INSERT,
-//     })
-//     res.send(postGerente)
-// }
-
-// export const updateGerentes = async (req, res) => {
-//     const {gerentes} = req.body;
-//     const updateGerentes = await dbGiama.query("UPDATE gerentes (Codigo, Nombre, Activo) SET ?",
-//     {
-//         replacements: [gerentes],
-//         type:QueryTypes.UPDATE,
-//     })
-//     res.send(updateGerentes)
-// }
+ 
 export const updateGerentes = async (req, res) => {
     const gerentes = req.body;
     console.log(gerentes)
@@ -99,26 +75,8 @@ export const deleteGerentes = async (req, res, error) => {
         }
 }
 
-<<<<<<< HEAD
-=======
-export const deleteGerentes = async (req, res, error) => {
-    const {gerentes} = req.body;
-    console.log(req.body)
-   // const Nombre  = req.body.Nombre;
-   // const Activo = req.body.Activo;
-   // const {}
-try{    await Gerente.destroy({
-      where: {Codigo: req.body.Codigo,} 
-        
-   }),
-   res.json({
-       "message":"Gerente borrado"
-   });
-   }catch(err){
-       console.log(err)
-   } }
 
->>>>>>> 34f216f31a06654ae63beea65309cb56a56ab077
+
    
  
  
