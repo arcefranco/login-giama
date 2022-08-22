@@ -9,7 +9,7 @@ const JWT_SECRET = 'MY_SECRET'
 export const verifyToken = async (req, res, next) => { //Este middleware verifica el estado del token enviado a la ruta
     const {id, token} = req.params
     if(!id) {
-      res.send('Invalid ID')
+      return res.send('Invalid ID')
   }
   const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?',
   {
@@ -26,6 +26,6 @@ export const verifyToken = async (req, res, next) => { //Este middleware verific
   
    } catch (error) {
     console.log(error)
-    res.send({status: false})
+    return res.send({status: false})
    } 
   }
