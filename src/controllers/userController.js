@@ -51,7 +51,6 @@ const verifyPass = (pwdsalt) => {
 
 }
 
-console.log(verifyPass(pwdsalt))
 
 if(verifyPass(pwdsalt) === user[0].password_hash){
  console.log('something with roles')
@@ -69,12 +68,14 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
     expiresIn: 86400, // 24 hours
   });
 
+
      res.status(200).send({
         id: user[0].ID,
         username: user[0].login,
         newUser: user[0].newuserBoolean,
         roles: roles,
-        token: token
+        token: token,
+
       
     })
 

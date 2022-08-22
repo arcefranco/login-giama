@@ -17,7 +17,7 @@ export const forgotPassword = async (req, res) => {
  }
 ); 
 if(user.length === 0){
-    res.send({message: 'Usuario no registrado!'})
+    return res.send({message: 'Usuario no registrado!'})
 }
 const userDb = user[0]
 const {emailtest, ID} = userDb
@@ -31,7 +31,7 @@ const token = jwt.sign(payload, secret, {expiresIn: '3h'}) //Una vez que lo encu
 
 sendEmail(emailtest, ID, token)
 
-res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contraseña!`, username: userDb.login})
+return res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contraseña!`, username: userDb.login})
 }
 
 

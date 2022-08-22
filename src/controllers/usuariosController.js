@@ -44,7 +44,7 @@ export const createUsuario = async (req, res) => {
         const passAndSalt = createPass(password)
         const {passHashed, newSalt} = passAndSalt
         
-        
+         
         UsuarioAnura && typeof(UsuarioAnura) === 'string' ? UsuarioAnura = parseInt(UsuarioAnura) : UsuarioAnura = UsuarioAnura
         TeamLeader && typeof(TeamLeader) === 'string'  ? TeamLeader = parseInt(TeamLeader.split(' ')[0]) : TeamLeader = TeamLeader
         Gerente  && typeof(Gerente) === 'string' ? Gerente = parseInt(Gerente.split(' ')[0]) : Gerente = Gerente
