@@ -39,7 +39,7 @@ if(user[0].newuserBoolean === 1) {
 const pwdsalt = password + user[0].salt
 
 
-   
+
 const verifyPass = (pwdsalt) => {
     
     const storedSaltBytes = new Buffer.from(pwdsalt, 'utf-8');
@@ -71,6 +71,7 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
 
      res.status(200).send({
         id: user[0].ID,
+        Nombre:user[0].Nombre,
         username: user[0].login,
         newUser: user[0].newuserBoolean,
         roles: roles,
