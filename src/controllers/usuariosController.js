@@ -33,6 +33,23 @@ export const getAllUsuarios = async (req, res) => {
 export const createUsuario = async (req, res) => {
     let {Nombre, Usuario, password, confirmPassword, Vendedor, Supervisor, 
         TeamLeader, Gerente, UsuarioAnura, us_activo, us_bloqueado, scoringAsignado, newUserBoolean, email } = req.body
+     const {user} = req.usuario
+        try {
+            const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+                replacements: [user],
+                type: QueryTypes.SELECT
+
+            })
+            console.log('roles: ', roles)
+            const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3.1')
+            if(!finded){
+                return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(400).send({status: false, data: error})
+        } 
+        
 
         if(!Nombre || !Usuario || !password || !confirmPassword) {
             return res.status(400).send({status: false, data: 'Faltan campos'})
@@ -69,7 +86,23 @@ export const createUsuario = async (req, res) => {
 export const updateUsuario = async (req, res) => {
     let {ID, Nombre, Usuario, Vendedor, Supervisor, 
         TeamLeader, Gerente, UsuarioAnura, us_activo, us_bloqueado, scoringAsignado, newUserBoolean, email } = req.body
+        
+        const {user} = req.usuario
+        try {
+            const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+                replacements: [user],
+                type: QueryTypes.SELECT
 
+            })
+            console.log('roles: ', roles)
+            const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3.2')
+            if(!finded){
+                return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(400).send({status: false, data: error})
+        } 
         if(!ID) {
             return res.status(400).send({status: false, data: 'sin provisto de ID'})
         }
@@ -104,6 +137,22 @@ export const deleteUsuario = async(req, res) => {
     if(!id){
        return res.status(400).send({status: false, data: 'Ningun id provisto'})
     }
+    const {user} = req.usuario
+    try {
+        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+            replacements: [user],
+            type: QueryTypes.SELECT
+
+        })
+        console.log('roles: ', roles)
+        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3')
+        if(!finded){
+            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({status: false, data: error})
+    } 
 
     try {
         await dbGiama.query("DELETE FROM usuarios WHERE ID = ?", {
@@ -123,7 +172,7 @@ res.send(result[0])
 }
 export const getAllGerentes = async (req, res) => {
     const result = await dbGiama.query("SELECT Codigo, Nombre from gerentes")
-res.send(result[0])
+    res.send(result[0])
 }
 export const getAllSupervisores = async (req, res) => {
     const result = await dbGiama.query("SELECT Codigo, Nombre from sucursales")
