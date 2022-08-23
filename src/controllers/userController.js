@@ -25,7 +25,7 @@ export const login = async (req, res) => {
 
 if (user[0]) {
 if (!login || !password) {   
-    res.status(400).send({
+    return res.status(400).send({
         status: false,
         message: "Email & password are requiered"
     });
@@ -59,9 +59,10 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
       replacements: [login],
       type: QueryTypes.SELECT
     }
-  );
+  ); 
   const payload = {
     id: user[0].ID,
+    user: user[0].login,
     iat: Date.now()
   }
   const token = jwt.sign(payload, 'JWT_SECRET', {
