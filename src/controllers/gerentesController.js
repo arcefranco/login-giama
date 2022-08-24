@@ -7,7 +7,7 @@ const dbGiama = db.sequelize
 
 
 export const getGerentes = async (req, res) => {
-    const allGerentes = await dbGiama.query("SELECT * FROM gerentes")
+    const allGerentes = await dbGiama.query("SELECT Codigo, Nombre, Activo FROM gerentes")
     res.send(allGerentes)
 }
 export const getGerentesById = async (req, res) => {
