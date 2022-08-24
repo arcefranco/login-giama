@@ -6,6 +6,7 @@ import UserRouter from "./routes/userRoutes";
 import GerentesRouter from './routes/gerentesRoutes'
 import resetRouter from "./routes/resetRoutes";
 import usuariosRoutes from "./routes/usuariosRoutes";
+import supervisoresRoutes from "./routes/supervisoresRoutes";
 const passport = require('passport')
 const app = express();
 db.sequelize; 
@@ -30,6 +31,7 @@ app.use('/login', UserRouter)
 app.use('/gerentes', GerentesRouter)
 app.use('/reset', resetRouter)
 app.use('/usuarios', usuariosRoutes)
+app.use('/supervisores', supervisoresRoutes)
 
 app.listen(3001, () => {
     console.log(`Our app is running on port 3001`);
