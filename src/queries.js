@@ -10,3 +10,8 @@ AND rl_codigo NOT LIKE '1.2.7%'`
 export var queryMora = `SELECT * FROM roles WHERE rl_codigo LIKE '1.4.%' AND rl_codigo NOT LIKE '1.4.1.%' 
 AND rl_codigo NOT LIKE '1.4.13%' AND rl_codigo NOT LIKE '1.4.9%' AND rl_codigo NOT LIKE '1.4.1'  
 AND rl_codigo NOT LIKE '1.4.10' AND rl_codigo NOT LIKE '1.4.10.%'`
+
+export var queryReportes = `SELECT * FROM roles WHERE rl_codigo LIKE '1.10.%' AND rl_codigo NOT LIKE '1.10.1%'
+AND rl_codigo NOT LIKE '1.10.2%' AND rl_codigo NOT LIKE '1.10.3%' AND rl_codigo NOT LIKE '1.10.4%'
+AND rl_codigo NOT LIKE '1.10.5%' AND rl_codigo NOT LIKE '1.10.6%' AND rl_codigo NOT LIKE '1.10.7%'
+AND rl_codigo NOT LIKE '1.10.8%';`
