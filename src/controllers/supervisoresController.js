@@ -26,7 +26,7 @@ export const getSupervisoresById = async (req, res) => {
 
 export const postSupervisores = async (req, res, error) => {
     console.log(req.body) 
-    let {Nombre, Email, Gerente, Inactivo:Activo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
+    let {Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
     
      
     // const Nombre  = req.body.Nombre;
@@ -34,7 +34,7 @@ export const postSupervisores = async (req, res, error) => {
     // const {}
 try{  
     await dbGiama.query("INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona) VALUES (?,?,?,?,?,?,?) ", {
-        replacements: [Nombre, Email, Gerente? Gerente: null, Activo? 1: 0, EsMiniEmprendedor, ValorPromedioMovil, Zona ],
+        replacements: [Nombre, Email, Gerente , Inactivo? 0: 1, EsMiniEmprendedor? 1 :0, ValorPromedioMovil, Zona ],
         type: QueryTypes.INSERT
       }),
     
@@ -49,16 +49,16 @@ try{
  
 export const updateSupervisores = async (req, res) => {
     console.log(req.body) 
-    let {Codigo, Nombre, Email, Gerente, Inactivo:Activo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
+    let {Codigo, Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
 try{  
     await dbGiama.query("UPDATE sucursales SET Nombre = ?, Email = ?, Gerente = ?, Inactivo = ?, EsMiniEmprendedor = ?, ValorPromedioMovil = ?, Zona = ? WHERE Codigo = ? ", {
-        replacements: [Nombre, Email, Gerente? Gerente: null, Activo? 1: 0, EsMiniEmprendedor, ValorPromedioMovil, Zona, Codigo ],
+        replacements: [Nombre, Email, Gerente? Gerente: null, Inactivo? 0: 1, EsMiniEmprendedor? 1:0, ValorPromedioMovil, Zona, Codigo ],
         type: QueryTypes.UPDATE
       }),
     res.json({
         "message":"Supervisor Modificado",
-        Nombre: supervisor.Nombre,
-        Activo: supervisor.Activo
+        Nombre: Nombre,
+        Activo: Activo
             })
         
     }
