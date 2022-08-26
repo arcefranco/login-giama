@@ -5,7 +5,7 @@ const hbs = require('nodemailer-express-handlebars');
 
 
 export const transporter = nodemailer.createTransport({ //Credenciales para enviar mail 
-    host: process.env.MAIL_HOST, //faltan .ENV
+    host: process.env.MAIL_HOST, 
     port: 25, 
     secure: false, // true for 465, false for other ports
     auth: {

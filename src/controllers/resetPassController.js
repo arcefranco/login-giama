@@ -1,7 +1,7 @@
 import db from "../database";
 const jwt = require('jsonwebtoken')
 import { sendEmail } from "../helpers/email/sendEmail";
-import { createPass } from "../helpers/createPass";
+import { createPass } from "../helpers/passwords/createPass";
 import { QueryTypes } from "sequelize";
 require('dotenv').config()
 
@@ -62,7 +62,7 @@ export const updatePass = async (req, res) => { //Recibo su nueva contraseña y 
   }
   const newPassResult = createPass(newPass)
   const {passHashed, newSalt} = newPassResult
-  const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?', //Es necesario preguntar dos veces si existe el usuario?
+  const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?', 
 {
   replacements: [id],
   type: QueryTypes.SELECT

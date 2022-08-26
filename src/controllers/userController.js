@@ -1,5 +1,5 @@
 import db from "../database";
-import { createHash } from "crypto";
+import { verifyPass } from "../helpers/passwords/verifyPass";
 const jwt = require('jsonwebtoken')
 import { QueryTypes } from "sequelize";
 
@@ -16,6 +16,7 @@ export const login = async (req, res) => {
     const {login} = req.body
     const {password} = req.body
     const {empresa} = req.body
+    
     const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
     {
       replacements: [login],
@@ -41,16 +42,6 @@ const pwdsalt = password + user[0].salt
 
 
 
-const verifyPass = (pwdsalt) => {
-    
-    const storedSaltBytes = new Buffer.from(pwdsalt, 'utf-8');
-    var sha256 = createHash("sha256");
-    sha256.update(storedSaltBytes, "utf8");
-    var result = sha256.digest("base64");
-     
-    return result
-
-}
 
 
 if(verifyPass(pwdsalt) === user[0].password_hash){
@@ -66,7 +57,7 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
     user: user[0].login,
     iat: Date.now()
   }
-  const token = jwt.sign(payload, 'JWT_SECRET', {
+  const token = jwt.sign(payload, process.env.SECRET, {
     expiresIn: 86400, // 24 hours
   });
 
