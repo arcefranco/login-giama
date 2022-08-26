@@ -5,12 +5,12 @@ const hbs = require('nodemailer-express-handlebars');
 
 
 export const transporter = nodemailer.createTransport({ //Credenciales para enviar mail 
-    host: "mail.giama.com.ar", //faltan .ENV
+    host: process.env.MAIL_HOST, //faltan .ENV
     port: 25, 
     secure: false, // true for 465, false for other ports
     auth: {
-      user: 'info@giama.com.ar',
-      pass: 'Q)9~X-?(5~,o' 
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS 
     },
     tls: {
       secure: false,

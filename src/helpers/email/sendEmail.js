@@ -1,4 +1,5 @@
 import { transporter } from "./transporter";
+require('dotenv').config()
 
 
 export const sendEmail = async(email, id, token) => { //faltan .ENV
@@ -9,7 +10,7 @@ try {
     subject: "Forgot Password",
     template: 'index',
     context: {
-      text: 'http://localhost:3000/reset-password/' + id + '/' + token + '', // html body
+      text: process.env.HOST + '/reset-password/' + id + '/' + token + '', // html body
     } , 
   /*   html: '<p>Click <a href="http://localhost:3000/reset-password/' + id + '/' + token + '">here</a> to reset your password</p>', // html body */
   });
