@@ -29,12 +29,12 @@ export const postSupervisores = async (req, res, error) => {
     let {Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
     
      
-    // const Nombre  = req.body.Nombre;
-    // const Activo = req.body.Activo;
-    // const {}
+    if(!Nombre || !Email || !Gerente || !ValorPromedioMovil || !Gerente) {
+        return res.status(400).send({status: false, data: 'Faltan campos'})
+    }
 try{  
     await dbGiama.query("INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona) VALUES (?,?,?,?,?,?,?) ", {
-        replacements: [Nombre, Email, Gerente , Inactivo? 0: 1, EsMiniEmprendedor? 1 :0, ValorPromedioMovil, Zona ],
+        replacements: [Nombre, Email, Gerente  , Inactivo? 0: 1, EsMiniEmprendedor? 1 :0, ValorPromedioMovil? ValorPromedioMovil: null, Zona ],
         type: QueryTypes.INSERT
       }),
     
