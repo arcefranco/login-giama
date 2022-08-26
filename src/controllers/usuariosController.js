@@ -1,7 +1,7 @@
 import { QueryTypes } from "sequelize";
 import db from "../database";
 import { createHash } from "crypto";
-import { createPass } from "../helpers/createPass";
+import { createPass } from "../helpers/passwords/createPass";
 
 const dbGiama = db.sequelize
 
