@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+require('dotenv').config()
 
 module.exports = async (req, res, next) => {
 
@@ -12,7 +12,7 @@ module.exports = async (req, res, next) => {
    }
 
    try {
-      const decoded = jwt.verify(token, 'JWT_SECRET');
+      const decoded = jwt.verify(token, process.env.SECRET);
       req.usuario = decoded
       next(); 
 

@@ -1,8 +1,9 @@
 import {Sequelize, DataTypes} from 'sequelize'
-const sequelize = new Sequelize('pa7', 'franco', 'password',{
-    host: 'giama-db-t3.cojfgn4yxtap.us-west-2.rds.amazonaws.com',
-    dialect: 'mysql'
-});
+require('dotenv').config()
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT
+})
 
  const  Gerente = sequelize.define('gerentes', {
         Codigo: {

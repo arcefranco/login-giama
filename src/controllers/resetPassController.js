@@ -3,10 +3,10 @@ const jwt = require('jsonwebtoken')
 import { sendEmail } from "../helpers/email/sendEmail";
 import { createPass } from "../helpers/createPass";
 import { QueryTypes } from "sequelize";
-
+require('dotenv').config()
 
 const dbGiama = db.sequelize
-const JWT_SECRET = 'MY_SECRET'
+
 
 export const forgotPassword = async (req, res) => {
  const {login} = req.body //Tomo el nombre de usuario y lo busco en la DB
@@ -22,7 +22,7 @@ if(user.length === 0){
 const userDb = user[0]
 const {emailtest, ID} = userDb
 
-const secret = JWT_SECRET + user[0].password_hash
+const secret = process.env.RESET_SECRET + user[0].password_hash
 const payload = {
     email: user[0].emailtest,
     id: user[0].ID
