@@ -1,24 +1,28 @@
 import sequelize from "sequelize";
 import { Sequelize, QueryTypes, DataTypes } from "sequelize";
 import {app} from '../index'
-import db from "../database";
 import Gerente from '../models/gerentesModel'
+import db from "../database";
+
 
 
 
 
 export const getGerentes = async (req, res) => {
     const dbGiama = app.get('db')
+    
     const allGerentes = await dbGiama.query("SELECT Codigo, Nombre, Activo FROM gerentes")
     res.send(allGerentes)
 }
 export const getGerentesById = async (req, res) => {
     const gerentes = req.body
+    const dbGiama = app.get('db').models.gerentes
     console.log(gerentes)
-    const allGerentesById = await Gerente.findAll(
+    const allGerentesById = await dbGiama.findAll(
         {
         where:{Codigo:gerentes.Codigo}
-    }) 
+    })
+    console.log(allGerentesById)
     res.send(allGerentesById)
 }
 
@@ -44,7 +48,7 @@ try{    await Gerente.create({
 export const updateGerentes = async (req, res) => {
     const gerentes = req.body;
     console.log(gerentes)
-    try{ await Gerente.update(
+    try{ await Gerente?.update(
     {
         Nombre: gerentes.Nombre,
         Activo: gerentes.Activo
@@ -66,7 +70,7 @@ export const updateGerentes = async (req, res) => {
 export const deleteGerentes = async (req, res, error) => {
     const gerentes = req.body;
     console.log(gerentes)
-    try{await Gerente.destroy({
+    try{await Gerente?.destroy({
         where: {Codigo: gerentes.id.Codigo} 
         }),
         res.json({
