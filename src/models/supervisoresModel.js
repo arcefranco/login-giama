@@ -5,6 +5,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, pr
     dialect: process.env.DB_DIALECT
 })
 
+
  const  Supervisor = sequelize.define('sucursales', {
         Codigo: {
             type:DataTypes.STRING,
