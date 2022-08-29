@@ -6,8 +6,7 @@ require('dotenv').config()
 function connection (req, res, next){
 const {empresa} = req.body
 if(app.get('db')){
-    console.log('entro al if como si lo tuviera y db es: ', app.get('db'))
-    next();
+    app.disable('db')
 }
 
 const sequelize = new Sequelize(empresa, process.env.DB_USERNAME, process.env.DB_PASSWORD,{
