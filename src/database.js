@@ -1,5 +1,4 @@
-import {Sequelize} from "sequelize";
-import {  DataTypes } from "sequelize";
+import {Sequelize,  DataTypes } from "sequelize";
 import {app} from "./index"
 require('dotenv').config()
 
