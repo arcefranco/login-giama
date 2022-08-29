@@ -17,7 +17,7 @@ export const login = async (req, res) => {
     const {login} = req.body
     const {password} = req.body
     
-    const user = await req.db.query('SELECT * FROM usuarios WHERE login = ?',
+    const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
     {
       replacements: [login],
       type: QueryTypes.SELECT
@@ -74,7 +74,6 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
     })
 
 }else{
-  app.disable('db')
    return res.status(400).send({
         message: "Invalid credentials"
     })
