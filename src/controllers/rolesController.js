@@ -257,6 +257,7 @@ export const getRoles = async (req, res) => {
 
 export const getUserRoles = async (req, res) => {
     const {user} = req.body
+    const dbGiama = app.get('db')
     if(!user){
         return res.send('No user provided')
     }else{
@@ -275,6 +276,7 @@ export const getUserRoles = async (req, res) => {
 
 export const addRol = async (req, res) => {
     const {rol, Usuario} = req.body
+    const dbGiama = app.get('db')
     if(!rol || !Usuario){
         return res.send('Faltan datos')
     }else{
@@ -292,6 +294,7 @@ export const addRol = async (req, res) => {
 }
 export const deleteRol = async (req, res) => {
     const dbGiama = app.get('db')
+    
     const {rol, Usuario} = req.body
     if(!rol || !Usuario){
         return res.send('Faltan datos')
