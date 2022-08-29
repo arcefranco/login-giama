@@ -1,12 +1,14 @@
 import sequelize from "sequelize";
 import { Sequelize, QueryTypes, DataTypes } from "sequelize";
+import {app} from '../index'
 import db from "../database";
 import Gerente from '../models/gerentesModel'
 
-const dbGiama = db.sequelize
+
 
 
 export const getGerentes = async (req, res) => {
+    const dbGiama = app.get('db')
     const allGerentes = await dbGiama.query("SELECT Codigo, Nombre, Activo FROM gerentes")
     res.send(allGerentes)
 }
@@ -16,7 +18,7 @@ export const getGerentesById = async (req, res) => {
     const allGerentesById = await Gerente.findAll(
         {
         where:{Codigo:gerentes.Codigo}
-    })
+    }) 
     res.send(allGerentesById)
 }
 

@@ -1,7 +1,7 @@
 import express from "express";
-import  db  from "./database";
 import cors from 'cors'
 import morgan from "morgan";
+import connection from "./database";
 import UserRouter from "./routes/userRoutes";
 import GerentesRouter from './routes/gerentesRoutes'
 import resetRouter from "./routes/resetRoutes";
@@ -12,8 +12,8 @@ import RolesRouter from "./routes/rolesRoutes";
 import supervisoresRoutes from "./routes/supervisoresRoutes";
 
 const passport = require('passport')
-const app = express();
-db.sequelize; 
+export const app = express();
+
 
 
 
@@ -44,4 +44,5 @@ app.listen(process.env.PORT, () => {
 
     console.log(`Our app is running on port 3001`);
 });
+
 

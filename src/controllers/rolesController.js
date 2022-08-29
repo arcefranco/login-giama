@@ -1,11 +1,13 @@
-import db from "../database";
+
+import {app} from '../index'
 import { QueryTypes } from "sequelize";
 import { queryMora, queryOperaciones, queryReportes} from "../queries";
 
 
-const dbGiama = db.sequelize
+
 
 export const getRoles = async (req, res) => {
+    const dbGiama = app.get('db')
     console.log('el body', req.body)
     const {rol} = req.body
     if(!rol){
@@ -289,6 +291,7 @@ export const addRol = async (req, res) => {
     }
 }
 export const deleteRol = async (req, res) => {
+    const dbGiama = app.get('db')
     const {rol, Usuario} = req.body
     if(!rol || !Usuario){
         return res.send('Faltan datos')
@@ -307,6 +310,7 @@ export const deleteRol = async (req, res) => {
 }
 
 export const copyRoles = async (req, res) => {
+    const dbGiama = app.get('db')
     const {userFrom, userTo} = req.body
     if(!userFrom || !userTo){
         return res.send('Faltan datos')

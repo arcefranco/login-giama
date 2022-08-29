@@ -1,16 +1,17 @@
-import sequelize from "sequelize";
 import { Sequelize, QueryTypes, DataTypes } from "sequelize";
-import db from "../database";
+import {app} from '../index'
 import Supervisor from '../models/supervisoresModel'
 
-const dbGiama = db.sequelize
+
 
 
 export const getSupervisores = async (req, res) => {
+    const dbGiama = app.get('db')
     const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo`  ")
     res.send(allSupervisores)
 }
 export const getSupervisoresById = async (req, res) => {
+    const dbGiama = app.get('db')
     const supervisores = req.body
     console.log(supervisores)
     const allSupervisoresById = await  dbGiama
@@ -25,6 +26,7 @@ export const getSupervisoresById = async (req, res) => {
 }
 
 export const postSupervisores = async (req, res, error) => {
+    const dbGiama = app.get('db')
     console.log(req.body) 
     let {Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
     
@@ -48,6 +50,7 @@ try{
     
  
 export const updateSupervisores = async (req, res) => {
+    const dbGiama = app.get('db')
     console.log(req.body) 
     let {Codigo, Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
 try{  
@@ -67,6 +70,7 @@ try{
     }
 }
 export const deleteSupervisores = async (req, res, error) => {
+
     const supervisor = req.body;
     console.log(supervisor)
     try{await Supervisor.destroy({
@@ -82,6 +86,7 @@ export const deleteSupervisores = async (req, res, error) => {
 
 
 export const getAllZonas = async (req, res) => {
+    const dbGiama = app.get('db')
     const result = await dbGiama.query("SELECT * from zonas")
     res.send(result)
 }

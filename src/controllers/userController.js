@@ -1,32 +1,33 @@
-import db from "../database";
+import {app} from '../index'
 import { verifyPass } from "../helpers/passwords/verifyPass";
 const jwt = require('jsonwebtoken')
 import { QueryTypes } from "sequelize";
 
 
-const dbGiama = db.sequelize
+
 
 export const getAllUsers = async (req, res) => {
+  const dbGiama = app.get('db')
     const allUsers = await dbGiama.query("SELECT * FROM usuarios")
-    res.send(allUsers)
-}
+    return res.send(allUsers)
+} 
 
 export const login = async (req, res) => {
     
     const {login} = req.body
     const {password} = req.body
-    const {empresa} = req.body
     
-    const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
+    const user = await req.db.query('SELECT * FROM usuarios WHERE login = ?',
     {
       replacements: [login],
       type: QueryTypes.SELECT
     }
-  );
+  ); 
  
 
 if (user[0]) {
-if (!login || !password) {   
+if (!login || !password) {
+  app.disable('db')   
     return res.status(400).send({
         status: false,
         message: "Email & password are requiered"
@@ -45,8 +46,7 @@ const pwdsalt = password + user[0].salt
 
 
 if(verifyPass(pwdsalt) === user[0].password_hash){
- console.log('something with roles')
-    const roles = await dbGiama.query('SELECT rl_codigo FROM usuarios_has_roles WHERE us_login = ?',
+    const roles = await req.db.query('SELECT rl_codigo FROM usuarios_has_roles WHERE us_login = ?',
     {
       replacements: [login],
       type: QueryTypes.SELECT
@@ -62,43 +62,33 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
   });
 
 
-     res.status(200).send({
+     return res.status(200).send({
         id: user[0].ID,
         Nombre:user[0].Nombre,
         username: user[0].login,
         newUser: user[0].newuserBoolean,
         roles: roles,
-        token: token,
-        empresa: empresa
+        token: token
 
       
     })
 
 }else{
-    res.status(400).send({
+  app.disable('db')
+   return res.status(400).send({
         message: "Invalid credentials"
     })
 }
 }else {
+  app.disable('db')
+   return res.status(400).send('User does not exist')
   
-    res.status(400).send('User does not exist')
-  
 }
 }
 
-export const getGerentes = async (req, res) => {
-    const allGerentes = await dbGiama.query("SELECT * FROM gerentes")
-    res.send(allGerentes)
-
+export const logout = (req, res) => {
+  app.disable('db')
+  console.log(app.get('db'))
+  res.send('LOGOUT OK!')
 }
 
-export const postGerentes = async (req, res, error) => {
-  const {gerentes} = req.body;
-  // const {}
-  const postGerente = await dbGiama.query("INSERT INTO gerentes (Nombre, Activo) VALUES (?)",
-  {
-      replacements: [gerentes],
-      type:QueryTypes.INSERT,
-  })
-  res.send(postGerente)
-}
