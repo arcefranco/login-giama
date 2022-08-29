@@ -57,7 +57,7 @@ export const getRoles = async (req, res) => {
         } catch (error) {
             console.log(error)
             return res.send(error)
-        }  
+        }     
     }else if(rol === 'personal'){
         try {
             const roles = await dbGiama.query(`SELECT * FROM roles WHERE rl_codigo LIKE '1.6.%' AND rl_codigo 
@@ -314,11 +314,19 @@ export const deleteRol = async (req, res) => {
 
 export const copyRoles = async (req, res) => {
     const dbGiama = app.get('db')
-    const {userFrom, userTo} = req.body
+    const {userFrom, userTo} = req.body 
     if(!userFrom || !userTo){
         return res.send('Faltan datos')
     }else{
         try {
+            const userHasRoles = await dbGiama.query(`SELECT * FROM usuarios_has_roles WHERE us_login = ?`,{
+                replacements: [userTo],
+                type: QueryTypes.SELECT
+            })
+            if(userHasRoles.length){
+
+                return res.send({message: 'Esta seguro que desea sobreescribir los roles?', status: true})
+            }
             await dbGiama.query(`INSERT INTO usuarios_has_roles (us_login, rl_codigo, uhr_activo) SELECT 
             ?, rl_codigo, uhr_activo
             FROM usuarios_has_roles WHERE us_login = ?`,{
@@ -332,4 +340,31 @@ export const copyRoles = async (req, res) => {
             return res.send('Hubo un error: ', error)
         }
     }
+}
+
+export const replaceRoles = async (req, res) => {
+    const {userFrom, userTo} = req.body 
+    const dbGiama = app.get('db')
+    if(!userFrom || !userTo){
+        return res.send('Faltan datos')
+    }else{
+        try {
+            await dbGiama.query(`DELETE FROM usuarios_has_roles WHERE us_login = ?`,{
+                replacements: [userTo],
+                type: QueryTypes.DELETE
+            })
+            await dbGiama.query(`INSERT INTO usuarios_has_roles (us_login, rl_codigo, uhr_activo) SELECT 
+            ?, rl_codigo, uhr_activo
+            FROM usuarios_has_roles WHERE us_login = ?`,{
+                replacements: [userTo, userFrom],
+                type: QueryTypes.INSERT
+                
+            })
+            return res.send(`Roles de ${userFrom} copiados exitosamente a ${userTo}`)
+        } catch (error) {
+            console.log(error)
+            return res.send('Hubo un error: ', error)
+        }
+    }
+    
 }
