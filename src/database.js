@@ -5,6 +5,7 @@ require('dotenv').config()
 
 function connection (req, res, next){
 const {empresa} = req.body
+const emp = empresa;
 if(app.get('db')){
     app.disable('db')
 }
