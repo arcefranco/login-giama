@@ -42,12 +42,12 @@ return res.send({message: `Te enviamos un correo a ${emailtest} para recuperar t
 export const tokenStatus = async (req, res) => { //Para enviar el estado del token de recupero de contraseña al front
 
    try {
-    res.send({
+    return res.send({
       status: true
     })
    } catch (error) {
     console.log(error)
-    res.send(error.message)
+    return res.send(error.message)
    }
 
 
