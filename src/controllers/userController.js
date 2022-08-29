@@ -13,7 +13,7 @@ export const getAllUsers = async (req, res) => {
 } 
 
 export const login = async (req, res) => {
-    
+    const dbGiama = app.get('db')
     const {login} = req.body
     const {password} = req.body
     
@@ -46,7 +46,7 @@ const pwdsalt = password + user[0].salt
 
 
 if(verifyPass(pwdsalt) === user[0].password_hash){
-    const roles = await req.db.query('SELECT rl_codigo FROM usuarios_has_roles WHERE us_login = ?',
+    const roles = await dbGiama.query('SELECT rl_codigo FROM usuarios_has_roles WHERE us_login = ?',
     {
       replacements: [login],
       type: QueryTypes.SELECT
