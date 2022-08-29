@@ -1,12 +1,11 @@
 import { QueryTypes } from "sequelize";
-import db from "../database";
-import { createHash } from "crypto";
+import {app} from '../index'
 import { createPass } from "../helpers/passwords/createPass";
 
-const dbGiama = db.sequelize
+
 
 export const getUsuarioById = async (req, res) => {
-
+    const dbGiama = app.get('db')
    const {id} = req.body 
 
  const usuarios = await 
@@ -22,7 +21,8 @@ res.send(usuarios)
 }
 
 export const getAllUsuarios = async (req, res) => {
- 
+    const dbGiama = app.get('db')
+    
   const usuarios = await 
   dbGiama
   .query
@@ -34,6 +34,7 @@ export const createUsuario = async (req, res) => {
     let {Nombre, Usuario, password, confirmPassword, Vendedor, Supervisor, 
         TeamLeader, Gerente, UsuarioAnura, us_activo, us_bloqueado, scoringAsignado, newUserBoolean, email } = req.body
      const {user} = req.usuario
+     const dbGiama = app.get('db')
         try {
             const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
                 replacements: [user],
@@ -88,6 +89,7 @@ export const updateUsuario = async (req, res) => {
         TeamLeader, Gerente, UsuarioAnura, us_activo, us_bloqueado, scoringAsignado, newUserBoolean, email } = req.body
         
         const {user} = req.usuario
+        const dbGiama = app.get('db')
         try {
             const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
                 replacements: [user],
@@ -132,8 +134,9 @@ export const updateUsuario = async (req, res) => {
 }
 
 export const deleteUsuario = async(req, res) => {
-    console.log('body', req.body)
+
     const {id} = req.body.Codigo 
+    const dbGiama = app.get('db')
     if(!id){
        return res.status(400).send({status: false, data: 'Ningun id provisto'})
     }
@@ -167,18 +170,22 @@ export const deleteUsuario = async(req, res) => {
 }
 
 export const getAllVendedores = async (req, res) => {
+    const dbGiama = app.get('db')
 const result = await dbGiama.query("SELECT Codigo, Nombre from vendedores")
 res.send(result[0])
 }
 export const getAllGerentes = async (req, res) => {
+    const dbGiama = app.get('db')
     const result = await dbGiama.query("SELECT Codigo, Nombre from gerentes")
     res.send(result[0])
 }
 export const getAllSupervisores = async (req, res) => {
+    const dbGiama = app.get('db')
     const result = await dbGiama.query("SELECT Codigo, Nombre from sucursales")
     res.send(result[0])
 }
 export const getAllTeamLeaders = async (req, res) => {
+    const dbGiama = app.get('db')
     const result = await dbGiama.query("SELECT Codigo, Nombre from teamleader")
     res.send(result[0])
 }

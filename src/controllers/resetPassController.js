@@ -1,14 +1,15 @@
-import db from "../database";
+import {app} from '../index'
 const jwt = require('jsonwebtoken')
 import { sendEmail } from "../helpers/email/sendEmail";
 import { createPass } from "../helpers/passwords/createPass";
 import { QueryTypes } from "sequelize";
 require('dotenv').config()
 
-const dbGiama = db.sequelize
+
 
 
 export const forgotPassword = async (req, res) => {
+  const dbGiama = app.get('db')
  const {login} = req.body //Tomo el nombre de usuario y lo busco en la DB
  const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
  {
@@ -52,7 +53,7 @@ export const tokenStatus = async (req, res) => { //Para enviar el estado del tok
 }
 
 export const updatePass = async (req, res) => { //Recibo su nueva contraseña y segun su id lo encuentro la DB 
-
+  const dbGiama = app.get('db')
   const {newPass, confirmPass, id} = req.body
   if(newPass !== confirmPass) {
    return res.json({message: 'Las contraseñas no coinciden', status: false})

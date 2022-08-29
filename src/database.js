@@ -1,12 +1,22 @@
 import {Sequelize} from "sequelize";
+import {app} from "./index"
 require('dotenv').config()
-const sequelize = new Sequelize(process.env.DB_NAME_CG, process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+
+
+function connection (req, res, next){
+const {empresa} = req.body
+if(app.get('db')){
+    console.log('entro al if como si lo tuviera y db es: ', app.get('db'))
+    next();
+}
+
+const sequelize = new Sequelize(empresa, process.env.DB_USERNAME, process.env.DB_PASSWORD,{
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT
 })
 
 sequelize.authenticate().then(() => { 
-    console.log('DB connected')
+    console.log(`DB ${empresa} connected`)
 })
 .catch(err => {
     console.log('DB ERROR: ', err)
@@ -17,4 +27,9 @@ const db = {}
 db.Sequelize = Sequelize
 db.sequelize = sequelize
 
-export default db
+req.db = db.sequelize
+app.set('db', db.sequelize)
+next();
+}
+
+export default connection
