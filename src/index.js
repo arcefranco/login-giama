@@ -1,13 +1,19 @@
 import express from "express";
-import  db  from "./database";
 import cors from 'cors'
 import morgan from "morgan";
+import connection from "./database";
 import UserRouter from "./routes/userRoutes";
 import GerentesRouter from './routes/gerentesRoutes'
 import resetRouter from "./routes/resetRoutes";
+import usuariosRoutes from "./routes/usuariosRoutes";
+require('dotenv').config()
+
+import RolesRouter from "./routes/rolesRoutes";
+import supervisoresRoutes from "./routes/supervisoresRoutes";
+
 const passport = require('passport')
-const app = express();
-db.sequelize; 
+export const app = express();
+
 
 
 
@@ -28,8 +34,15 @@ app.use(passport.initialize());
 app.use('/login', UserRouter)
 app.use('/gerentes', GerentesRouter)
 app.use('/reset', resetRouter)
+app.use('/usuarios', usuariosRoutes)
 
-app.listen(3001, () => {
+app.use('/roles', RolesRouter)
+
+app.use('/supervisores', supervisoresRoutes)
+
+app.listen(process.env.PORT, () => {
+
     console.log(`Our app is running on port 3001`);
 });
+
 

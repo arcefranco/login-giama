@@ -1,14 +1,16 @@
-import db from "../database";
+import {app} from '../index'
 const jwt = require('jsonwebtoken')
 import { sendEmail } from "../helpers/email/sendEmail";
-import { createPass } from "../helpers/createPass";
+import { createPass } from "../helpers/passwords/createPass";
 import { QueryTypes } from "sequelize";
+require('dotenv').config()
 
 
-const dbGiama = db.sequelize
-const JWT_SECRET = 'MY_SECRET'
+
 
 export const forgotPassword = async (req, res) => {
+  const dbGiama = app.get('db')
+  console.log(dbGiama)
  const {login} = req.body //Tomo el nombre de usuario y lo busco en la DB
  const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
  {
@@ -17,12 +19,12 @@ export const forgotPassword = async (req, res) => {
  }
 ); 
 if(user.length === 0){
-    res.send({message: 'Usuario no registrado!'})
+    return res.send({message: 'Usuario no registrado!'})
 }
 const userDb = user[0]
 const {emailtest, ID} = userDb
 
-const secret = JWT_SECRET + user[0].password_hash
+const secret = process.env.RESET_SECRET + user[0].password_hash
 const payload = {
     email: user[0].emailtest,
     id: user[0].ID
@@ -31,7 +33,7 @@ const token = jwt.sign(payload, secret, {expiresIn: '3h'}) //Una vez que lo encu
 
 sendEmail(emailtest, ID, token)
 
-res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contraseña!`, username: userDb.login})
+return res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contraseña!`, username: userDb.login})
 }
 
 
@@ -40,19 +42,19 @@ res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contr
 export const tokenStatus = async (req, res) => { //Para enviar el estado del token de recupero de contraseña al front
 
    try {
-    res.send({
+    return res.send({
       status: true
     })
    } catch (error) {
     console.log(error)
-    res.send(error.message)
+    return res.send(error.message)
    }
 
 
 }
 
 export const updatePass = async (req, res) => { //Recibo su nueva contraseña y segun su id lo encuentro la DB 
-
+  const dbGiama = app.get('db')
   const {newPass, confirmPass, id} = req.body
   if(newPass !== confirmPass) {
    return res.json({message: 'Las contraseñas no coinciden', status: false})
@@ -60,9 +62,9 @@ export const updatePass = async (req, res) => { //Recibo su nueva contraseña y 
   if(!id) {
    return res.json({message: 'Not user provided', status: false})  
   }
-  const newPassResult = await createPass(id, newPass)
-
-  const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?', //Es necesario preguntar dos veces si existe el usuario?
+  const newPassResult = createPass(newPass)
+  const {passHashed, newSalt} = newPassResult
+  const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?', 
 {
   replacements: [id],
   type: QueryTypes.SELECT
@@ -71,9 +73,9 @@ export const updatePass = async (req, res) => { //Recibo su nueva contraseña y 
 
 if(user.length) {
   
- await dbGiama.query('UPDATE usuarios SET password_hash = ? WHERE ID = ?', 
+ await dbGiama.query('UPDATE usuarios SET password_hash = ?, salt = ?, newuserBoolean = ? WHERE ID = ?', 
   {
-    replacements: [newPassResult, id],
+    replacements: [passHashed, newSalt, 0, id],
     type: QueryTypes.UPDATE
   }
  ); 

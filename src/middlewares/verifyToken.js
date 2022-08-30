@@ -1,15 +1,16 @@
-import db from "../database";
+import {app} from '../index'
 const jwt = require('jsonwebtoken')
 import { QueryTypes } from "sequelize";
+require('dotenv').config()
 
-const dbGiama = db.sequelize
-const JWT_SECRET = 'MY_SECRET'
+
 
 
 export const verifyToken = async (req, res, next) => { //Este middleware verifica el estado del token enviado a la ruta
     const {id, token} = req.params
+    const dbGiama = app.get('db')
     if(!id) {
-      res.send('Invalid ID')
+      return res.send('Invalid ID')
   }
   const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?',
   {
@@ -17,7 +18,7 @@ export const verifyToken = async (req, res, next) => { //Este middleware verific
     type: QueryTypes.SELECT
   }
   );
-  const secret = JWT_SECRET + user[0].password_hash
+  const secret = process.env.RESET_SECRET + user[0].password_hash
   
    try {
   
@@ -26,6 +27,6 @@ export const verifyToken = async (req, res, next) => { //Este middleware verific
   
    } catch (error) {
     console.log(error)
-    res.send({status: false})
+    return res.send({status: false})
    } 
   }
