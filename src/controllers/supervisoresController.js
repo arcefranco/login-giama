@@ -73,6 +73,7 @@ export const deleteSupervisores = async (req, res, error) => {
 
     const supervisor = req.body;
     console.log(supervisor)
+    const Supervisor = app.get('db').models.sucursales
     try{await Supervisor.destroy({
         where: {Codigo: supervisor.Codigo} 
         }),

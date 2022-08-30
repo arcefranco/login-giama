@@ -1,7 +1,7 @@
 import sequelize from "sequelize";
 import { Sequelize, QueryTypes, DataTypes } from "sequelize";
 import {app} from '../index'
-import Gerente from '../models/gerentesModel'
+// import Gerente from '../models/gerentesModel'
 import db from "../database";
 
 
@@ -29,6 +29,7 @@ export const getGerentesById = async (req, res) => {
 export const postGerentes = async (req, res, error) => {
      const {gerentes} = req.body;
      console.log(req.body)
+     const Gerente = app.get('db').models.gerentes
     // const Nombre  = req.body.Nombre;
     // const Activo = req.body.Activo;
     // const {}
@@ -48,6 +49,7 @@ try{    await Gerente.create({
 export const updateGerentes = async (req, res) => {
     const gerentes = req.body;
     console.log(gerentes)
+    const Gerente = app.get('db').models.gerentes
     try{ await Gerente?.update(
     {
         Nombre: gerentes.Nombre,
@@ -70,6 +72,7 @@ export const updateGerentes = async (req, res) => {
 export const deleteGerentes = async (req, res, error) => {
     const gerentes = req.body;
     console.log(gerentes)
+    const Gerente = app.get('db').models.gerentes
     try{await Gerente?.destroy({
         where: {Codigo: gerentes.id.Codigo} 
         }),

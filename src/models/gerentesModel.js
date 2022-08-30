@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-import {Sequelize,DataTypes} from 'sequelize'
+/*import {Sequelize,DataTypes} from 'sequelize'
 require('dotenv').config()
 const sequelize = new Sequelize(process.env.DB_NAME_CG, process.env.DB_USERNAME, process.env.DB_PASSWORD,{
-=======
-=======
->>>>>>> a6e892781473e6a6766027aff8505cc7e4f805ab
 import {Sequelize, DataTypes} from 'sequelize'
 import {app} from '../index'
 require('dotenv').config()
