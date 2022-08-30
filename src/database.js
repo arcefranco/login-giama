@@ -38,6 +38,45 @@ freezeTableName:true,
 timestamps:false,
 }) 
 Gerente.removeAttribute('id')  
+
+const  Supervisor = sequelize.define('sucursales', {
+    Codigo: {
+        type:DataTypes.STRING,
+    },
+    Nombre: {
+       type:DataTypes.STRING,
+       allowNull:false
+   },
+   Email: {
+    type:DataTypes.STRING,
+    allowNull:false
+    },
+    Gerente: {
+        type:DataTypes.STRING,
+        allowNull:false
+        },
+    EsMiniEmprendedor: {
+        type:DataTypes.BOOLEAN,
+        allowNull:false
+    },
+    ValorPromedioMovil: {
+        type:DataTypes.STRING,
+        allowNull:false
+        },
+   Inactivo: {
+       type:DataTypes.BOOLEAN,
+       allowNull:false
+   },
+   Zona: {
+    type:DataTypes.STRING,
+    allowNull:false
+    },
+
+},{
+freezeTableName:true,
+timestamps:false,
+})
+Supervisor.removeAttribute('id')
  
 const db = {}
 

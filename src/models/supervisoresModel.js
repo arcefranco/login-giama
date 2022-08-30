@@ -1,4 +1,4 @@
-import {Sequelize, DataTypes} from 'sequelize'
+/*import {Sequelize, DataTypes} from 'sequelize'
 require('dotenv').config()
 const sequelize = new Sequelize(process.env.DB_NAME_CG, process.env.DB_USERNAME, process.env.DB_PASSWORD,{
     host: process.env.DB_HOST,
@@ -45,6 +45,6 @@ const sequelize = new Sequelize(process.env.DB_NAME_CG, process.env.DB_USERNAME,
    })
    Supervisor.removeAttribute('id')
 
-  module.exports = Supervisor
+  module.exports = Supervisor*/
    
    
