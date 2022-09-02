@@ -42,7 +42,7 @@ app.use('/supervisores', supervisoresRoutes)
 
 app.listen(process.env.PORT, () => {
 
-    console.log(`Our app is running on port 3001`);
+    console.log(`Our app is running on port 3001 (probando pull)`);
 });
 
 
