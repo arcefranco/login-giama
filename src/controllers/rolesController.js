@@ -281,11 +281,12 @@ export const addRol = async (req, res) => {
         return res.send('Faltan datos')
     }else{
         try {
-            await dbGiama.query('INSERT INTO usuarios_has_roles (us_login, rl_codigo) VALUES (?, ?)', {
-                replacements: [Usuario, rol],
-                type: QueryTypes.INSERT
-            })
-            return res.send(`El rol ha sido añadido correctamente al usuario ${Usuario}`)
+                 await dbGiama.query('INSERT INTO usuarios_has_roles (us_login, rl_codigo) VALUES (?, ?)', {
+                    replacements: [Usuario, rol],
+                    type: QueryTypes.INSERT
+                })
+                return res.send(`El rol ha sido añadido correctamente al usuario ${Usuario}`)
+            
         } catch (error) {
             console.log(error)
             return res.send('Hubo un error al enviar los datos')
@@ -344,7 +345,7 @@ export const copyRoles = async (req, res) => {
 
 export const replaceRoles = async (req, res) => {
     const {userFrom, userTo} = req.body 
-    const dbGiama = app.get('db')
+    const dbGiama = app.get('db') 
     if(!userFrom || !userTo){
         return res.send('Faltan datos')
     }else{
