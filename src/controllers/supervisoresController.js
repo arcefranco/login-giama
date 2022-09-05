@@ -31,7 +31,7 @@ export const postSupervisores = async (req, res, error) => {
     let {Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
     
      
-    if(!Nombre || !Email || !Gerente || !ValorPromedioMovil || !Gerente) {
+    if(!Nombre || !Email || !Gerente  || !Zona) {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
 try{  
@@ -61,7 +61,7 @@ try{
     res.json({
         "message":"Supervisor Modificado",
         Nombre: Nombre,
-        Activo: Activo
+        Activo: Inactivo? 0 : 1,
             })
         
     }
