@@ -31,7 +31,7 @@ const Gerente = sequelize.define('gerentes', {
    },
    Activo: {
        type:DataTypes.BOOLEAN,
-       allowNull:false
+       
    }
 },{
 freezeTableName:true,

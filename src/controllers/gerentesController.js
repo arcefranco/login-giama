@@ -35,7 +35,7 @@ export const postGerentes = async (req, res, error) => {
     // const {}
 try{    await Gerente.create({
         Nombre: req.body.Nombre, 
-        Activo: req.body.Activo, 
+        Activo: req.body.Activo? 0 : req.body.Activo  , 
     }),
     res.json({
         "message":"Gerente creado"
