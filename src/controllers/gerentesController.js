@@ -27,15 +27,12 @@ export const getGerentesById = async (req, res) => {
 }
 
 export const postGerentes = async (req, res, error) => {
-     const {gerentes} = req.body;
+     let {Nombre, Activo} = req.body;
      console.log(req.body)
-     const Gerente = app.get('db').models.gerentes
-    // const Nombre  = req.body.Nombre;
-    // const Activo = req.body.Activo;
-    // const {}
-try{    await Gerente.create({
-        Nombre: req.body.Nombre, 
-        Activo: req.body.Activo? 0 : req.body.Activo  , 
+     const dbGiama = app.get('db');
+try{    await dbGiama.query('INSERT INTO gerentes (Nombre, Activo) VALUES (?,?) ',{
+        Replacements: [Nombre, Activo? 0 : 1],
+        type: QueryTypes.INSERT,    
     }),
     res.json({
         "message":"Gerente creado"
@@ -49,7 +46,8 @@ try{    await Gerente.create({
 export const updateGerentes = async (req, res) => {
     const gerentes = req.body;
     console.log(gerentes)
-    const Gerente = app.get('db').models.gerentes
+    
+    const Gerente = app.get('db').models.gerentes;
     try{ await Gerente?.update(
     {
         Nombre: gerentes.Nombre,
