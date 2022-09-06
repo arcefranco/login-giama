@@ -1,6 +1,9 @@
 import {  QueryTypes } from "sequelize";
 import {app} from '../index'
 
+// import Supervisor from '../models/supervisoresModel'
+
+
 
 export const getSupervisores = async (req, res) => {
 
