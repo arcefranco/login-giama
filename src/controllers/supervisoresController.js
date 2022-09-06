@@ -1,6 +1,6 @@
 import { Sequelize, QueryTypes, DataTypes } from "sequelize";
 import {app} from '../index'
-import Supervisor from '../models/supervisoresModel'
+// import Supervisor from '../models/supervisoresModel'
 
 
 
