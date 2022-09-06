@@ -1,14 +1,19 @@
-import { Sequelize, QueryTypes, DataTypes } from "sequelize";
+import {  QueryTypes } from "sequelize";
 import {app} from '../index'
+<<<<<<< HEAD
 // import Supervisor from '../models/supervisoresModel'
 
 
+=======
+>>>>>>> 1bef372a61f734bb51aa604d40f56a34104e58f2
 
 
 export const getSupervisores = async (req, res) => {
-    const dbGiama = app.get('db')
-    const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo`  ")
-    res.send(allSupervisores)
+
+        const dbGiama = app.get('db')
+        const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo`  ")
+        res.send(allSupervisores)
+
 }
 export const getSupervisoresById = async (req, res) => {
     const dbGiama = app.get('db')

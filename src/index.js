@@ -17,7 +17,6 @@ export const app = express();
 
 
 
-
 app.use(express.json())
 app.use(cors());
 app.use(express.urlencoded({extended:true}))
@@ -42,7 +41,7 @@ app.use('/supervisores', supervisoresRoutes)
 
 app.listen(process.env.PORT, () => {
 
-    console.log(`Our app is running on port 3001 (probando pull)`);
+    console.log(`App is running on port`, process.env.PORT);
 });
 
 
