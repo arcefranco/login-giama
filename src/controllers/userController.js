@@ -75,12 +75,12 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
 
 }else{
    return res.status(400).send({
-        message: "Invalid credentials"
+        message: "Contraseña Incorrecta"
     })
 }
 }else {
   app.disable('db')
-   return res.status(400).send('User does not exist')
+   return res.status(400).send('El usuario no existe')
   
 }
 }
