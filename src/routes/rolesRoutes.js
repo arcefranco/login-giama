@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { getRoles, getUserRoles, addRol, deleteRol, copyRoles, replaceRoles, giveMaster } from "../controllers/rolesController";
+import { errorHandling } from "../middlewares/errorHandling";
 
 const RolesRouter = Router()
-
+RolesRouter.use(errorHandling)
 RolesRouter.route('/').post(getRoles)
 RolesRouter.route('/user').post(getUserRoles)
 RolesRouter.route('/rol').post(addRol)
