@@ -2,8 +2,11 @@ import { Router } from "express";
 import { createUsuario, getAllTeamLeaders, getAllGerentes, getAllSupervisores, getAllUsuarios, 
     getAllVendedores, getUsuarioById, updateUsuario, deleteUsuario } from "../controllers/usuariosController";
 import authentication from "../middlewares/authentication";
+import { errorHandling } from "../middlewares/errorHandling";
 
 const usuariosRoutes = Router()
+
+usuariosRoutes.use(errorHandling)
 
 usuariosRoutes.route('/id').post(getUsuarioById)
 usuariosRoutes.route('/todos').get(getAllUsuarios)
