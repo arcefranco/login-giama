@@ -55,7 +55,7 @@ try{
         type: QueryTypes.INSERT
       });
       console.log('roles')
-    
+
     return res.send({status: true, data: 'Supervisor creado con exito!'})
     }catch(err){
         console.log(err)
@@ -98,10 +98,11 @@ export const updateSupervisores = async (req, res) => {
     }
 }
 export const deleteSupervisores = async (req, res, error) => {
-
-    const supervisor = req.body;
-    console.log(supervisor)
-    const {user} = req.body.HechoPor;
+    const dbGiama = app.get('db')
+    const {Codigo} = req.body;
+    
+    const user = req.body.HechoPor;
+    console.log(req.body)
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
             replacements: [user],
@@ -119,11 +120,9 @@ export const deleteSupervisores = async (req, res, error) => {
     } 
     const Supervisor = app.get('db').models.sucursales
     try{await Supervisor.destroy({
-        where: {Codigo: supervisor.Codigo} 
-        }),
-        res.json({
-            "message":"Supervisor borrado"
+        where: {Codigo: Codigo} 
         });
+        return res.send({status: true, data: 'Supervisor Borrado!'})
         }catch(err){
             console.log(err)
         }

@@ -30,13 +30,31 @@ export const postGerentes = async (req, res, error) => {
      let {Nombre, Activo} = req.body;
      console.log(req.body)
      const dbGiama = app.get('db');
-try{    await dbGiama.query('INSERT INTO gerentes (Nombre, Activo) VALUES (?,?) ',{
-        Replacements: [Nombre, Activo? 0 : 1],
+     const user = req.body.HechoPor;
+     try {
+         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+             replacements: [user],
+             type: QueryTypes.SELECT
+ 
+         })
+         console.log('roles: ', roles)
+         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.1')
+         if(!finded){
+             return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+         }
+     } catch (error) {
+         console.log(error)
+         return res.status(400).send({status: false, data: error})
+     }
+     if(!Nombre ) {
+        return res.status(400).send({status: false, data: 'Faltan campos'})
+    }
+     
+try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo) VALUES (?,?)",{
+        replacements: [Nombre, Activo? Activo : 0],
         type: QueryTypes.INSERT,    
-    }),
-    res.json({
-        "message":"Gerente creado"
     });
+    return res.send({status: true, data: 'Gerente creado!'})
     }catch(err){
         console.log(err)
     } }
@@ -46,7 +64,23 @@ try{    await dbGiama.query('INSERT INTO gerentes (Nombre, Activo) VALUES (?,?) 
 export const updateGerentes = async (req, res) => {
     const gerentes = req.body;
     console.log(gerentes)
-    
+    const dbGiama = app.get('db')
+    const user = req.body.HechoPor;
+    try {
+        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+            replacements: [user],
+            type: QueryTypes.SELECT
+
+        })
+        console.log('roles: ', roles)
+        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.2')
+        if(!finded){
+            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({status: false, data: error})
+    }
     const Gerente = app.get('db').models.gerentes;
     try{ await Gerente?.update(
     {
@@ -55,28 +89,39 @@ export const updateGerentes = async (req, res) => {
     }
     ,{
         where: {Codigo: gerentes.Codigo}
-    },
-    res.json({
-        "message":"Gerente Modificado",
-        Nombre: gerentes.Nombre,
-        Activo: gerentes.Activo
-            })
-        );
+    });
+    return res.send({status: true, data: 'Gerente actualizado correctamente!'})
+        
     }
     catch(err) {
         console.log(err)
     }
 }
 export const deleteGerentes = async (req, res, error) => {
-    const gerentes = req.body;
-    console.log(gerentes)
+    const {Codigo} = req.body;
+    console.log(Codigo)
+    const dbGiama = app.get('db')
+    const user = req.body.HechoPor;
+    try {
+        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+            replacements: [user],
+            type: QueryTypes.SELECT
+
+        })
+        console.log('roles: ', roles)
+        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.3')
+        if(!finded){
+            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({status: false, data: error})
+    }
     const Gerente = app.get('db').models.gerentes
     try{await Gerente?.destroy({
-        where: {Codigo: gerentes.id.Codigo} 
-        }),
-        res.json({
-            "message":"Gerente borrado"
+        where: {Codigo: Codigo} 
         });
+        return res.send({status: true, data: 'Gerente Borrado!'})
         }catch(err){
             console.log(err)
         }
