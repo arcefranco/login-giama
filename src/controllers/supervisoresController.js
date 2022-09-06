@@ -27,9 +27,25 @@ export const getSupervisoresById = async (req, res) => {
 
 export const postSupervisores = async (req, res, error) => {
     const dbGiama = app.get('db')
-    console.log(req.body) 
+    console.log(req.body)
+    console.log(req.body.HechoPor) ;
     let {Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
-    
+    const user = req.body.HechoPor;
+    try {
+        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+            replacements: [user],
+            type: QueryTypes.SELECT
+
+        })
+        console.log('roles: ', roles)
+        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.1')
+        if(!finded){
+            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({status: false, data: error})
+    } 
      
     if(!Nombre || !Email || !Gerente  || !Zona) {
         return res.status(400).send({status: false, data: 'Faltan campos'})
@@ -38,11 +54,10 @@ try{
     await dbGiama.query("INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona) VALUES (?,?,?,?,?,?,?) ", {
         replacements: [Nombre, Email, Gerente  , Inactivo? 0: 1, EsMiniEmprendedor? 1 :0, ValorPromedioMovil? ValorPromedioMovil: null, Zona ],
         type: QueryTypes.INSERT
-      }),
+      });
+      console.log('roles')
     
-    res.json({
-        "message":"Supervisor creado"
-    });
+    return res.send({status: true, data: 'Supervisor creado con exito!'})
     }catch(err){
         console.log(err)
     } }
@@ -52,17 +67,31 @@ try{
 export const updateSupervisores = async (req, res) => {
     const dbGiama = app.get('db')
     console.log(req.body) 
+    console.log(req.body.HechoPor) 
     let {Codigo, Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
-try{  
+    const user = req.body.HechoPor;
+    try {
+        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+            replacements: [user],
+            type: QueryTypes.SELECT
+
+        })
+        console.log('roles: ', roles)
+        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.2')
+        if(!finded){
+            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({status: false, data: error})
+    } 
+
+    try{  
     await dbGiama.query("UPDATE sucursales SET Nombre = ?, Email = ?, Gerente = ?, Inactivo = ?, EsMiniEmprendedor = ?, ValorPromedioMovil = ?, Zona = ? WHERE Codigo = ? ", {
         replacements: [Nombre, Email, Gerente? Gerente: null, Inactivo? 0: 1, EsMiniEmprendedor? 1:0, ValorPromedioMovil, Zona, Codigo ],
         type: QueryTypes.UPDATE
-      }),
-    res.json({
-        "message":"Supervisor Modificado",
-        Nombre: Nombre,
-        Activo: Inactivo? 0 : 1,
-            })
+      });
+      return res.send({status: true, data: 'Supervisor modificado con exito!'})
         
     }
     catch(err) {
@@ -73,6 +102,22 @@ export const deleteSupervisores = async (req, res, error) => {
 
     const supervisor = req.body;
     console.log(supervisor)
+    const {user} = req.body.HechoPor;
+    try {
+        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+            replacements: [user],
+            type: QueryTypes.SELECT
+
+        })
+        console.log('roles: ', roles)
+        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.3')
+        if(!finded){
+            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({status: false, data: error})
+    } 
     const Supervisor = app.get('db').models.sucursales
     try{await Supervisor.destroy({
         where: {Codigo: supervisor.Codigo} 
