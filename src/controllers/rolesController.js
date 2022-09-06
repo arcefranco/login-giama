@@ -2,6 +2,8 @@
 import {app} from '../index'
 import { QueryTypes } from "sequelize";
 import { queryMora, queryOperaciones, queryReportes} from "../queries";
+import { logout } from './userController';
+
 
 
 
@@ -256,70 +258,81 @@ export const getRoles = async (req, res) => {
 }
 
 export const getUserRoles = async (req, res) => {
-    const {user} = req.body
+    try {
+        const {user} = req.body
     const dbGiama = app.get('db')
     if(!user){
         return res.send('No user provided')
     }else{
-        try {
+        
             const userRoles = await dbGiama.query('SELECT rl_codigo FROM usuarios_has_roles WHERE us_login = ?', {
                 replacements: [user],
                 type: QueryTypes.SELECT
             })
             return res.send(userRoles)
-        } catch (error) {
+        } 
+        }
+        catch (error) {
             console.log(error)
             return res.send(error)
         }
-    }
+    
 }
 
 export const addRol = async (req, res) => {
+    try {
     const {rol, Usuario} = req.body
     const dbGiama = app.get('db')
     if(!rol || !Usuario){
         return res.send('Faltan datos')
     }else{
-        try {
+        
                  await dbGiama.query('INSERT INTO usuarios_has_roles (us_login, rl_codigo) VALUES (?, ?)', {
                     replacements: [Usuario, rol],
                     type: QueryTypes.INSERT
                 })
                 return res.send(`El rol ha sido añadido correctamente al usuario ${Usuario}`)
             
-        } catch (error) {
+        } 
+        }
+        
+        catch (error) {
             console.log(error)
             return res.send('Hubo un error al enviar los datos')
         }
-    }
+    
 }
 export const deleteRol = async (req, res) => {
-    const dbGiama = app.get('db')
+    try {
+        const dbGiama = app.get('db')
     
     const {rol, Usuario} = req.body
     if(!rol || !Usuario){
         return res.send('Faltan datos')
     }else{
-        try {
+        
             await dbGiama.query('DELETE FROM usuarios_has_roles WHERE us_login = ? AND rl_codigo = ?', {
                 replacements: [Usuario, rol],
                 type: QueryTypes.INSERT
             })
             return res.send(`El rol ha sido eliminado correctamente al usuario ${Usuario}`)
-        } catch (error) {
+        } 
+        }
+        catch (error) {
             console.log(error)
             return res.send('Hubo un error al enviar los datos')
         }
-    }
+    
 }
 
 export const copyRoles = async (req, res) => {
+    try {
     const dbGiama = app.get('db')
     const {userFrom, userTo} = req.body 
     if(!userFrom || !userTo){
         return res.send('Faltan datos')
     }else{
-        try {
+        
             const userHasRoles = await dbGiama.query(`SELECT * FROM usuarios_has_roles WHERE us_login = ?`,{
                 replacements: [userTo],
                 type: QueryTypes.SELECT
@@ -336,20 +349,23 @@ export const copyRoles = async (req, res) => {
                 
             })
             return res.send(`Roles de ${userFrom} copiados exitosamente a ${userTo}`)
-        } catch (error) {
+        } 
+        }
+        catch (error) {
             console.log(error)
             return res.send('Hubo un error: ', error)
         }
-    }
+    
 }
 
 export const replaceRoles = async (req, res) => {
-    const {userFrom, userTo} = req.body 
+    const {userFrom, userTo} = req.body  
+    try {
     const dbGiama = app.get('db') 
     if(!userFrom || !userTo){
         return res.send('Faltan datos')
     }else{
-        try {
+       
             await dbGiama.query(`DELETE FROM usuarios_has_roles WHERE us_login = ?`,{
                 replacements: [userTo],
                 type: QueryTypes.DELETE
@@ -362,10 +378,51 @@ export const replaceRoles = async (req, res) => {
                 
             })
             return res.send(`Roles de ${userFrom} copiados exitosamente a ${userTo}`)
-        } catch (error) {
+        } 
+        }
+        catch (error) {
             console.log(error)
             return res.send('Hubo un error: ', error)
         }
-    }
     
+    
+}
+
+export const giveMaster = async (req, res) => {
+    const {Usuario} = req.body
+    try {
+        
+        const dbGiama = app.get('db') 
+        const userHasRoles = await dbGiama.query(`SELECT * FROM usuarios_has_roles WHERE us_login = ? AND rl_codigo = "1"`,{
+            replacements: [Usuario],
+            type: QueryTypes.SELECT
+        }) 
+    
+        if(!userHasRoles.length){
+            try {
+                await dbGiama.query('INSERT INTO usuarios_has_roles (us_login, rl_codigo) VALUES (?, "1")',
+                {
+                    replacements: [Usuario],
+                    type: QueryTypes.INSERT
+                })
+    
+                return res.send(`Se le ha agregado el rol master correctamente a ${Usuario}`)
+                
+            } catch (error) {
+                console.log(error)
+                return res.send('Hubo un error en la DB')
+            }
+        }else{
+            return res.send(`El usuario ${Usuario} ya posee el rol master`)
+        }
+    } catch (error) {
+        if(error.name){
+            return res.send(error.name)
+        }else{
+            return res.send('Hubo un error', error)
+        }
+        
+    }
+
+
 }
