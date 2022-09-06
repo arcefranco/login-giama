@@ -28,7 +28,7 @@ export const getGerentesById = async (req, res) => {
 
 export const postGerentes = async (req, res, error) => {
      let {Nombre, Activo} = req.body;
-     console.log(req.body)
+     console.log(req.body) 
      const dbGiama = app.get('db');
 try{    await dbGiama.query('INSERT INTO gerentes (Nombre, Activo) VALUES (?,?) ',{
         Replacements: [Nombre, Activo? 0 : 1],
