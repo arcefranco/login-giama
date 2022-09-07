@@ -7,18 +7,18 @@ import {app} from '../index'
 
 
 
-export const getSupervisores = async (req, res) => {
+export const getTeamLeaders = async (req, res) => {
 
         const dbGiama = app.get('db')
-        const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo`  ")
-        res.send(allSupervisores)
+        const allTeamLeaders = await dbGiama.query("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre' ,  sucursales.`Nombre` AS 'Supervisor', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM teamleader LEFT JOIN sucursales ON teamleader.`Supervisor` = sucursales.`Codigo` LEFT JOIN zonas ON teamleader.`Zona` = zonas.`codigo`  ")
+        res.send(allTeamLeaders)
 
 }
-export const getSupervisoresById = async (req, res) => {
+export const getTeamLeadersById = async (req, res) => {
     const dbGiama = app.get('db')
-    const supervisores = req.body
-    console.log(supervisores)
-    const allSupervisoresById = await  dbGiama
+    const teamLeaders = req.body
+    console.log(teamLeaders)
+    const allTeamLeadersById = await  dbGiama
     .query
     ("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo` WHERE sucursales.`Codigo` = ? ",
     {
@@ -26,10 +26,10 @@ export const getSupervisoresById = async (req, res) => {
       type: QueryTypes.SELECT
     }
    );
-    res.send(allSupervisoresById)
+    res.send(allTeamLeadersById)
 }
 
-export const postSupervisores = async (req, res, error) => {
+export const postTeamLeaders = async (req, res, error) => {
     const dbGiama = app.get('db')
     console.log(req.body)
     console.log(req.body.HechoPor) ;
@@ -68,7 +68,7 @@ try{
 
     
  
-export const updateSupervisores = async (req, res) => {
+export const updateTeamLeaders = async (req, res) => {
     const dbGiama = app.get('db')
     console.log(req.body) 
     console.log(req.body.HechoPor) 
@@ -102,7 +102,7 @@ export const updateSupervisores = async (req, res) => {
         console.log(err)
     }
 }
-export const deleteSupervisores = async (req, res, error) => {
+export const deleteTeamLeaders = async (req, res, error) => {
     const dbGiama = app.get('db')
     const {Codigo} = req.body;
     
@@ -123,8 +123,8 @@ export const deleteSupervisores = async (req, res, error) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     } 
-    const Supervisor = app.get('db').models.sucursales
-    try{await Supervisor.destroy({
+    const TeamLeaders = app.get('db').models.teamLeaders
+    try{await TeamLeaders.destroy({
         where: {Codigo: Codigo} 
         });
         return res.send({status: true, data: 'Supervisor Borrado!'})
