@@ -1,22 +1,32 @@
 import { QueryTypes } from "sequelize";
 import {app} from '../index'
+import Sequelize from "sequelize";
 import { createPass } from "../helpers/passwords/createPass";
 
 
+let transaction;
 
 export const getUsuarioById = async (req, res) => {
     const dbGiama = app.get('db')
    const {id} = req.body 
+   
 
- const usuarios = await 
- dbGiama
+ transaction = await dbGiama.transaction({
+    isolationLevel: Sequelize.Transaction.SERIALIZABLE
+  })
+let usuarios = await 
+ dbGiama 
  .query
- ("SELECT usuarios.`ID`, usuarios.`emailtest` AS 'email', usuarios.`login` AS 'Usuario', usuarios.`Nombre`, vendedores.`Codigo` AS 'Vendedor', teamleader.`Codigo` AS 'TeamLeader',sucursales.`Codigo` AS 'Supervisor', gerentes.`Codigo` AS 'Gerente', usuarios.`UsuarioAnura`, usuarios.`VerSoloScoringAsignado`, usuarios.`us_bloqueado`, usuarios.`us_activo` FROM usuarios LEFT JOIN gerentes ON usuarios.`CodigoGerente` = gerentes.`Codigo` LEFT JOIN teamleader ON usuarios.`CodigoTeamLeader` = teamleader.`Codigo` LEFT JOIN vendedores ON usuarios.`CodigoVendedor` = vendedores.`Codigo` LEFT JOIN sucursales ON usuarios.`CodigoSucursal` = sucursales.`Codigo` WHERE ID = ?",
+ ("SELECT usuarios.`ID`, usuarios.`emailtest` AS 'email', usuarios.`login` AS 'Usuario', usuarios.`Nombre`, vendedores.`Codigo` AS 'Vendedor', teamleader.`Codigo` AS 'TeamLeader',sucursales.`Codigo` AS 'Supervisor', gerentes.`Codigo` AS 'Gerente', usuarios.`UsuarioAnura`, usuarios.`VerSoloScoringAsignado`, usuarios.`us_bloqueado`, usuarios.`us_activo` FROM usuarios LEFT JOIN gerentes ON usuarios.`CodigoGerente` = gerentes.`Codigo` LEFT JOIN teamleader ON usuarios.`CodigoTeamLeader` = teamleader.`Codigo` LEFT JOIN vendedores ON usuarios.`CodigoVendedor` = vendedores.`Codigo` LEFT JOIN sucursales ON usuarios.`CodigoSucursal` = sucursales.`Codigo` WHERE ID = ? FOR UPDATE",
  {
+    transaction: transaction,
    replacements: [id],
    type: QueryTypes.SELECT
  }
 );
+ console.log(Date.now())
+/* usuarios[0]["transaction"] = usuarios  */
+
 res.send(usuarios) 
 }
 
@@ -41,7 +51,6 @@ export const createUsuario = async (req, res) => {
                 type: QueryTypes.SELECT
 
             })
-            console.log('roles: ', roles)
             const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3.1')
             if(!finded){
                 return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
@@ -70,6 +79,7 @@ export const createUsuario = async (req, res) => {
         Vendedor && typeof(Vendedor) === 'string' ? Vendedor = parseInt(Vendedor.split(' ')[0]) : Vendedor = Vendedor
 
     try {
+        
         await dbGiama.query("INSERT INTO usuarios (login, salt, password_hash, Nombre, CodigoVendedor, CodigoSucursal, CodigoTeamLeader, CodigoGerente, UsuarioAnura, us_activo, us_bloqueado, VerSoloScoringAsignado, emailtest, newuserBoolean) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", {
             replacements: [Usuario, newSalt, passHashed, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, 1],
             type: QueryTypes.INSERT
@@ -96,7 +106,6 @@ export const updateUsuario = async (req, res) => {
                 type: QueryTypes.SELECT
 
             })
-            console.log('roles: ', roles)
             const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3.2')
             if(!finded){
                 return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
@@ -119,11 +128,15 @@ export const updateUsuario = async (req, res) => {
         Supervisor && typeof(Supervisor) === 'string' ? Supervisor = parseInt(Supervisor.split(' ')[0]) : Supervisor = Supervisor
         Vendedor && typeof(Vendedor) === 'string' ? Vendedor = parseInt(Vendedor.split(' ')[0]) : Vendedor = Vendedor
         try {
-            const usuarioUpdated = await dbGiama.query("UPDATE usuarios SET login = ?, Nombre = ?, CodigoVendedor = ?,  CodigoSucursal = ?, CodigoTeamLeader = ?, CodigoGerente = ?, UsuarioAnura = ?, us_activo = ?, us_bloqueado = ?, VerSoloScoringAsignado = ?, emailtest = ?  WHERE ID = ?", {
-                 replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
-                 type: QueryTypes.UPDATE
-               }
-              ); 
+         
+            await dbGiama.query(`UPDATE usuarios SET login = ?, Nombre = ?, CodigoVendedor = ?,  CodigoSucursal = ?, CodigoTeamLeader = ?, CodigoGerente = ?, UsuarioAnura = ?, us_activo = ?, us_bloqueado = ?, VerSoloScoringAsignado = ?, emailtest = ?  WHERE ID = ?`, {
+                transaction: transaction,
+                replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
+                type: QueryTypes.UPDATE
+            } 
+            ).then(() => transaction.commit()) 
+            
+            
               
                 return res.send({status: true, data: 'Usuario actualizado correctamente!'}) 
              

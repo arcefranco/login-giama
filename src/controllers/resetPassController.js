@@ -11,10 +11,10 @@ require('dotenv').config()
 export const forgotPassword = async (req, res) => {
   const dbGiama = app.get('db')
   console.log(dbGiama)
- const {login} = req.body //Tomo el nombre de usuario y lo busco en la DB
+ const {username} = req.body //Tomo el nombre de usuario y lo busco en la DB
  const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
  {
-   replacements: [login],
+   replacements: [username],
    type: QueryTypes.SELECT
  }
 ); 
