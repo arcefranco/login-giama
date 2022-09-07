@@ -5,7 +5,6 @@ require('dotenv').config()
 
 function connection (req, res, next){
 const {empresa} = req.body
-const emp = empresa;
 if(app.get('db')){
     app.disable('db')
 }
@@ -85,7 +84,6 @@ db.sequelize = sequelize
 
 req.db = db.sequelize
 app.set('db', db.sequelize)
-console.log('DB: ', app.get('db').models.gerentes)
 next();
 }
 
