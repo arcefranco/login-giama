@@ -106,7 +106,6 @@ export const updateUsuario = async (req, res) => {
                 type: QueryTypes.SELECT
 
             })
-            console.log('roles: ', roles)
             const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3.2')
             if(!finded){
                 return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
@@ -129,14 +128,15 @@ export const updateUsuario = async (req, res) => {
         Supervisor && typeof(Supervisor) === 'string' ? Supervisor = parseInt(Supervisor.split(' ')[0]) : Supervisor = Supervisor
         Vendedor && typeof(Vendedor) === 'string' ? Vendedor = parseInt(Vendedor.split(' ')[0]) : Vendedor = Vendedor
         try {
-            
-            await transaction.commit();
+         
             await dbGiama.query(`UPDATE usuarios SET login = ?, Nombre = ?, CodigoVendedor = ?,  CodigoSucursal = ?, CodigoTeamLeader = ?, CodigoGerente = ?, UsuarioAnura = ?, us_activo = ?, us_bloqueado = ?, VerSoloScoringAsignado = ?, emailtest = ?  WHERE ID = ?`, {
-                 replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
-                 type: QueryTypes.UPDATE
-               } 
-              ); 
-
+                transaction: transaction,
+                replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
+                type: QueryTypes.UPDATE
+            } 
+            ).then(() => transaction.commit()) 
+            
+            
               
                 return res.send({status: true, data: 'Usuario actualizado correctamente!'}) 
              
