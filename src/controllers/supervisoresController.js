@@ -4,10 +4,6 @@ import {app} from '../index'
 
 
 
-
-
-
-
 export const getSupervisores = async (req, res) => {
 
         const dbGiama = app.get('db')
