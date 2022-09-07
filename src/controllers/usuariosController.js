@@ -12,7 +12,8 @@ export const getUsuarioById = async (req, res) => {
    
 
  transaction = await dbGiama.transaction({
-    isolationLevel: Sequelize.Transaction.SERIALIZABLE
+    isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+    autocommit:false
   })
 let usuarios = await 
  dbGiama 
@@ -180,6 +181,12 @@ export const deleteUsuario = async(req, res) => {
     } catch (error) {
        return res.status(400).send({status: false, data: `error al eliminar en base de datos: ${error}` })
     } 
+}
+
+export const endCommit = async (req, res) => {
+    await transaction.commit()
+    res.send('No fueron guardados los cambios')
+
 }
 
 export const getAllVendedores = async (req, res) => {
