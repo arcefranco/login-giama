@@ -10,7 +10,8 @@ import {app} from '../index'
 export const getTeamLeaders = async (req, res) => {
 
         const dbGiama = app.get('db')
-        const allTeamLeaders = await dbGiama.query("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre' ,  sucursales.`Nombre` AS 'Supervisor', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM teamleader LEFT JOIN sucursales ON teamleader.`Supervisor` = sucursales.`Codigo` LEFT JOIN zonas ON teamleader.`Zona` = zonas.`codigo`  ")
+        // const allTeamLeaders = await dbGiama.query("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre' ,  sucursales.`Nombre` AS 'Supervisor', NOT Inactivo AS Activo,  FROM teamleader LEFT JOIN sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   ")
+        const allTeamLeaders = await dbGiama.query("SELECT teamleader. `Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`  ")
         res.send(allTeamLeaders)
 
 }
@@ -20,9 +21,9 @@ export const getTeamLeadersById = async (req, res) => {
     console.log(teamLeaders)
     const allTeamLeadersById = await  dbGiama
     .query
-    ("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo` WHERE sucursales.`Codigo` = ? ",
+    ("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   WHERE teamleader.`Codigo` = ? ",
     {
-      replacements: [supervisores.Codigo],
+      replacements: [teamLeaders.Codigo],
       type: QueryTypes.SELECT
     }
    );
@@ -33,7 +34,7 @@ export const postTeamLeaders = async (req, res, error) => {
     const dbGiama = app.get('db')
     console.log(req.body)
     console.log(req.body.HechoPor) ;
-    let {Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
+    let {Nombre, Supervisor, Activo:Inactivo, } = req.body;
     const user = req.body.HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
@@ -51,17 +52,17 @@ export const postTeamLeaders = async (req, res, error) => {
         return res.status(400).send({status: false, data: error})
     } 
      
-    if(!Nombre || !Email || !Gerente  || !Zona) {
+    if(!Nombre ||  !Supervisor  ) {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
 try{  
-    await dbGiama.query("INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona) VALUES (?,?,?,?,?,?,?) ", {
-        replacements: [Nombre, Email, Gerente  , Inactivo? 0: 1, EsMiniEmprendedor? 1 :0, ValorPromedioMovil? ValorPromedioMovil: null, Zona ],
+    await dbGiama.query("INSERT INTO teamleader (Nombre,  Sucursal, Inactivo, UsuarioAltaRegistro ) VALUES (?,?,CONVERT(?,BINARY),?) ", {
+        replacements: [Nombre,  Supervisor  , Inactivo? Inactivo: 1, user  ],
         type: QueryTypes.INSERT
       });
       console.log('roles')
 
-    return res.send({status: true, data: 'Supervisor creado con exito!'})
+    return res.send({status: true, data: 'Team Leader creado con exito!'})
     }catch(err){
         console.log(err)
     } }
@@ -72,7 +73,7 @@ export const updateTeamLeaders = async (req, res) => {
     const dbGiama = app.get('db')
     console.log(req.body) 
     console.log(req.body.HechoPor) 
-    let {Codigo, Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
+    let {Codigo, Nombre,  Supervisor, Activo:Inactivo, } = req.body;
     const user = req.body.HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
@@ -91,11 +92,11 @@ export const updateTeamLeaders = async (req, res) => {
     } 
 
     try{  
-    await dbGiama.query("UPDATE sucursales SET Nombre = ?, Email = ?, Gerente = ?, Inactivo = ?, EsMiniEmprendedor = ?, ValorPromedioMovil = ?, Zona = ? WHERE Codigo = ? ", {
-        replacements: [Nombre, Email, Gerente? Gerente: null, Inactivo? 0: 1, EsMiniEmprendedor? 1:0, ValorPromedioMovil, Zona, Codigo ],
+    await dbGiama.query("UPDATE teamleader SET Nombre = ?,  Sucursal = ?, Inactivo = NOT CONVERT(?,BINARY), UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
+        replacements: [Nombre,  Supervisor? Supervisor:null, Inactivo, user , Codigo ],
         type: QueryTypes.UPDATE
       });
-      return res.send({status: true, data: 'Supervisor modificado con exito!'})
+      return res.send({status: true, data: 'Team Leader modificado con exito!'})
         
     }
     catch(err) {
@@ -123,11 +124,11 @@ export const deleteTeamLeaders = async (req, res, error) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     } 
-    const TeamLeaders = app.get('db').models.teamLeaders
+    const TeamLeaders = app.get('db').models.teamleader
     try{await TeamLeaders.destroy({
         where: {Codigo: Codigo} 
         });
-        return res.send({status: true, data: 'Supervisor Borrado!'})
+        return res.send({status: true, data: 'Team Leader Borrado!'})
         }catch(err){
             console.log(err)
         }
