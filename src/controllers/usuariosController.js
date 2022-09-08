@@ -155,6 +155,7 @@ export const updateUsuario = async (req, res) => {
         Supervisor && typeof(Supervisor) === 'string' ? Supervisor = parseInt(Supervisor.split(' ')[0]) : Supervisor = Supervisor
         Vendedor && typeof(Vendedor) === 'string' ? Vendedor = parseInt(Vendedor.split(' ')[0]) : Vendedor = Vendedor
         try {
+
          
             await dbGiama.query(`UPDATE usuarios SET login = ?, Nombre = ?, CodigoVendedor = ?,  CodigoSucursal = ?, CodigoTeamLeader = ?, CodigoGerente = ?, UsuarioAnura = ?, us_activo = ?, us_bloqueado = ?, VerSoloScoringAsignado = ?, emailtest = ?  WHERE ID = ?`, {
                 transaction: transaction,
@@ -167,6 +168,7 @@ export const updateUsuario = async (req, res) => {
             }) 
             
             
+
               
                 return res.send({status: true, data: 'Usuario actualizado correctamente!'}) 
              

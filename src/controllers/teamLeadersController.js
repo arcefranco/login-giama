@@ -4,33 +4,37 @@ import {app} from '../index'
 
 
 
-export const getSupervisores = async (req, res) => {
+
+
+
+export const getTeamLeaders = async (req, res) => {
 
         const dbGiama = app.get('db')
-        const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo`  ")
-        res.send(allSupervisores)
+        // const allTeamLeaders = await dbGiama.query("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre' ,  sucursales.`Nombre` AS 'Supervisor', NOT Inactivo AS Activo,  FROM teamleader LEFT JOIN sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   ")
+        const allTeamLeaders = await dbGiama.query("SELECT teamleader. `Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`  ")
+        res.send(allTeamLeaders)
 
 }
-export const getSupervisoresById = async (req, res) => {
+export const getTeamLeadersById = async (req, res) => {
     const dbGiama = app.get('db')
-    const supervisores = req.body
-    console.log(supervisores)
-    const allSupervisoresById = await  dbGiama
+    const teamLeaders = req.body
+    console.log(teamLeaders)
+    const allTeamLeadersById = await  dbGiama
     .query
-    ("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo` WHERE sucursales.`Codigo` = ? ",
+    ("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   WHERE teamleader.`Codigo` = ? ",
     {
-      replacements: [supervisores.Codigo],
+      replacements: [teamLeaders.Codigo],
       type: QueryTypes.SELECT
     }
    );
-    res.send(allSupervisoresById)
+    res.send(allTeamLeadersById)
 }
 
-export const postSupervisores = async (req, res, error) => {
+export const postTeamLeaders = async (req, res, error) => {
     const dbGiama = app.get('db')
     console.log(req.body)
     console.log(req.body.HechoPor) ;
-    let {Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
+    let {Nombre, Supervisor, Activo:Inactivo, } = req.body;
     const user = req.body.HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
@@ -48,28 +52,28 @@ export const postSupervisores = async (req, res, error) => {
         return res.status(400).send({status: false, data: error})
     } 
      
-    if(!Nombre || !Email ) {
+    if(!Nombre ||  !Supervisor  ) {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
 try{  
-    await dbGiama.query("INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona, UsuarioAltaRegistro ) VALUES (?,?,?,NOT ?,?,?,?,?) ", {
-        replacements: [Nombre, Email, Gerente? Gerente : null  , Inactivo? Inactivo : 0, EsMiniEmprendedor? EsMiniEmprendedor :0, ValorPromedioMovil? ValorPromedioMovil: 0, Zona? Zona : null, user ],
+    await dbGiama.query("INSERT INTO teamleader (Nombre,  Sucursal, Inactivo, UsuarioAltaRegistro ) VALUES (?,?,CONVERT(?,BINARY),?) ", {
+        replacements: [Nombre,  Supervisor  , Inactivo? Inactivo: 1, user  ],
         type: QueryTypes.INSERT
       });
       console.log('roles')
 
-    return res.send({status: true, data: 'Supervisor creado con exito!'})
+    return res.send({status: true, data: 'Team Leader creado con exito!'})
     }catch(err){
         console.log(err)
     } }
 
     
  
-export const updateSupervisores = async (req, res) => {
+export const updateTeamLeaders = async (req, res) => {
     const dbGiama = app.get('db')
     console.log(req.body) 
     console.log(req.body.HechoPor) 
-    let {Codigo, Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
+    let {Codigo, Nombre,  Supervisor, Activo:Inactivo, } = req.body;
     const user = req.body.HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
@@ -86,22 +90,20 @@ export const updateSupervisores = async (req, res) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     } 
-    if(!Nombre || !Email ) {
-        return res.status(400).send({status: false, data: 'Faltan campos'})
-    }
+
     try{  
-    await dbGiama.query("UPDATE sucursales SET Nombre = ?, Email = ?, Gerente = ?, Inactivo = NOT ?, EsMiniEmprendedor = ?, ValorPromedioMovil = ?, Zona = ?, UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
-        replacements: [Nombre, Email, Gerente? Gerente : null, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona? Zona: null, user, Codigo ],
+    await dbGiama.query("UPDATE teamleader SET Nombre = ?,  Sucursal = ?, Inactivo = NOT CONVERT(?,BINARY), UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
+        replacements: [Nombre,  Supervisor? Supervisor:null, Inactivo, user , Codigo ],
         type: QueryTypes.UPDATE
       });
-      return res.send({status: true, data: 'Supervisor modificado con exito!'})
+      return res.send({status: true, data: 'Team Leader modificado con exito!'})
         
     }
     catch(err) {
         console.log(err)
     }
 }
-export const deleteSupervisores = async (req, res, error) => {
+export const deleteTeamLeaders = async (req, res, error) => {
     const dbGiama = app.get('db')
     const {Codigo} = req.body;
     
@@ -122,11 +124,11 @@ export const deleteSupervisores = async (req, res, error) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     } 
-    const Supervisor = app.get('db').models.sucursales
-    try{await Supervisor.destroy({
+    const TeamLeaders = app.get('db').models.teamleader
+    try{await TeamLeaders.destroy({
         where: {Codigo: Codigo} 
         });
-        return res.send({status: true, data: 'Supervisor Borrado!'})
+        return res.send({status: true, data: 'Team Leader Borrado!'})
         }catch(err){
             console.log(err)
         }
