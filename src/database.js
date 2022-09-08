@@ -31,6 +31,10 @@ const Gerente = sequelize.define('gerentes', {
    Activo: {
        type:DataTypes.BOOLEAN,
        allowNull:false
+   },
+   UsuarioAltaRegistro: {
+    type:DataTypes.STRING,
+       allowNull:false
    }
 },{
 freezeTableName:true,
@@ -70,13 +74,39 @@ const  Supervisor = sequelize.define('sucursales', {
     type:DataTypes.STRING,
     allowNull:false
     },
+    UsuarioAltaRegistro: {
+        type:DataTypes.STRING,
+           allowNull:false
+       }
 
 },{
 freezeTableName:true,
 timestamps:false,
 })
 Supervisor.removeAttribute('id')
- 
+
+const TeamLeader = sequelize.define('teamleader', {
+    Codigo: {
+        type:DataTypes.STRING,
+    },
+    Nombre: {
+       type:DataTypes.STRING,
+       allowNull:false
+   },
+   Activo: {
+       type:DataTypes.BOOLEAN,
+       allowNull:false
+   },
+   UsuarioAltaRegistro: {
+    type:DataTypes.STRING,
+       allowNull:false
+   }
+},{
+freezeTableName:true,
+timestamps:false,
+}) 
+TeamLeader.removeAttribute('id')  
+
 const db = {}
 
 db.Sequelize = Sequelize

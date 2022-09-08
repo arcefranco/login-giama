@@ -50,8 +50,8 @@ export const postGerentes = async (req, res, error) => {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
      
-try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo) VALUES (?,?)",{
-        replacements: [Nombre, Activo? Activo : 0],
+try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRegistro) VALUES (?,?,?)",{
+        replacements: [Nombre, Activo? Activo : 0, user],
         type: QueryTypes.INSERT,    
     });
     return res.send({status: true, data: 'Gerente creado!'})
@@ -85,7 +85,8 @@ export const updateGerentes = async (req, res) => {
     try{ await Gerente?.update(
     {
         Nombre: gerentes.Nombre,
-        Activo: gerentes.Activo
+        Activo: gerentes.Activo,
+        UsuarioAltaRegistro: user,
     }
     ,{
         where: {Codigo: gerentes.Codigo}
