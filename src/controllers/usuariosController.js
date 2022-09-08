@@ -1,4 +1,4 @@
-import { QueryTypes } from "sequelize";
+import { QueryTypes, Transaction } from "sequelize";
 import {app} from '../index'
 import Sequelize from "sequelize";
 import { createPass } from "../helpers/passwords/createPass";
@@ -22,6 +22,8 @@ export const getUsuarioById = async (req, res) => {
     isolationLevel: Sequelize.Transaction.SERIALIZABLE,
     autocommit:false
   })
+
+  
   const query = () => {
     return new Promise((resolve, reject) => 
     {
@@ -160,7 +162,8 @@ export const updateUsuario = async (req, res) => {
                 replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
                 type: QueryTypes.UPDATE
             } 
-            )/* .then(() => transaction.commit()) */.catch((error) => {
+            ).then(() => transaction.commit()).catch((error) => {
+                transaction.rollback()
                 return res.send(error)
             }) 
             
@@ -212,8 +215,13 @@ export const deleteUsuario = async(req, res) => {
 }
 
 export const endCommit = async (req, res) => {
-    await transaction.commit()
-    res.send('No fueron guardados los cambios')
+    if(transaction.finished === 'commit'){
+        res.send('Fueron guardados los cambios')
+    }else{
+        await transaction.rollback()
+        res.send('No fueron guardados los cambios')
+        
+    }
 
 }
 
