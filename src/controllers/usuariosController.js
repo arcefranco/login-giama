@@ -6,28 +6,53 @@ import { createPass } from "../helpers/passwords/createPass";
 
 let transaction;
 
+function awaitWithTimeout(timeout, ...args) {
+    function timeOut() {
+      return new Promise((res, rej) => setTimeout(res, timeout, {status: false, message: 'El campo esta siendo modificado por otro usuario'}));
+    }
+    return Promise.race([...args, timeOut()]);
+  }
+
 export const getUsuarioById = async (req, res) => {
     const dbGiama = app.get('db')
    const {id} = req.body 
    
 
  transaction = await dbGiama.transaction({
-    isolationLevel: Sequelize.Transaction.SERIALIZABLE
+    isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+    autocommit:false
   })
-let usuarios = await 
- dbGiama 
- .query
- ("SELECT usuarios.`ID`, usuarios.`emailtest` AS 'email', usuarios.`login` AS 'Usuario', usuarios.`Nombre`, vendedores.`Codigo` AS 'Vendedor', teamleader.`Codigo` AS 'TeamLeader',sucursales.`Codigo` AS 'Supervisor', gerentes.`Codigo` AS 'Gerente', usuarios.`UsuarioAnura`, usuarios.`VerSoloScoringAsignado`, usuarios.`us_bloqueado`, usuarios.`us_activo` FROM usuarios LEFT JOIN gerentes ON usuarios.`CodigoGerente` = gerentes.`Codigo` LEFT JOIN teamleader ON usuarios.`CodigoTeamLeader` = teamleader.`Codigo` LEFT JOIN vendedores ON usuarios.`CodigoVendedor` = vendedores.`Codigo` LEFT JOIN sucursales ON usuarios.`CodigoSucursal` = sucursales.`Codigo` WHERE ID = ? FOR UPDATE",
- {
-    transaction: transaction,
-   replacements: [id],
-   type: QueryTypes.SELECT
- }
-);
- console.log(Date.now())
-/* usuarios[0]["transaction"] = usuarios  */
+  const query = () => {
+    return new Promise((resolve, reject) => 
+    {
+        let usuarios =  dbGiama 
+      .query
+      ("SELECT usuarios.`ID`, usuarios.`emailtest` AS 'email', usuarios.`login` AS 'Usuario', usuarios.`Nombre`, vendedores.`Codigo` AS 'Vendedor', teamleader.`Codigo` AS 'TeamLeader',sucursales.`Codigo` AS 'Supervisor', gerentes.`Codigo` AS 'Gerente', usuarios.`UsuarioAnura`, usuarios.`VerSoloScoringAsignado`, usuarios.`us_bloqueado`, usuarios.`us_activo` FROM usuarios LEFT JOIN gerentes ON usuarios.`CodigoGerente` = gerentes.`Codigo` LEFT JOIN teamleader ON usuarios.`CodigoTeamLeader` = teamleader.`Codigo` LEFT JOIN vendedores ON usuarios.`CodigoVendedor` = vendedores.`Codigo` LEFT JOIN sucursales ON usuarios.`CodigoSucursal` = sucursales.`Codigo` WHERE ID = ? FOR UPDATE",
+      {
+          transaction: transaction,
+          replacements: [id],
+          type: QueryTypes.SELECT
+        }
+        )
 
-res.send(usuarios) 
+        resolve(usuarios)
+        
+    }
+ 
+    )
+        
+        
+   
+  }
+
+    
+const response = await awaitWithTimeout(4000, query()) 
+
+res.send(response)
+
+
+
+
 }
 
 export const getAllUsuarios = async (req, res) => {
@@ -106,7 +131,6 @@ export const updateUsuario = async (req, res) => {
                 type: QueryTypes.SELECT
 
             })
-            console.log('roles: ', roles)
             const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3.2')
             if(!finded){
                 return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
@@ -129,14 +153,19 @@ export const updateUsuario = async (req, res) => {
         Supervisor && typeof(Supervisor) === 'string' ? Supervisor = parseInt(Supervisor.split(' ')[0]) : Supervisor = Supervisor
         Vendedor && typeof(Vendedor) === 'string' ? Vendedor = parseInt(Vendedor.split(' ')[0]) : Vendedor = Vendedor
         try {
-            
-            
+
+         
             await dbGiama.query(`UPDATE usuarios SET login = ?, Nombre = ?, CodigoVendedor = ?,  CodigoSucursal = ?, CodigoTeamLeader = ?, CodigoGerente = ?, UsuarioAnura = ?, us_activo = ?, us_bloqueado = ?, VerSoloScoringAsignado = ?, emailtest = ?  WHERE ID = ?`, {
-                 replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
-                 type: QueryTypes.UPDATE
-               } 
-              ); 
-            await transaction.commit();
+                transaction: transaction,
+                replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
+                type: QueryTypes.UPDATE
+            } 
+            )/* .then(() => transaction.commit()) */.catch((error) => {
+                return res.send(error)
+            }) 
+            
+            
+
               
                 return res.send({status: true, data: 'Usuario actualizado correctamente!'}) 
              
@@ -180,6 +209,12 @@ export const deleteUsuario = async(req, res) => {
     } catch (error) {
        return res.status(400).send({status: false, data: `error al eliminar en base de datos: ${error}` })
     } 
+}
+
+export const endCommit = async (req, res) => {
+    await transaction.commit()
+    res.send('No fueron guardados los cambios')
+
 }
 
 export const getAllVendedores = async (req, res) => {
