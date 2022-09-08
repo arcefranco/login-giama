@@ -6,6 +6,13 @@ import { createPass } from "../helpers/passwords/createPass";
 
 let transaction;
 
+function awaitWithTimeout(timeout, ...args) {
+    function timeOut() {
+      return new Promise((res, rej) => setTimeout(res, timeout, {status: false, message: 'El campo esta siendo modificado por otro usuario'}));
+    }
+    return Promise.race([...args, timeOut()]);
+  }
+
 export const getUsuarioById = async (req, res) => {
     const dbGiama = app.get('db')
    const {id} = req.body 
@@ -15,20 +22,37 @@ export const getUsuarioById = async (req, res) => {
     isolationLevel: Sequelize.Transaction.SERIALIZABLE,
     autocommit:false
   })
-let usuarios = await 
- dbGiama 
- .query
- ("SELECT usuarios.`ID`, usuarios.`emailtest` AS 'email', usuarios.`login` AS 'Usuario', usuarios.`Nombre`, vendedores.`Codigo` AS 'Vendedor', teamleader.`Codigo` AS 'TeamLeader',sucursales.`Codigo` AS 'Supervisor', gerentes.`Codigo` AS 'Gerente', usuarios.`UsuarioAnura`, usuarios.`VerSoloScoringAsignado`, usuarios.`us_bloqueado`, usuarios.`us_activo` FROM usuarios LEFT JOIN gerentes ON usuarios.`CodigoGerente` = gerentes.`Codigo` LEFT JOIN teamleader ON usuarios.`CodigoTeamLeader` = teamleader.`Codigo` LEFT JOIN vendedores ON usuarios.`CodigoVendedor` = vendedores.`Codigo` LEFT JOIN sucursales ON usuarios.`CodigoSucursal` = sucursales.`Codigo` WHERE ID = ? FOR UPDATE",
- {
-    transaction: transaction,
-   replacements: [id],
-   type: QueryTypes.SELECT
- }
-).catch(() => {
-    return res.send('error en back')
-})
+  const query = () => {
+    return new Promise((resolve, reject) => 
+    {
+        let usuarios =  dbGiama 
+      .query
+      ("SELECT usuarios.`ID`, usuarios.`emailtest` AS 'email', usuarios.`login` AS 'Usuario', usuarios.`Nombre`, vendedores.`Codigo` AS 'Vendedor', teamleader.`Codigo` AS 'TeamLeader',sucursales.`Codigo` AS 'Supervisor', gerentes.`Codigo` AS 'Gerente', usuarios.`UsuarioAnura`, usuarios.`VerSoloScoringAsignado`, usuarios.`us_bloqueado`, usuarios.`us_activo` FROM usuarios LEFT JOIN gerentes ON usuarios.`CodigoGerente` = gerentes.`Codigo` LEFT JOIN teamleader ON usuarios.`CodigoTeamLeader` = teamleader.`Codigo` LEFT JOIN vendedores ON usuarios.`CodigoVendedor` = vendedores.`Codigo` LEFT JOIN sucursales ON usuarios.`CodigoSucursal` = sucursales.`Codigo` WHERE ID = ? FOR UPDATE",
+      {
+          transaction: transaction,
+          replacements: [id],
+          type: QueryTypes.SELECT
+        }
+        )
 
-res.send(usuarios) 
+        resolve(usuarios)
+        
+    }
+ 
+    )
+        
+        
+   
+  }
+
+    
+const response = await awaitWithTimeout(4000, query()) 
+
+res.send(response)
+
+
+
+
 }
 
 export const getAllUsuarios = async (req, res) => {
@@ -135,7 +159,7 @@ export const updateUsuario = async (req, res) => {
                 replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
                 type: QueryTypes.UPDATE
             } 
-            ).then(() => transaction.commit()).catch((error) => {
+            )/* .then(() => transaction.commit()) */.catch((error) => {
                 return res.send(error)
             }) 
             
