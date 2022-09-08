@@ -24,9 +24,9 @@ let usuarios = await
    replacements: [id],
    type: QueryTypes.SELECT
  }
-);
- console.log(Date.now())
-/* usuarios[0]["transaction"] = usuarios  */
+).catch(() => {
+    return res.send('error en back')
+})
 
 res.send(usuarios) 
 }
@@ -135,7 +135,9 @@ export const updateUsuario = async (req, res) => {
                 replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
                 type: QueryTypes.UPDATE
             } 
-            ).then(() => transaction.commit()) 
+            ).then(() => transaction.commit()).catch((error) => {
+                return res.send(error)
+            }) 
             
             
               
