@@ -48,12 +48,12 @@ export const postSupervisores = async (req, res, error) => {
         return res.status(400).send({status: false, data: error})
     } 
      
-    if(!Nombre || !Email || !Gerente  || !Zona) {
+    if(!Nombre || !Email ) {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
 try{  
-    await dbGiama.query("INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona) VALUES (?,?,?,?,?,?,?) ", {
-        replacements: [Nombre, Email, Gerente  , Inactivo? 0: 1, EsMiniEmprendedor? 1 :0, ValorPromedioMovil? ValorPromedioMovil: null, Zona ],
+    await dbGiama.query("INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona, UsuarioAltaRegistro ) VALUES (?,?,?,NOT ?,?,?,?,?) ", {
+        replacements: [Nombre, Email, Gerente? Gerente : null  , Inactivo? Inactivo : 0, EsMiniEmprendedor? EsMiniEmprendedor :0, ValorPromedioMovil? ValorPromedioMovil: 0, Zona? Zona : null, user ],
         type: QueryTypes.INSERT
       });
       console.log('roles')
@@ -86,10 +86,12 @@ export const updateSupervisores = async (req, res) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     } 
-
+    if(!Nombre || !Email ) {
+        return res.status(400).send({status: false, data: 'Faltan campos'})
+    }
     try{  
-    await dbGiama.query("UPDATE sucursales SET Nombre = ?, Email = ?, Gerente = ?, Inactivo = ?, EsMiniEmprendedor = ?, ValorPromedioMovil = ?, Zona = ? WHERE Codigo = ? ", {
-        replacements: [Nombre, Email, Gerente? Gerente: null, Inactivo? 0: 1, EsMiniEmprendedor? 1:0, ValorPromedioMovil, Zona, Codigo ],
+    await dbGiama.query("UPDATE sucursales SET Nombre = ?, Email = ?, Gerente = ?, Inactivo = NOT ?, EsMiniEmprendedor = ?, ValorPromedioMovil = ?, Zona = ?, UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
+        replacements: [Nombre, Email, Gerente? Gerente : null, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona? Zona: null, user, Codigo ],
         type: QueryTypes.UPDATE
       });
       return res.send({status: true, data: 'Supervisor modificado con exito!'})
