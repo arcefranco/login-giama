@@ -2,16 +2,12 @@ import { QueryTypes, Transaction } from "sequelize";
 import {app} from '../index'
 import Sequelize from "sequelize";
 import { createPass } from "../helpers/passwords/createPass";
+import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
 
 let transaction;
 
-function awaitWithTimeout(timeout, ...args) {
-    function timeOut() {
-      return new Promise((res, rej) => setTimeout(res, timeout, {status: false, message: 'El campo esta siendo modificado por otro usuario'}));
-    }
-    return Promise.race([...args, timeOut()]); 
-  }
+
 
 export const getUsuarioById = async (req, res) => {
     const dbGiama = app.get('db')
