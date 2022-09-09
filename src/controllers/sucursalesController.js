@@ -1,7 +1,11 @@
 import {app} from '../index'
 import { QueryTypes } from "sequelize";
+import Sequelize from "sequelize";
 require('dotenv').config()
+import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
+
+let transaction;
 
 export const getAllSucursales = async (req, res) => {
     const dbGiama = app.get('db')
@@ -12,14 +16,27 @@ export const getAllSucursales = async (req, res) => {
 export const getSucursalesById = async (req, res) => {
     const dbGiama = app.get('db')
     const {id} = req.body
-    console.log('id sucursal', id)
-    const sucursalById = await dbGiama.query("SELECT sucursalreal.`Codigo` AS 'Codigo', sucursalreal.`Nombre`, sucursalreal.`UsuarioAltaRegistro` FROM sucursalreal WHERE sucursalreal.`Codigo` = ?", 
-    {
-        replacements: [id],
-        type: QueryTypes.SELECT
-    })
+    transaction = await dbGiama.transaction({
+        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+        autocommit:false
+      })
+    const query = () => {
+        return new Promise((resolve, reject) => {
+            let sucursalById = dbGiama.query("SELECT sucursalreal.`Codigo` AS 'Codigo', sucursalreal.`Nombre`, sucursalreal.`UsuarioAltaRegistro` FROM sucursalreal WHERE sucursalreal.`Codigo` = ? FOR UPDATE", 
+            {
+                transaction: transaction,
+                replacements: [id],
+                type: QueryTypes.SELECT
+            })
 
-    res.send(sucursalById[0])
+            resolve(sucursalById)
+        })
+    }
+
+ 
+    const response = await awaitWithTimeout(4000, query()) 
+
+    res.send(response)
 }
 
 export const deleteSucursal = async(req, res) => {
@@ -83,14 +100,28 @@ export const updateSucursal = async (req, res) => {
 
     try {
         await dbGiama.query('UPDATE sucursalreal SET Nombre = ? WHERE Codigo = ?', {
+            transaction: transaction,
             replacements: [Nombre, Codigo],
             type: QueryTypes.UPDATE
-        })
+        }).then(() => transaction.commit()).catch((error) => {
+            transaction.rollback()
+            return res.send(error)
+        }) 
         return res.send({status: true, data: 'Sucursal actualizada correctamente!'}) 
     }catch(error){
         console.log('error en la DB: ', error)
         return res.status(400).send({status: false, data: 'error en la DB'})
     }
+}
+export const endCommit = async (req, res) => {
+    if(transaction.finished === 'commit'){
+        res.send('Fueron guardados los cambios')
+    }else{
+        await transaction.rollback()
+        res.send('No fueron guardados los cambios')
+        
+    }
+
 }
 
 export const createSucursal = async (req, res) => {
