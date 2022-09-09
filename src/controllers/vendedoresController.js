@@ -1,8 +1,10 @@
 import {  QueryTypes } from "sequelize";
 import {app} from '../index'
-// import Vendedor from '../models/vendedoresModel'
+require('dotenv').config()
+import Sequelize from "sequelize";
+import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
-
+let transaction;
 
 export const getVendedores = async (req, res) => {
 
@@ -15,15 +17,28 @@ export const getVendedoresById = async (req, res) => {
     const dbGiama = app.get('db')
     const vendedores = req.body
     console.log(vendedores)
-    const allVendedoresById = await  dbGiama
+    transaction = await dbGiama.transaction({
+        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+        autocommit:false
+      })
+      const query = () => {
+        return new Promise((resolve, reject) => {
+    const allVendedoresById =   dbGiama
     .query
     ("SELECT vendedores.`Codigo`, vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Nombre` AS 'TeamLeader', Categoria, oficialesscoring.`Nombre` AS OficialScoring, oficialesmora.`Nombre` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%Y-%m-%d') AS 'FechaBaja', escalascomisionesvendedores.`Nombre` AS 'Escala' FROM vendedores LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` WHERE vendedores.`Codigo` = ? ",
     {
+        transaction: transaction,
       replacements: [vendedores.Codigo],
       type: QueryTypes.SELECT
     }
    );
-    res.send(allVendedoresById)
+    resolve(allVendedoresById)
+    })
+
+    }
+    const response = await awaitWithTimeout(4000, query()) 
+
+    res.send(response)
 }
 
 export const postVendedores = async (req, res, error) => {
@@ -100,6 +115,18 @@ export const updateVendedores = async (req, res) => {
         console.log(err)
     }
 }
+
+export const endCommit = async (req, res) => {
+    if(transaction.finished === 'commit'){
+        res.send('Fueron guardados los cambios')
+    }else{
+        await transaction.rollback()
+        res.send('No fueron guardados los cambios')
+        
+    }
+
+}
+
 export const deleteVendedores = async (req, res, error) => {
     const dbGiama = app.get('db')
     const {Codigo} = req.body;
