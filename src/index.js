@@ -11,8 +11,12 @@ require('dotenv').config()
 
 import RolesRouter from "./routes/rolesRoutes";
 import supervisoresRoutes from "./routes/supervisoresRoutes";
+
+import SucursalesRouter from "./routes/sucursalesRoutes";
+
 import TeamLeadersRouter from "./routes/teamLeadersRoutes";
 import VendedoresRouter from "./routes/vendedoresRoutes";
+
 
 const passport = require('passport')
 export const app = express();
@@ -37,7 +41,12 @@ app.use('/login', UserRouter)
 app.use('/gerentes', GerentesRouter)
 app.use('/reset', resetRouter)
 app.use('/usuarios', usuariosRoutes)
+
+app.use('/sucursales', SucursalesRouter)
+
+
 app.use('/teamleaders', TeamLeadersRouter)
+
 app.use('/roles', RolesRouter)
 app.use('/vendedores', VendedoresRouter)
 app.use('/supervisores', supervisoresRoutes)
