@@ -20,6 +20,9 @@ sequelize.authenticate().then(() => {
 .catch(err => {
     console.log('DB ERROR: ', err)
 })
+
+/*-----------------------MODELOS SEQUELIZE----------------------------*/
+//GERENTES
 const Gerente = sequelize.define('gerentes', {
     Codigo: {
         type:DataTypes.STRING,
@@ -42,6 +45,7 @@ timestamps:false,
 }) 
 Gerente.removeAttribute('id')  
 
+//SUPERVISOR
 const  Supervisor = sequelize.define('sucursales', {
     Codigo: {
         type:DataTypes.STRING,
@@ -85,6 +89,7 @@ timestamps:false,
 })
 Supervisor.removeAttribute('id')
 
+//TEAM LEADER
 const TeamLeader = sequelize.define('teamleader', {
     Codigo: {
         type:DataTypes.STRING,
@@ -106,6 +111,17 @@ freezeTableName:true,
 timestamps:false,
 }) 
 TeamLeader.removeAttribute('id')  
+
+//VENDEDORES
+const Vendedores = sequelize.define('vendedores', {
+    Codigo: {
+        type:DataTypes.STRING,
+    },
+},{
+freezeTableName:true,
+timestamps:false,
+}) 
+Vendedores.removeAttribute('id')
 
 const db = {}
 
