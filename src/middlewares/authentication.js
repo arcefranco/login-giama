@@ -18,6 +18,6 @@ module.exports = async (req, res, next) => {
 
    } catch (error) {
       console.log(error);
-      next({ status: 400, message: "Invalid token" });
+      return res.send({ status: 400, message: "Invalid token" });
    }
 }
