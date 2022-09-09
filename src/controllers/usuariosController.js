@@ -10,7 +10,7 @@ function awaitWithTimeout(timeout, ...args) {
     function timeOut() {
       return new Promise((res, rej) => setTimeout(res, timeout, {status: false, message: 'El campo esta siendo modificado por otro usuario'}));
     }
-    return Promise.race([...args, timeOut()]);
+    return Promise.race([...args, timeOut()]); 
   }
 
 export const getUsuarioById = async (req, res) => {
@@ -192,7 +192,6 @@ export const deleteUsuario = async(req, res) => {
             type: QueryTypes.SELECT
 
         })
-        console.log('roles: ', roles)
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3')
         if(!finded){
             return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
