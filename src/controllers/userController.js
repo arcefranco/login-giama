@@ -16,7 +16,8 @@ export const login = async (req, res) => {
     const dbGiama = app.get('db')
     const {login} = req.body
     const {password} = req.body
-    
+    const {empresa} = req.body
+    const {empresaReal} = req.body
     const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
     {
       replacements: [login],
@@ -68,7 +69,9 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
         username: user[0].login,
         newUser: user[0].newuserBoolean,
         roles: roles,
-        token: token
+        empresa: empresa,
+        token: token,
+        empresaReal: empresaReal
 
       
     })
