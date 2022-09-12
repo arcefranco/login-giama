@@ -1,10 +1,12 @@
 import {  QueryTypes } from "sequelize";
 import {app} from '../index'
+
 require('dotenv').config()
 import Sequelize from "sequelize";
 import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
 let transaction;
+
 
 export const getVendedores = async (req, res) => {
 
@@ -39,6 +41,7 @@ export const getVendedoresById = async (req, res) => {
     const response = await awaitWithTimeout(4000, query()) 
 
     res.send(response)
+
 }
 
 export const postVendedores = async (req, res, error) => {

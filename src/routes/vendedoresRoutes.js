@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import { endCommit } from "../controllers/vendedoresController";
 import {  getVendedores, getVendedoresById, postVendedores, updateVendedores,deleteVendedores,  getAllEscalas, getAllOficialesScoring, getAllOficialesMora } from "../controllers/vendedoresController";
 import { errorHandling } from "../middlewares/errorHandling";
