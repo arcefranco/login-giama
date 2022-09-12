@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {  getTeamLeaders, getTeamLeadersById, postTeamLeaders, updateTeamLeaders,deleteTeamLeaders, getAllZonas } from "../controllers/teamLeadersController";
+import {  getTeamLeaders, getTeamLeadersById, postTeamLeaders, updateTeamLeaders,deleteTeamLeaders, getAllZonas, endCommit } from "../controllers/teamLeadersController";
 import {  getGerentes} from "../controllers/gerentesController";
 import { errorHandling } from "../middlewares/errorHandling";
 
@@ -13,8 +13,7 @@ TeamLeadersRouter.route('/id').post(getTeamLeadersById);
 TeamLeadersRouter.route('/').post(postTeamLeaders);
 TeamLeadersRouter.route('/').put(updateTeamLeaders);
 TeamLeadersRouter.route('/').delete(deleteTeamLeaders);
-
-//get gerentes, zonas
-TeamLeadersRouter.route('/gerentes').get(getGerentes)
+TeamLeadersRouter.get('/endCommit', endCommit);
+TeamLeadersRouter.route('/gerentes').get(getGerentes);
 
 export default TeamLeadersRouter
