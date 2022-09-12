@@ -86,7 +86,7 @@ export const updateVendedores = async (req, res) => {
     const dbGiama = app.get('db')
     console.log(req.body) 
     console.log(req.body.HechoPor) 
-    let {Codigo, Nombre,  Sucursal, Activo:Inactivo, TeamLeader, Categoria, OficialScoring, OficialMora, FechaBaja, Escala} = req.body;
+    let {Codigo, Nombre,   Activo:Inactivo, TeamLeader, Categoria, OficialScoring, OficialMora, FechaBaja, Escala} = req.body;
     const user = req.body.HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
