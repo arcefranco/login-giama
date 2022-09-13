@@ -380,13 +380,21 @@ export const updateOficiales = async (req, res) => {
 }
 
 export const endCommit = async (req, res) => {
-    if(transaction.finished === 'commit'){
-        res.send('Fueron guardados los cambios')
-    }else{
-        await transaction.rollback()
-        res.send('No fueron guardados los cambios')
+    if(transaction.finished){
+
+        if(transaction.finished === 'commit'){
+            return res.send('Fueron guardados los cambios')
+            
+        }
+        else if(transaction.finished === 'rollback'){
+            return res.send('No fueron guardados los cambios')
+        }
         
-    }
+    }else{
+            await transaction.rollback()
+            return res.send('No fueron guardados los cambios')
+            
+        }
 
 }
 
