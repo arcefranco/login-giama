@@ -66,11 +66,11 @@ export const deleteOficiales = async (req, res) => {
                         replacements: [Codigo],
                         type: QueryTypes.DELETE
                     })
-                    return res.send('Eliminado correctamente!')
+                    return res.send({status: true, message: 'Eliminado correctamente!'})
                     
                 } catch (error) {
                     console.log(error)
-                    return res.send('Hubo un problema')
+                    return res.send({status: false, message: 'Hubo un problema'})
                 }   
 
         case 'Adjudicaciones':
@@ -79,11 +79,11 @@ export const deleteOficiales = async (req, res) => {
                        replacements: [Codigo],
                        type: QueryTypes.DELETE
                     })
-                    return res.send('Eliminado correctamente!')
+                    return res.send({status: true, message: 'Eliminado correctamente!'})
                     
                 } catch (error) {
                     console.log(error)
-                    return res.send('Hubo un problema')
+                    return res.send({status: false, message: 'Hubo un problema'})
                 }
         
         case 'Plan Canje':
@@ -92,11 +92,11 @@ export const deleteOficiales = async (req, res) => {
                    replacements: [Codigo],
                    type: QueryTypes.DELETE
                 })
-                return res.send('Eliminado correctamente!')
+                return res.send({status: true, message: 'Eliminado correctamente!'})
                 
             } catch (error) {
                 console.log(error)
-                return res.send('Hubo un problema')
+                return res.send({status: false, message: 'Hubo un problema'})
             }
 
         case 'Scoring':
@@ -105,11 +105,11 @@ export const deleteOficiales = async (req, res) => {
                    replacements: [Codigo],
                    type: QueryTypes.DELETE
                 })
-                return res.send('Eliminado correctamente!')
+                return res.send({status: true, message: 'Eliminado correctamente!'})
                 
             } catch (error) {
                 console.log(error)
-                return res.send('Hubo un problema')
+                return res.send({status: false, message: 'Hubo un problema'})
             }
         
         case 'Mora':
@@ -118,7 +118,7 @@ export const deleteOficiales = async (req, res) => {
                        replacements: [Codigo],
                        type: QueryTypes.DELETE
                     })
-                    return res.send('Eliminado correctamente!')
+                    return res.send({status: true, message: 'Eliminado correctamente!'})
                 
             } catch (error) {
                 
@@ -130,11 +130,11 @@ export const deleteOficiales = async (req, res) => {
                      replacements: [Codigo],
                      type: QueryTypes.DELETE
                     })
-                    return res.send('Eliminado correctamente!')
+                    return res.send({status: true, message: 'Eliminado correctamente!'})
                 
             } catch (error) {
                 console.log(error)
-                return res.send('Hubo un problema')
+                return res.send({status: false, message: 'Hubo un problema'})
             }
         
         case 'Compra':
@@ -143,11 +143,11 @@ export const deleteOficiales = async (req, res) => {
                    replacements: [Codigo],
                    type: QueryTypes.DELETE
                 })
-                return res.send('Eliminado correctamente!')
+                return res.send({status: true, message: 'Eliminado correctamente!'})
                 
             } catch (error) {
                 console.log(error)
-                return res.send('Hubo un problema')
+                return res.send({status: false, message: 'Hubo un problema'})
             }
 
         case 'Carga': 
@@ -156,11 +156,11 @@ export const deleteOficiales = async (req, res) => {
                    replacements: [Codigo],
                    type: QueryTypes.DELETE
                 })
-                return res.send('Eliminado correctamente!')
+                return res.send({status: true, message: 'Eliminado correctamente!'})
                 
             } catch (error) {
                 console.log(error)
-                return res.send('Hubo un problema')
+                return res.send({status: false, message: 'Hubo un problema'})
             }
             
         case 'Patentamiento':
@@ -169,11 +169,11 @@ export const deleteOficiales = async (req, res) => {
                    replacements: [Codigo],
                    type: QueryTypes.DELETE
                 })
-                return res.send('Eliminado correctamente!')
+                return res.send({status: true, message: 'Eliminado correctamente!'})
                 
             } catch (error) {
                 console.log(error)
-                return res.send('Hubo un problema')
+                return res.send({status: false, message: 'Hubo un problema'})
             }
         
         case 'Asignacion': 
@@ -182,14 +182,436 @@ export const deleteOficiales = async (req, res) => {
                    replacements: [Codigo],
                    type: QueryTypes.DELETE
                 })
-                return res.send('Eliminado correctamente!')
+                return res.send({status: true, message: 'Eliminado correctamente!'})
                 
             } catch (error) {
                 console.log(error)
-                return res.send('Hubo un problema')
+                return res.send({status: false, message: 'Hubo un problema'})
             }
 
         default:
-           return res.send('Error')
+           return res.send({status: false, message: 'Error'})
+    }
+}
+export const updateOficiales = async (req, res) => {
+
+    const {categoria, Codigo, Nombre} = req.body
+    const dbGiama = app.get('db')
+    console.log(req.body)
+
+    switch (categoria) {
+        case 'Licitaciones':
+                try {
+                    await dbGiama.query("UPDATE oficialeslicitaciones SET Nombre = ? WHERE Codigo = ?", {
+                        replacements: [Nombre, Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send({status: true, message: 'Actualizado correctamente!'})
+                    
+                } catch (error) {
+                    console.log(error)
+                    return res.send({status: false, message: 'Hubo un problema'})
+                }   
+
+        case 'Adjudicaciones':
+                try {
+                    await dbGiama.query("UPDATE oficialesadjudicacion SET Nombre = ? WHERE Codigo = ?", {
+                       replacements: [Nombre, Codigo],
+                       type: QueryTypes.UPDATE
+                    })
+                    return res.send({status: true, message: 'Actualizado correctamente!'})
+                    
+                } catch (error) {
+                    console.log(error)
+                    return res.send({status: false, message: 'Hubo un problema'})
+                }
+        
+        case 'Canje':
+            try {
+                await dbGiama.query("UPDATE oficialesplancanje SET Nombre = ? WHERE Codigo = ?", {
+                   replacements: [Nombre, Codigo],
+                   type: QueryTypes.UPDATE
+                })
+                return res.send({status: true, message: 'Actualizado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+
+        case 'Scoring':
+            try {
+                await dbGiama.query("UPDATE oficialesscoring SET Nombre = ? WHERE Codigo = ?", {
+                   replacements: [Nombre, Codigo],
+                   type: QueryTypes.UPDATE
+                })
+                return res.send({status: true, message: 'Actualizado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+        
+        case 'Mora':
+            try {
+                await dbGiama.query("UPDATE oficialesmora SET Nombre = ? WHERE Codigo = ?", {
+                       replacements: [Nombre, Codigo],
+                       type: QueryTypes.UPDATE
+                    })
+                    return res.send({status: true, message: 'Actualizado correctamente!'})
+                
+            } catch (error) {
+                
+            }
+
+        case 'Subite':
+            try {
+                await dbGiama.query("UPDATE subite_oficiales SET Nombre = ? WHERE Codigo = ?", {
+                     replacements: [Nombre, Codigo],
+                     type: QueryTypes.UPDATE
+                    })
+                    return res.send({status: true, message: 'Actualizado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+        
+        case 'Compra':
+            try {
+                dbGiama.query("UPDATE comprar_oficiales SET Nombre = ? WHERE Codigo = ?", {
+                   replacements: [Nombre, Codigo],
+                   type: QueryTypes.UPDATE
+                })
+                return res.send({status: true, message: 'Actualizado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+
+        case 'Carga': 
+            try {
+                await dbGiama.query("UPDATE oficialescarga SET Nombre = ? WHERE Codigo = ?", {
+                   replacements: [Nombre, Codigo],
+                   type: QueryTypes.UPDATE
+                })
+                return res.send({status: true, message: 'Actualizado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+            
+        case 'Patentamiento':
+            try {
+                await dbGiama.query("UPDATE oficialespatentamiento SET Nombre = ? WHERE Codigo = ?", {
+                   replacements: [Nombre, Codigo],
+                   type: QueryTypes.UPDATE
+                })
+                return res.send({status: true, message: 'Actualizado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+        
+        case 'Asignacion': 
+            try {
+                await dbGiama.query("UPDATE oficialesasignacion SET Nombre = ? WHERE Codigo = ?", {
+                   replacements: [Nombre, Codigo],
+                   type: QueryTypes.UPDATE
+                })
+                return res.send({status: true, message: 'Actualizado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+
+        default:
+           return res.send({status: false, message: 'Error'})
+    }
+}
+
+export const createOficiales = async (req, res) => {
+
+    const {categoria, Nombre} = req.body
+    const dbGiama = app.get('db')
+    console.log(req.body)
+
+    switch (categoria) {
+        case 'Licitaciones':
+                try {
+                    await dbGiama.query("INSERT INTO oficialeslicitaciones (Nombre) VALUES (?)", {
+                        replacements: [Nombre],
+                        type: QueryTypes.INSERT
+                    })
+                    return res.send({status: true, message: 'Creado correctamente!'})
+                    
+                } catch (error) {
+                    console.log(error)
+                    return res.send({status: false, message: 'Hubo un problema'})
+                }   
+
+        case 'Adjudicaciones':
+                try {
+                    await dbGiama.query("INSERT INTO oficialesadjudicacion (Nombre) VALUES (?)", {
+                       replacements: [Nombre],
+                       type: QueryTypes.INSERT
+                    })
+                    return res.send({status: true, message: 'Creado correctamente!'})
+                    
+                } catch (error) {
+                    console.log(error)
+                    return res.send({status: false, message: 'Hubo un problema'})
+                }
+        
+        case 'Canje':
+            try {
+                await dbGiama.query("INSERT INTO oficialesplancanje (Nombre) VALUES (?)", {
+                   replacements: [Nombre],
+                   type: QueryTypes.INSERT
+                })
+                return res.send({status: true, message: 'Creado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+
+        case 'Scoring':
+            try {
+                await dbGiama.query("INSERT INTO oficialesscoring (Nombre) VALUES (?)", {
+                   replacements: [Nombre],
+                   type: QueryTypes.INSERT
+                })
+                return res.send({status: true, message: 'Creado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+        
+        case 'Mora':
+            try {
+                await dbGiama.query("INSERT INTO oficialesmora (Nombre) VALUES (?)", {
+                       replacements: [Nombre],
+                       type: QueryTypes.INSERT
+                    })
+                    return res.send({status: true, message: 'Creado correctamente!'})
+                
+            } catch (error) {
+                
+            }
+
+        case 'Subite':
+            try {
+                await dbGiama.query("INSERT INTO subite_oficiales (Nombre) VALUES (?)", {
+                     replacements: [Nombre],
+                     type: QueryTypes.INSERT
+                    })
+                    return res.send({status: true, message: 'Creado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+        
+        case 'Compra':
+            try {
+                dbGiama.query("INSERT INTO comprar_oficiales (Nombre) VALUES (?)", {
+                   replacements: [Nombre],
+                   type: QueryTypes.INSERT
+                })
+                return res.send({status: true, message: 'Creado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+
+        case 'Carga': 
+            try {
+                await dbGiama.query("INSERT INTO oficialescarga (Nombre) VALUES (?)", {
+                   replacements: [Nombre],
+                   type: QueryTypes.INSERT
+                })
+                return res.send({status: true, message: 'Creado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+            
+        case 'Patentamiento':
+            try {
+                await dbGiama.query("INSERT INTO oficialespatentamiento (Nombre) VALUES (?)", {
+                   replacements: [Nombre],
+                   type: QueryTypes.INSERT
+                })
+                return res.send({status: true, message: 'Creado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+        
+        case 'Asignacion': 
+            try {
+                await dbGiama.query("INSERT INTO oficialesasignacion (Nombre) VALUES (?)", {
+                   replacements: [Nombre],
+                   type: QueryTypes.INSERT
+                })
+                return res.send({status: true, message: 'Creado correctamente!'})
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+
+        default:
+           return res.send({status: false, message: 'Error'})
+    }
+}
+
+export const getOficialesById = async (req, res) => {
+
+    const {categoria, Codigo} = req.body
+    const dbGiama = app.get('db')
+    console.log(req.body)
+
+    switch (categoria) {
+        case 'Licitaciones':
+                try {
+                    const oficial = await dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ?", {
+                        replacements: [Codigo],
+                        type: QueryTypes.SELECT
+                    })
+                    return res.send(oficial[0])
+                    
+                } catch (error) {
+                    console.log(error)
+                    return res.send({status: false, message: 'Hubo un problema'})
+                }   
+
+        case 'Adjudicaciones':
+                try {
+                    const oficial = await dbGiama.query("SELECT * FROM oficialesadjudicacion WHERE Codigo = ?", {
+                       replacements: [Codigo],
+                       type: QueryTypes.SELECT
+                    })
+                    return res.send(oficial[0])
+                    
+                } catch (error) {
+                    console.log(error)
+                    return res.send({status: false, message: 'Hubo un problema'})
+                }
+        
+        case 'Canje':
+            try {
+                const oficial = await dbGiama.query("SELECT * FROM oficialesplancanje WHERE Codigo = ?", {
+                   replacements: [Codigo],
+                   type: QueryTypes.SELECT
+                })
+                return res.send(oficial[0])
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+
+        case 'Scoring':
+            try {
+                const oficial = await dbGiama.query("SELECT * FROM oficialesscoring WHERE Codigo = ?", {
+                   replacements: [Codigo],
+                   type: QueryTypes.SELECT
+                })
+                return res.send(oficial[0])
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+        
+        case 'Mora':
+            try {
+                const oficial = await dbGiama.query("SELECT * FROM oficialesmora WHERE Codigo = ?", {
+                       replacements: [Codigo],
+                       type: QueryTypes.SELECT
+                    })
+                    return res.send(oficial[0])
+                
+            } catch (error) {
+                
+            }
+
+        case 'Subite':
+            try {
+                const oficial = await dbGiama.query("SELECT * FROM subite_oficiales WHERE Codigo = ?", {
+                     replacements: [Codigo],
+                     type: QueryTypes.SELECT
+                    })
+                    return res.send(oficial[0])
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+        
+        case 'Compra':
+            try {
+                const oficial = await dbGiama.query("SELECT * FROM comprar_oficiales WHERE Codigo = ?", {
+                   replacements: [Codigo],
+                   type: QueryTypes.SELECT
+                })
+                return res.send(oficial[0])
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+
+        case 'Carga': 
+            try {
+                const oficial = await dbGiama.query("SELECT * FROM oficialescarga WHERE Codigo = ?", {
+                   replacements: [Codigo],
+                   type: QueryTypes.SELECT
+                })
+                return res.send(oficial[0])
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+            
+        case 'Patentamiento':
+            try {
+                const oficial = await dbGiama.query("SELECT * FROM oficialespatentamiento WHERE Codigo = ?", {
+                   replacements: [Codigo],
+                   type: QueryTypes.SELECT
+                })
+                return res.send(oficial[0])
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+        
+        case 'Asignacion': 
+            try {
+                const oficial = await dbGiama.query("SELECT * FROM oficialesasignacion WHERE Codigo = ?", {
+                   replacements: [Codigo],
+                   type: QueryTypes.SELECT
+                })
+                return res.send(oficial[0])
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
+            }
+
+        default:
+           return res.send({status: false, message: 'Error'})
     }
 }
