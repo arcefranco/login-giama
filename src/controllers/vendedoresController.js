@@ -11,7 +11,7 @@ let transaction;
 export const getVendedores = async (req, res) => {
 
         const dbGiama = app.get('db')
-        const allVendedores = await dbGiama.query("SELECT vendedores.`Codigo`, sucursales.`Nombre` AS 'Sucursal' , vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Nombre` AS 'TeamLeader', Categoria, oficialesscoring.`Nombre` AS OficialScoring, oficialesmora.`Nombre` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%d/%m/%Y') AS 'FechaBaja', escalascomisionesvendedores.`Nombre` AS 'Escala' FROM vendedores LEFT JOIN sucursales ON vendedores.`Sucursal` = sucursales.`Codigo` LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` ")
+        const allVendedores = await dbGiama.query("SELECT vendedores.`Codigo`, vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Nombre` AS 'TeamLeader', Categoria, oficialesscoring.`Nombre` AS OficialScoring, oficialesmora.`Nombre` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%d/%m/%Y') AS 'FechaBaja', escalascomisionesvendedores.`Nombre` AS 'Escala' FROM vendedores LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` ")
         res.send(allVendedores)
 
 }
@@ -171,10 +171,19 @@ export const getAllOficialesScoring = async (req, res) => {
     const dbGiama = app.get('db')
     const result = await dbGiama.query("SELECT * from oficialesscoring")
     res.send(result)
+}
+export const getAllOficialesScoringActivos = async (req, res) => {
+    const dbGiama = app.get('db')
+    const result = await dbGiama.query("SELECT * from oficialesscoring WHERE Inactivo = 0")
+    res.send(result)
 }   
 export const getAllOficialesMora = async (req, res) => {
     const dbGiama = app.get('db')
     const result = await dbGiama.query("SELECT * from oficialesmora")
     res.send(result)
 } 
- 
+export const getAllOficialesMoraActivos = async (req, res) => {
+    const dbGiama = app.get('db')
+    const result = await dbGiama.query("SELECT * from oficialesmora WHERE Activo = 1")
+    res.send(result)
+}  

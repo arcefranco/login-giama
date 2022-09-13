@@ -13,6 +13,14 @@ export const getSupervisores = async (req, res) => {
         res.send(allSupervisores)
 
 }
+
+export const getSupervisoresActivos = async (req, res) => {
+
+    const dbGiama = app.get('db')
+    const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo` WHERE Inactivo = 0 ")
+    res.send(allSupervisores)
+
+}
 export const getSupervisoresById = async (req, res) => {
     const dbGiama = app.get('db')
     const supervisores = req.body

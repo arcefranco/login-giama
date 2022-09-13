@@ -12,6 +12,12 @@ export const getGerentes = async (req, res) => {
     const allGerentes = await dbGiama.query("SELECT Codigo, Nombre, Activo FROM gerentes")
     res.send(allGerentes)
 }
+export const getGerentesActivos = async (req, res) => {
+    const dbGiama = app.get('db')
+    
+    const allGerentes = await dbGiama.query("SELECT Codigo, Nombre, Activo FROM gerentes WHERE Activo = 1")
+    res.send(allGerentes)
+}    
 export const getGerentesById = async (req, res) => {
     const gerentes = req.body
     const dbGiama = app.get('db')
@@ -30,12 +36,15 @@ export const getGerentesById = async (req, res) => {
     })
     console.log(allGerentesById)
     resolve(allGerentesById)
+
+    
 })
 }
 const response = await awaitWithTimeout(4000, query()) 
 
 res.send(response)
 }
+
 
 export const postGerentes = async (req, res, error) => {
      let {Nombre, Activo} = req.body;
