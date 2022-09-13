@@ -15,7 +15,11 @@ import supervisoresRoutes from "./routes/supervisoresRoutes";
 import SucursalesRouter from "./routes/sucursalesRoutes";
 
 import TeamLeadersRouter from "./routes/teamLeadersRoutes";
+
+import OficialesRouter from "./routes/oficialesRoutes";
+
 import VendedoresRouter from "./routes/vendedoresRoutes";
+
 
 
 const passport = require('passport')
@@ -50,6 +54,8 @@ app.use('/teamleaders', TeamLeadersRouter)
 app.use('/roles', RolesRouter)
 app.use('/vendedores', VendedoresRouter)
 app.use('/supervisores', supervisoresRoutes)
+
+app.use('/oficiales', OficialesRouter)
 
 app.listen(process.env.PORT, () => {
 
