@@ -16,6 +16,15 @@ export const getTeamLeaders = async (req, res) => {
         res.send(allTeamLeaders)
 
 }
+export const getTeamLeadersActivos = async (req, res) => {
+
+    const dbGiama = app.get('db')
+    // const allTeamLeaders = await dbGiama.query("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre' ,  sucursales.`Nombre` AS 'Supervisor', NOT Inactivo AS Activo,  FROM teamleader LEFT JOIN sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   ")
+    const allTeamLeaders = await dbGiama.query("SELECT teamleader. `Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo` WHERE CONVERT(teamleader.`Inactivo`, DECIMAL) = 0 ")
+    res.send(allTeamLeaders)
+
+}
+
 export const getTeamLeadersById = async (req, res) => {
     const dbGiama = app.get('db')
     const teamLeaders = req.body

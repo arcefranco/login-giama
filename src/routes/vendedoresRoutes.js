@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { endCommit } from "../controllers/vendedoresController";
+import { endCommit, getAllOficialesMoraActivos, getAllOficialesScoringActivos } from "../controllers/vendedoresController";
 import {  getVendedores, getVendedoresById, postVendedores, updateVendedores,deleteVendedores,  getAllEscalas, getAllOficialesScoring, getAllOficialesMora } from "../controllers/vendedoresController";
 import { errorHandling } from "../middlewares/errorHandling";
 
@@ -21,5 +21,7 @@ VendedoresRouter.get('/endCommit', endCommit);
 VendedoresRouter.route('/escalas').get(getAllEscalas)
 VendedoresRouter.route('/oficialesScoring').get(getAllOficialesScoring)
 VendedoresRouter.route('/oficialesMora').get(getAllOficialesMora)
+VendedoresRouter.route('/oficialesScoringActivos').get(getAllOficialesScoringActivos)
+VendedoresRouter.route('/oficialesMoraActivos').get(getAllOficialesMoraActivos)
 
 export default VendedoresRouter
