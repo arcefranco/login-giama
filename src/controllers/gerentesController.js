@@ -1,12 +1,10 @@
-import sequelize from "sequelize";
-import { Sequelize, QueryTypes, DataTypes } from "sequelize";
+import {  QueryTypes, DataTypes } from "sequelize";
 import {app} from '../index'
-// import Gerente from '../models/gerentesModel'
-import db from "../database";
+import Sequelize from "sequelize";
+require('dotenv').config()
+import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
-
-
-
+let transaction;
 
 export const getGerentes = async (req, res) => {
     const dbGiama = app.get('db')
@@ -16,14 +14,27 @@ export const getGerentes = async (req, res) => {
 }
 export const getGerentesById = async (req, res) => {
     const gerentes = req.body
-    const dbGiama = app.get('db').models.gerentes
+    const dbGiama = app.get('db')
+    const gerentesModel = app.get('db').models.gerentes
     console.log(gerentes)
-    const allGerentesById = await dbGiama.findAll(
+    transaction = await dbGiama.transaction({
+        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+        autocommit:false
+      })
+      const query = () => {
+        return new Promise((resolve, reject) => {
+    const allGerentesById =  gerentesModel.findAll(
         {
+        transaction: transaction,
         where:{Codigo:gerentes.Codigo}
     })
     console.log(allGerentesById)
-    res.send(allGerentesById)
+    resolve(allGerentesById)
+})
+}
+const response = await awaitWithTimeout(4000, query()) 
+
+res.send(response)
 }
 
 export const postGerentes = async (req, res, error) => {
@@ -98,6 +109,16 @@ export const updateGerentes = async (req, res) => {
         console.log(err)
     }
 }
+
+export const endCommit = async (req, res) => {
+    if(transaction.finished === 'commit'){
+        res.send('Fueron guardados los cambios')
+    }else{
+        await transaction.rollback()
+        res.send('No fueron guardados los cambios')
+    }
+}
+
 export const deleteGerentes = async (req, res, error) => {
     const {Codigo} = req.body;
     console.log(Codigo)

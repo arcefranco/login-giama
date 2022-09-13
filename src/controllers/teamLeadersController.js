@@ -1,10 +1,11 @@
 import {  QueryTypes } from "sequelize";
 import {app} from '../index'
-// import Supervisor from '../models/supervisoresModel'
+import Sequelize from "sequelize";
+require('dotenv').config()
+import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
 
-
-
+let transaction;
 
 
 export const getTeamLeaders = async (req, res) => {
@@ -19,15 +20,27 @@ export const getTeamLeadersById = async (req, res) => {
     const dbGiama = app.get('db')
     const teamLeaders = req.body
     console.log(teamLeaders)
-    const allTeamLeadersById = await  dbGiama
+    transaction = await dbGiama.transaction({
+        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+        autocommit:false
+      })
+     const query = () => {
+        return new Promise((resolve, reject) => {
+    const allTeamLeadersById = dbGiama
     .query
     ("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   WHERE teamleader.`Codigo` = ? ",
     {
+      transaction: transaction,
       replacements: [teamLeaders.Codigo],
       type: QueryTypes.SELECT
     }
    );
-    res.send(allTeamLeadersById)
+    resolve(allTeamLeadersById)
+})
+}
+const response = await awaitWithTimeout(4000, query()) 
+
+res.send(response)
 }
 
 export const postTeamLeaders = async (req, res, error) => {
@@ -103,6 +116,15 @@ export const updateTeamLeaders = async (req, res) => {
         console.log(err)
     }
 }
+export const endCommit = async (req, res) => {
+    if(transaction.finished === 'commit'){
+        res.send('Fueron guardados los cambios')
+    }else{
+        await transaction.rollback()
+        res.send('No fueron guardados los cambios')
+    }
+}
+
 export const deleteTeamLeaders = async (req, res, error) => {
     const dbGiama = app.get('db')
     const {Codigo} = req.body;

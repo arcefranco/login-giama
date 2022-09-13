@@ -1,8 +1,10 @@
 import {  QueryTypes } from "sequelize";
 import {app} from '../index'
-// import Supervisor from '../models/supervisoresModel'
+import Sequelize from "sequelize";
+require('dotenv').config()
+import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
-
+let transaction;
 
 export const getSupervisores = async (req, res) => {
 
@@ -15,15 +17,27 @@ export const getSupervisoresById = async (req, res) => {
     const dbGiama = app.get('db')
     const supervisores = req.body
     console.log(supervisores)
-    const allSupervisoresById = await  dbGiama
+    transaction = await dbGiama.transaction({
+        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+        autocommit:false
+      })
+      const query = () => {
+        return new Promise((resolve, reject) => {
+    const allSupervisoresById = dbGiama
     .query
     ("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo` WHERE sucursales.`Codigo` = ? ",
     {
+        transaction: transaction,
       replacements: [supervisores.Codigo],
       type: QueryTypes.SELECT
     }
    );
-    res.send(allSupervisoresById)
+   resolve(allSupervisoresById)
+})
+}
+const response = await awaitWithTimeout(4000, query()) 
+
+res.send(response)
 }
 
 export const postSupervisores = async (req, res, error) => {
@@ -101,6 +115,15 @@ export const updateSupervisores = async (req, res) => {
         console.log(err)
     }
 }
+export const endCommit = async (req, res) => {
+    if(transaction.finished === 'commit'){
+        res.send('Fueron guardados los cambios')
+    }else{
+        await transaction.rollback()
+        res.send('No fueron guardados los cambios')
+    }
+}
+
 export const deleteSupervisores = async (req, res, error) => {
     const dbGiama = app.get('db')
     const {Codigo} = req.body;

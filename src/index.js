@@ -6,6 +6,7 @@ import UserRouter from "./routes/userRoutes";
 import GerentesRouter from './routes/gerentesRoutes'
 import resetRouter from "./routes/resetRoutes";
 import usuariosRoutes from "./routes/usuariosRoutes";
+
 require('dotenv').config()
 
 import RolesRouter from "./routes/rolesRoutes";
@@ -14,7 +15,11 @@ import supervisoresRoutes from "./routes/supervisoresRoutes";
 import SucursalesRouter from "./routes/sucursalesRoutes";
 
 import TeamLeadersRouter from "./routes/teamLeadersRoutes";
+
 import OficialesRouter from "./routes/oficialesRoutes";
+
+import VendedoresRouter from "./routes/vendedoresRoutes";
+
 
 
 const passport = require('passport')
@@ -47,7 +52,7 @@ app.use('/sucursales', SucursalesRouter)
 app.use('/teamleaders', TeamLeadersRouter)
 
 app.use('/roles', RolesRouter)
-
+app.use('/vendedores', VendedoresRouter)
 app.use('/supervisores', supervisoresRoutes)
 
 app.use('/oficiales', OficialesRouter)
