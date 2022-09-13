@@ -222,7 +222,7 @@ export const updateOficiales = async (req, res) => {
                     return res.send({status: false, message: 'Hubo un problema'})
                 }   
 
-        case 'Adjudicaciones':
+        case 'Adjudicacion':
                 try {
                     await dbGiama.query("UPDATE oficialesadjudicacion SET Nombre = ? WHERE Codigo = ?", {
                         transaction: transaction,
@@ -432,7 +432,7 @@ export const createOficiales = async (req, res) => {
                     return res.send({status: false, message: 'Hubo un problema'})
                 }
         
-        case 'Canje':
+        case 'Plan Canje':
             try {
                 await dbGiama.query("INSERT INTO oficialesplancanje (Nombre) VALUES (?)", {
                    replacements: [Nombre],
@@ -568,7 +568,7 @@ export const getOficialesById = async (req, res) => {
 
             return res.send(responseLic) 
 
-        case 'Adjudicaciones':
+        case 'Adjudicacion':
             const queryAdj = () => {
                 return new Promise((resolve, reject) => {
                     let oficial = dbGiama.query("SELECT * FROM oficialesadjudicacion WHERE Codigo = ? FOR UPDATE", 
