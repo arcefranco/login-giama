@@ -1,5 +1,6 @@
 import { QueryTypes } from "sequelize";
 import awaitWithTimeout from "../helpers/transaction/awaitWithTimeout";
+import Sequelize from "sequelize";
 import {app} from '../index'
 
 let transaction;
@@ -557,7 +558,7 @@ export const getOficialesById = async (req, res) => {
             }
             const responseLic = await awaitWithTimeout(4000, queryLic()) 
 
-            res.send(responseLic) 
+            return res.send(responseLic) 
 
         case 'Adjudicaciones':
             const queryAdj = () => {
@@ -574,7 +575,7 @@ export const getOficialesById = async (req, res) => {
             }
             const responseAdj = await awaitWithTimeout(4000, queryAdj()) 
 
-            res.send(responseAdj) 
+            return res.send(responseAdj) 
                 
         
         case 'Canje':
@@ -592,7 +593,7 @@ export const getOficialesById = async (req, res) => {
             }
             const responseCanje = await awaitWithTimeout(4000, queryCanje()) 
 
-            res.send(responseCanje) 
+            return res.send(responseCanje) 
             
 
         case 'Scoring':
@@ -610,7 +611,7 @@ export const getOficialesById = async (req, res) => {
             }
             const responseScoring = await awaitWithTimeout(4000, queryScoring()) 
 
-            res.send(responseScoring) 
+            return res.send(responseScoring) 
             
         case 'Mora':
             const queryMora = () => {
@@ -627,7 +628,7 @@ export const getOficialesById = async (req, res) => {
             }
             const responseMora = await awaitWithTimeout(4000, queryMora()) 
 
-            res.send(responseMora) 
+            return res.send(responseMora) 
 
         case 'Subite':
             const querySubite = () => {
@@ -644,7 +645,7 @@ export const getOficialesById = async (req, res) => {
             }
             const responseSubite = await awaitWithTimeout(4000, querySubite()) 
 
-            res.send(responseSubite) 
+            return res.send(responseSubite) 
 
             
         case 'Compra':
@@ -662,7 +663,7 @@ export const getOficialesById = async (req, res) => {
             }
             const responseCompra = await awaitWithTimeout(4000, queryCompra()) 
 
-            res.send(responseCompra) 
+            return res.send(responseCompra) 
             
 
         case 'Carga': 
@@ -680,7 +681,7 @@ export const getOficialesById = async (req, res) => {
         }
         const responseCarga = await awaitWithTimeout(4000, queryCarga()) 
 
-        res.send(responseCarga) 
+        return res.send(responseCarga) 
             
         case 'Patentamiento':
             const queryPat = () => {
@@ -697,7 +698,7 @@ export const getOficialesById = async (req, res) => {
             }
             const responsePat = await awaitWithTimeout(4000, queryPat()) 
     
-            res.send(responsePat) 
+            return res.send(responsePat) 
             
         case 'Asignacion': 
         const queryAs = () => {
@@ -714,7 +715,7 @@ export const getOficialesById = async (req, res) => {
         }
         const responseAs = await awaitWithTimeout(4000, queryAs()) 
 
-        res.send(responseAs) 
+        return res.send(responseAs) 
             
         default:
            return res.send({status: false, message: 'Error'})
