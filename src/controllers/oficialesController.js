@@ -212,8 +212,8 @@ export const updateOficiales = async (req, res) => {
                         replacements: [Nombre, Usuario, Activo, Codigo],
                         type: QueryTypes.UPDATE
                     }).then(() => transaction.commit()).catch((error) => {
-                        endCommitHelper(transaction)
-                         console.log(error)
+                        transaction.rollback()
+                        console.log(error)
                     })
                     return res.send({status: true, message: 'Actualizado correctamente!'})
                     
@@ -393,7 +393,7 @@ export const updateOficiales = async (req, res) => {
 
 export const endCommit = async (req, res) => {
     if(transaction){
-        console.log('transaction in progress: ', transaction)
+        console.log('transaction in progress: ', transaction.id)
         if(Object.keys(transaction).find(e => e.finished)){
             console.log('transaction state: ', transaction.finished)
             if(transaction.finished === 'commit'){
@@ -415,29 +415,7 @@ export const endCommit = async (req, res) => {
 
 }
 
-export const endCommitHelper = async (transaction) => {
-    if(transaction){
-        console.log('transaction in progress: ', transaction)
-        if(Object.keys(transaction).find(e => e.finished)){
-            console.log('transaction state: ', transaction.finished)
-            if(transaction.finished === 'commit'){
-                return res.send('Fueron guardados los cambios')
-                
-            }
-            else if(transaction.finished === 'rollback'){
-                return res.send('No fueron guardados los cambios')
-            }
-            
-        }else{
-                await transaction.rollback()
-                return res.send('No fueron guardados los cambios')
-                
-            }
-    }else{
-        return
-    }
 
-}
 
 
 
