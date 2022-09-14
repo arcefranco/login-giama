@@ -588,7 +588,7 @@ export const getOficialesById = async (req, res) => {
                         replacements: [Codigo],
                         type: QueryTypes.SELECT
                     })
-                    console.log(transaction)
+                    
                     resolve(oficial)
                 })
             }
