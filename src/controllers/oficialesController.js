@@ -213,7 +213,7 @@ export const updateOficiales = async (req, res) => {
                         type: QueryTypes.UPDATE
                     }).then(() => transaction.commit()).catch((error) => {
                         transaction.rollback()
-                        console.log(error)
+                        console.log('vino aca 1: ', error)
                     })
                     return res.send({status: true, message: 'Actualizado correctamente!'})
                     
