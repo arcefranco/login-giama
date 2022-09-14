@@ -3,7 +3,10 @@ import awaitWithTimeout from "../helpers/transaction/awaitWithTimeout";
 import Sequelize from "sequelize";
 import {app} from '../index'
 
-let transaction;
+const transaction = await dbGiama.transaction({
+    isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+    autocommit:false
+  })
 
 
 export const getOficialesByName = async (req, res) => {
@@ -570,10 +573,7 @@ export const getOficialesById = async (req, res) => {
     const {categoria, Codigo} = req.body
     const dbGiama = app.get('db')
 
-    transaction = await dbGiama.transaction({
-        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-        autocommit:false
-      })
+
 
     switch (categoria) {
         case 'Licitaciones':
