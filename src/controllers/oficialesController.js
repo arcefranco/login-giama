@@ -3,10 +3,7 @@ import awaitWithTimeout from "../helpers/transaction/awaitWithTimeout";
 import Sequelize from "sequelize";
 import {app} from '../index'
 
-const transaction = await dbGiama.transaction({
-    isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-    autocommit:false
-  })
+let transaction;
 
 
 export const getOficialesByName = async (req, res) => {
@@ -581,7 +578,10 @@ export const getOficialesById = async (req, res) => {
                 return new Promise((resolve, reject) => {
                     let oficial = dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ? FOR UPDATE", 
                     {
-                        transaction: transaction,
+                        transaction: dbGiama.transaction({
+                            isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+                            autocommit:false
+                          }),
                         replacements: [Codigo],
                         type: QueryTypes.SELECT
                     })
