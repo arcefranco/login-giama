@@ -200,20 +200,20 @@ export const deleteOficiales = async (req, res) => {
 }
 export const updateOficiales = async (req, res) => {
 
-    const {categoria, Codigo, Nombre} = req.body
+    const {categoria, Codigo, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HN, Supervisor} = req.body
     const dbGiama = app.get('db')
     console.log(req.body)
 
     switch (categoria) {
         case 'Licitaciones':
                 try {
-                    await dbGiama.query("UPDATE oficialeslicitaciones SET Nombre = ? WHERE Codigo = ?", {
+                    await dbGiama.query("UPDATE oficialeslicitaciones SET Nombre = ?, IdUsuarioLogin = ?, Activo = ? WHERE Codigo = ?", {
                         transaction: transaction,
-                        replacements: [Nombre, Codigo],
+                        replacements: [Nombre, Usuario, Activo, Codigo],
                         type: QueryTypes.UPDATE
                     }).then(() => transaction.commit()).catch((error) => {
                         transaction.rollback()
-                        return res.send(error)
+                         console.log(error)
                     })
                     return res.send({status: true, message: 'Actualizado correctamente!'})
                     
@@ -224,13 +224,14 @@ export const updateOficiales = async (req, res) => {
 
         case 'Adjudicacion':
                 try {
-                    await dbGiama.query("UPDATE oficialesadjudicacion SET Nombre = ? WHERE Codigo = ?", {
+                    const Inactivo = Activo === 1 ? 0 : 1
+                    await dbGiama.query("UPDATE oficialesadjudicacion SET Nombre = ?, Inactivo = ? WHERE Codigo = ?", {
                         transaction: transaction,
-                       replacements: [Nombre, Codigo],
+                       replacements: [Nombre, Inactivo, Codigo],
                        type: QueryTypes.UPDATE
                     }).then(() => transaction.commit()).catch((error) => {
                         transaction.rollback()
-                        return res.send(error)
+                         console.log(error)
                     })
                     return res.send({status: true, message: 'Actualizado correctamente!'})
                     
@@ -241,13 +242,14 @@ export const updateOficiales = async (req, res) => {
         
         case 'Canje':
             try {
-                await dbGiama.query("UPDATE oficialesplancanje SET Nombre = ? WHERE Codigo = ?", {
+                
+                await dbGiama.query("UPDATE oficialesplancanje SET Nombre = ?, Activo = ? WHERE Codigo = ?", {
                     transaction: transaction,
-                   replacements: [Nombre, Codigo],
+                   replacements: [Nombre, Activo, Codigo],
                    type: QueryTypes.UPDATE
                 }).then(() => transaction.commit()).catch((error) => {
                     transaction.rollback()
-                    return res.send(error)
+                    console.log(error)
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
                 
@@ -258,13 +260,17 @@ export const updateOficiales = async (req, res) => {
 
         case 'Scoring':
             try {
-                await dbGiama.query("UPDATE oficialesscoring SET Nombre = ? WHERE Codigo = ?", {
+                const Inactivo = Activo === 1 ? 0 : 1
+                const ObjetivotoNum = Objetivo && parseInt(Objetivo)
+                console.log('inactivo: ', Inactivo)
+                await dbGiama.query("UPDATE oficialesscoring SET Nombre = ?, IdUsuarioLogin = ?, Inactivo = ?, Objetivo = ? WHERE Codigo = ?", {
                     transaction: transaction,
-                   replacements: [Nombre, Codigo],
+                   replacements: [Nombre, Usuario, Inactivo, Objetivo? ObjetivotoNum : 0, Codigo],
                    type: QueryTypes.UPDATE
                 }).then(() => transaction.commit()).catch((error) => {
+                    console.log('error transaction: ', error)
                     transaction.rollback()
-                    return res.send(error)
+                    
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
                 
@@ -274,30 +280,35 @@ export const updateOficiales = async (req, res) => {
             }
         
         case 'Mora':
+            const toNumber = parseInt(TipoOficialMora)
             try {
-                await dbGiama.query("UPDATE oficialesmora SET Nombre = ? WHERE Codigo = ?", {
+                await dbGiama.query("UPDATE oficialesmora SET Nombre = ?, IdUsuarioLogin = ?, TipoOficialMora = ?, Activo = ? WHERE Codigo = ?", {
                     transaction: transaction,
-                       replacements: [Nombre, Codigo],
+                       replacements: [Nombre, Usuario, toNumber, Activo, Codigo],
                        type: QueryTypes.UPDATE
                     }).then(() => transaction.commit()).catch((error) => {
                         transaction.rollback()
-                        return res.send(error)
+                        console.log(error)
+                        
                     })
                     return res.send({status: true, message: 'Actualizado correctamente!'})
                 
             } catch (error) {
-                
+                console.log(error)
+                return res.send({status: false, message: 'Hubo un problema'})
             }
 
         case 'Subite':
             try {
-                await dbGiama.query("UPDATE subite_oficiales SET Nombre = ? WHERE Codigo = ?", {
+                const HNtoNumber = parseInt(HN)
+                const SupervisorToNumber = parseInt(Supervisor)
+                await dbGiama.query("UPDATE subite_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Supervisor = ?, Activo = ? WHERE Codigo = ?", {
                     transaction: transaction,
-                     replacements: [Nombre, Codigo],
+                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber, Activo, Codigo],
                      type: QueryTypes.UPDATE
                     }).then(() => transaction.commit()).catch((error) => {
                         transaction.rollback()
-                        return res.send(error)
+                        console.log(error)
                     })
                     return res.send({status: true, message: 'Actualizado correctamente!'})
                 
@@ -307,14 +318,15 @@ export const updateOficiales = async (req, res) => {
             }
         
         case 'Compra':
+             const HNtoNumber = parseInt(HN) 
             try {
-                dbGiama.query("UPDATE comprar_oficiales SET Nombre = ? WHERE Codigo = ?", {
+                dbGiama.query("UPDATE comprar_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Activo = ? WHERE Codigo = ?", {
                     transaction: transaction,
-                   replacements: [Nombre, Codigo],
+                   replacements: [Nombre, Usuario, HN, Activo, Codigo],
                    type: QueryTypes.UPDATE
                 }).then(() => transaction.commit()).catch((error) => {
                     transaction.rollback()
-                    return res.send(error)
+                    console.log(error)
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
                 
@@ -325,13 +337,13 @@ export const updateOficiales = async (req, res) => {
 
         case 'Carga': 
             try {
-                await dbGiama.query("UPDATE oficialescarga SET Nombre = ? WHERE Codigo = ?", {
+                await dbGiama.query("UPDATE oficialescarga SET Nombre = ?, Activo = ? WHERE Codigo = ?", {
                     transaction: transaction,
-                   replacements: [Nombre, Codigo],
+                   replacements: [Nombre, Activo, Codigo],
                    type: QueryTypes.UPDATE
                 }).then(() => transaction.commit()).catch((error) => {
                     transaction.rollback()
-                    return res.send(error)
+                    console.log(error)
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
                 
@@ -342,13 +354,13 @@ export const updateOficiales = async (req, res) => {
             
         case 'Patentamiento':
             try {
-                await dbGiama.query("UPDATE oficialespatentamiento SET Nombre = ? WHERE Codigo = ?", {
+                await dbGiama.query("UPDATE oficialespatentamiento SET Nombre = ?, Activo = ? WHERE Codigo = ?", {
                     transaction: transaction,
-                   replacements: [Nombre, Codigo],
+                   replacements: [Nombre, Activo, Codigo],
                    type: QueryTypes.UPDATE
                 }).then(() => transaction.commit()).catch((error) => {
                     transaction.rollback()
-                    return res.send(error)
+                    console.log(error)
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
                 
@@ -359,13 +371,13 @@ export const updateOficiales = async (req, res) => {
         
         case 'Asignacion': 
             try {
-                await dbGiama.query("UPDATE oficialesasignacion SET Nombre = ? WHERE Codigo = ?", {
+                await dbGiama.query("UPDATE oficialesasignacion SET Nombre = ?, Activo = ? WHERE Codigo = ?", {
                     transaction: transaction,
-                   replacements: [Nombre, Codigo],
+                   replacements: [Nombre, Activo, Codigo],
                    type: QueryTypes.UPDATE
                 }).then(() => transaction.commit()).catch((error) => {
                     transaction.rollback()
-                    return res.send(error)
+                    console.log(error)
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
                 
@@ -380,36 +392,41 @@ export const updateOficiales = async (req, res) => {
 }
 
 export const endCommit = async (req, res) => {
-    if(transaction.finished){
-
-        if(transaction.finished === 'commit'){
-            return res.send('Fueron guardados los cambios')
+    if(transaction){
+        console.log('transaction in progress: ', transaction)
+        if(Object.keys(transaction).find(e => e.finished)){
+            console.log('transaction state: ', transaction.finished)
+            if(transaction.finished === 'commit'){
+                return res.send('Fueron guardados los cambios')
+                
+            }
+            else if(transaction.finished === 'rollback'){
+                return res.send('No fueron guardados los cambios')
+            }
             
-        }
-        else if(transaction.finished === 'rollback'){
-            return res.send('No fueron guardados los cambios')
-        }
-        
+        }else{
+                await transaction.rollback()
+                return res.send('No fueron guardados los cambios')
+                
+            }
     }else{
-            await transaction.rollback()
-            return res.send('No fueron guardados los cambios')
-            
-        }
+        return
+    }
 
 }
 
 
 export const createOficiales = async (req, res) => {
 
-    const {categoria, Nombre} = req.body
+    const {categoria, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HN, Supervisor}  = req.body
     const dbGiama = app.get('db')
     console.log(req.body)
 
     switch (categoria) {
         case 'Licitaciones':
                 try {
-                    await dbGiama.query("INSERT INTO oficialeslicitaciones (Nombre) VALUES (?)", {
-                        replacements: [Nombre],
+                    await dbGiama.query("INSERT INTO oficialeslicitaciones (Nombre, IdUsuarioLogin, Activo) VALUES (?,?,?)", {
+                        replacements: [Nombre, Usuario, Activo],
                         type: QueryTypes.INSERT
                     })
                     return res.send({status: true, message: 'Creado correctamente!'})
@@ -421,8 +438,9 @@ export const createOficiales = async (req, res) => {
 
         case 'Adjudicaciones':
                 try {
-                    await dbGiama.query("INSERT INTO oficialesadjudicacion (Nombre) VALUES (?)", {
-                       replacements: [Nombre],
+                    const Inactivo = Activo === 1 ? 0 : 1
+                    await dbGiama.query("INSERT INTO oficialesadjudicacion (Nombre, Inactivo) VALUES (?,?)", {
+                       replacements: [Nombre, Inactivo],
                        type: QueryTypes.INSERT
                     })
                     return res.send({status: true, message: 'Creado correctamente!'})
@@ -434,8 +452,8 @@ export const createOficiales = async (req, res) => {
         
         case 'Plan Canje':
             try {
-                await dbGiama.query("INSERT INTO oficialesplancanje (Nombre) VALUES (?)", {
-                   replacements: [Nombre],
+                await dbGiama.query("INSERT INTO oficialesplancanje (Nombre, Activo) VALUES (?,?)", {
+                   replacements: [Nombre, Activo],
                    type: QueryTypes.INSERT
                 })
                 return res.send({status: true, message: 'Creado correctamente!'})
@@ -446,9 +464,11 @@ export const createOficiales = async (req, res) => {
             }
 
         case 'Scoring':
+            const Inactivo = Activo === 1 ? 0 : 1
+            const ObjetivotoNum = Objetivo && parseInt(Objetivo)
             try {
-                await dbGiama.query("INSERT INTO oficialesscoring (Nombre) VALUES (?)", {
-                   replacements: [Nombre],
+                await dbGiama.query("INSERT INTO oficialesscoring (Nombre, IdUsuarioLogin, Inactivo, Objetivo) VALUES (?,?,?,?)", {
+                   replacements: [Nombre, Usuario, Inactivo, Objetivo? ObjetivotoNum : 0],
                    type: QueryTypes.INSERT
                 })
                 return res.send({status: true, message: 'Creado correctamente!'})
@@ -459,9 +479,10 @@ export const createOficiales = async (req, res) => {
             }
         
         case 'Mora':
+            const toNumber = parseInt(TipoOficialMora)
             try {
-                await dbGiama.query("INSERT INTO oficialesmora (Nombre) VALUES (?)", {
-                       replacements: [Nombre],
+                await dbGiama.query("INSERT INTO oficialesmora (Nombre, IdUsuarioLogin, TipoOficialMora, Activo) VALUES (?,?,?,?)", {
+                       replacements: [Nombre, Usuario, toNumber, Activo],
                        type: QueryTypes.INSERT
                     })
                     return res.send({status: true, message: 'Creado correctamente!'})
@@ -471,9 +492,11 @@ export const createOficiales = async (req, res) => {
             }
 
         case 'Subite':
+                const HNtoNumber = parseInt(HN)
+                const SupervisorToNumber = parseInt(Supervisor)
             try {
-                await dbGiama.query("INSERT INTO subite_oficiales (Nombre) VALUES (?)", {
-                     replacements: [Nombre],
+                await dbGiama.query("INSERT INTO subite_oficiales (Nombre, login, HNMayor40, Supervisor, Activo) VALUES (?,?,?,?,?)", {
+                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber, Activo],
                      type: QueryTypes.INSERT
                     })
                     return res.send({status: true, message: 'Creado correctamente!'})
@@ -484,9 +507,10 @@ export const createOficiales = async (req, res) => {
             }
         
         case 'Compra':
+            const HNCompratoNumber = parseInt(HN)
             try {
-                dbGiama.query("INSERT INTO comprar_oficiales (Nombre) VALUES (?)", {
-                   replacements: [Nombre],
+                dbGiama.query("INSERT INTO comprar_oficiales (Nombre, login, HNMayor40, Activo) VALUES (?,?,?,?)", {
+                   replacements: [Nombre, Usuario, HNCompratoNumber, Activo],
                    type: QueryTypes.INSERT
                 })
                 return res.send({status: true, message: 'Creado correctamente!'})
@@ -498,8 +522,8 @@ export const createOficiales = async (req, res) => {
 
         case 'Carga': 
             try {
-                await dbGiama.query("INSERT INTO oficialescarga (Nombre) VALUES (?)", {
-                   replacements: [Nombre],
+                await dbGiama.query("INSERT INTO oficialescarga (Nombre, Activo) VALUES (?,?)", {
+                   replacements: [Nombre, Activo],
                    type: QueryTypes.INSERT
                 })
                 return res.send({status: true, message: 'Creado correctamente!'})
@@ -511,8 +535,8 @@ export const createOficiales = async (req, res) => {
             
         case 'Patentamiento':
             try {
-                await dbGiama.query("INSERT INTO oficialespatentamiento (Nombre) VALUES (?)", {
-                   replacements: [Nombre],
+                await dbGiama.query("INSERT INTO oficialespatentamiento (Nombre, Activo) VALUES (?,?)", {
+                   replacements: [Nombre, Activo],
                    type: QueryTypes.INSERT
                 })
                 return res.send({status: true, message: 'Creado correctamente!'})
@@ -524,8 +548,8 @@ export const createOficiales = async (req, res) => {
         
         case 'Asignacion': 
             try {
-                await dbGiama.query("INSERT INTO oficialesasignacion (Nombre) VALUES (?)", {
-                   replacements: [Nombre],
+                await dbGiama.query("INSERT INTO oficialesasignacion (Nombre, Activo) VALUES (?,?)", {
+                   replacements: [Nombre, Activo],
                    type: QueryTypes.INSERT
                 })
                 return res.send({status: true, message: 'Creado correctamente!'})
@@ -560,7 +584,7 @@ export const getOficialesById = async (req, res) => {
                         replacements: [Codigo],
                         type: QueryTypes.SELECT
                     })
-        
+                    console.log(transaction)
                     resolve(oficial)
                 })
             }
