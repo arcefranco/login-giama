@@ -575,10 +575,10 @@ export const getOficialesById = async (req, res) => {
     switch (categoria) {
         case 'Licitaciones':
             const queryLic = () => {
-                return new Promise((resolve, reject) => {
+                return new Promise(async (resolve, reject) => {
                     let oficial = dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ? FOR UPDATE", 
                     {
-                        transaction: dbGiama.transaction({
+                        transaction: await dbGiama.transaction({
                             isolationLevel: Sequelize.Transaction.SERIALIZABLE,
                             autocommit:false
                           }),
