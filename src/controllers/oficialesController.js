@@ -569,7 +569,10 @@ export const getOficialesById = async (req, res) => {
 
     const {categoria, Codigo} = req.body
     const dbGiama = app.get('db')
-
+    transaction =  await dbGiama.transaction({
+        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+        autocommit:false
+      }).catch(() => console.log('entro catch transaction'))
 
 
     switch (categoria) {
@@ -578,18 +581,19 @@ export const getOficialesById = async (req, res) => {
                 return new Promise(async (resolve, reject) => {
                     let oficial = dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ? FOR UPDATE", 
                     {
-                        transaction: await dbGiama.transaction({
-                            isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-                            autocommit:false
-                          }),
+                        transaction: transaction,
                         replacements: [Codigo],
                         type: QueryTypes.SELECT
                     })
                     
                     resolve(oficial)
+                    reject('esto')
+                }).catch((error) => {
+                    console.log('entro al catch querylic')
+                   
                 })
             }
-            const responseLic = await awaitWithTimeout(4000, queryLic()).catch((error) => console.log('nuevo error: ', error)) 
+            const responseLic = await awaitWithTimeout(4000, queryLic()).catch(() => transaction.rollback())
 
             return res.send(responseLic) 
 
