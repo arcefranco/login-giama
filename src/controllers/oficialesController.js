@@ -3,8 +3,9 @@ import awaitWithTimeout from "../helpers/transaction/awaitWithTimeout";
 import Sequelize from "sequelize";
 import {app} from '../index'
 
-let transaction;
 
+ 
+ 
 
 export const getOficialesByName = async (req, res) => {
 
@@ -206,12 +207,15 @@ export const updateOficiales = async (req, res) => {
 
     switch (categoria) {
         case 'Licitaciones':
-                try {
-                    await dbGiama.query("UPDATE oficialeslicitaciones SET Nombre = ?, IdUsuarioLogin = ?, Activo = ? WHERE Codigo = ?", {
-                        transaction: transaction,
+            try {
+
+            
+                 await dbGiama.query("UPDATE oficialeslicitaciones SET Nombre = ?, IdUsuarioLogin = ?, Activo = ? WHERE Codigo = ?", {
+                        
                         replacements: [Nombre, Usuario, Activo, Codigo],
                         type: QueryTypes.UPDATE
-                    }).then(() => transaction.commit())
+                    }).then(() => console.log(('transaction')))
+
                     return res.send({status: true, message: 'Actualizado correctamente!'})
                     
                 } catch (error) {
@@ -334,14 +338,11 @@ export const updateOficiales = async (req, res) => {
 
         case 'Carga': 
             try {
-                await dbGiama.query("UPDATE oficialescarga SET Nombre = ?, Activo = ? WHERE Codigo = ?", {
-                    transaction: transaction,
+                await dbGiama.query("UPDATE oficialescarga SET Nombre = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
                    replacements: [Nombre, Activo, Codigo],
                    type: QueryTypes.UPDATE
-                }).then(() => transaction.commit()).catch((error) => {
-                    transaction.rollback()
-                    console.log(error)
                 })
+                
                 return res.send({status: true, message: 'Actualizado correctamente!'})
                 
             } catch (error) {
@@ -388,29 +389,7 @@ export const updateOficiales = async (req, res) => {
     }
 }
 
-export const endCommit = async (req, res) => {
-    if(transaction){
-        console.log('transaction in progress: ', transaction.id, 'finished: ', transaction.finished)
-        if(transaction.finished){
-            console.log('transaction state: ', transaction.finished)
-            if(transaction.finished === 'commit'){
-                return res.send('Fueron guardados los cambios')
-                
-            }
-            else if(transaction.finished === 'rollback'){
-                return res.send('No fueron guardados los cambios')
-            }
-            
-        }else{
-                await transaction.rollback()
-                return res.send('No fueron guardados los cambios')
-                
-            }
-    }else{
-        return
-    }
 
-}
 
 
 
@@ -421,6 +400,7 @@ export const createOficiales = async (req, res) => {
 
     const {categoria, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HN, Supervisor}  = req.body
     const dbGiama = app.get('db')
+   
     console.log(req.body)
 
     switch (categoria) {
@@ -569,31 +549,36 @@ export const getOficialesById = async (req, res) => {
 
     const {categoria, Codigo} = req.body
     const dbGiama = app.get('db')
+    const myName = app.get('myUser')
 
-
-
-    switch (categoria) {
-        case 'Licitaciones':
-            console.log('TRANSACTION BEFORE', transaction)
-
-            const queryLic = async () => {
-                transaction =  await dbGiama.transaction({
-                    isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-                    autocommit:false
-                  }).catch(() => console.log('entro catch transaction'))
+      
+      
+      switch (categoria) {
+          case 'Licitaciones':
+              
+              dbGiama.transaction((t1) => {
+                session.get('transaction') === t1; // true
+              });
+            
+            session.run(someDeepNestedCallToGet())
+            const queryLic = () => {
                 return new Promise(async (resolve, reject) => {
-                    let oficial = dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ? FOR UPDATE", 
-                    {
-                        transaction: transaction,
-                        replacements: [Codigo],
-                        type: QueryTypes.SELECT
-                    })
+                     let oficial = 
+                        
+                         dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ? FOR UPDATE", 
+                        {   
+                           /*   transaction: session.get('transaction'), */
+                            replacements: [Codigo],
+                            type: QueryTypes.SELECT
+                        }) 
+                    
+                       
+                    
                     
                     resolve(oficial)
-                    reject('esto')
                 })
             }
-            const responseLic = await awaitWithTimeout(4000, queryLic()).catch(() => transaction.rollback())
+            const responseLic = await awaitWithTimeout(4000, queryLic()).catch((error) => namespace.get('transaction').rollback())
 
             return res.send(responseLic) 
 
@@ -704,21 +689,37 @@ export const getOficialesById = async (req, res) => {
             
 
         case 'Carga': 
-        const queryCarga = () => {
-            return new Promise((resolve, reject) => {
-                let oficial = dbGiama.query("SELECT * FROM oficialescarga WHERE Codigo = ? FOR UPDATE", 
-                {
-                    transaction: transaction,
-                    replacements: [Codigo],
-                    type: QueryTypes.SELECT
-                })
-    
-                resolve(oficial)
-            })
-        }
-        const responseCarga = await awaitWithTimeout(4000, queryCarga()) 
+        
+        console.log(myName)
+                try {
+                    const oficialPrev = await dbGiama.query("SELECT * FROM oficialescarga WHERE Codigo = ?", 
+                     {
+                         replacements: [Codigo],
+                         type: QueryTypes.SELECT
+                     })
+                     if(oficialPrev[0].inUpdate) {
+                        return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                     }
+                
+                  
+               try {
+               await dbGiama.query("UPDATE oficialescarga SET inUpdate = ? WHERE Codigo = ?",  {
+              replacements: [myName, Codigo],
+               type: QueryTypes.UPDATE
+                  })
 
-        return res.send(responseCarga) 
+                return res.send(oficialPrev)
+               } catch (error) {
+                  console.log('error:', error)
+               return res.send(error)
+                        }
+                    
+                   }catch (error) {
+                    console.log('2nd error', error)
+                } 
+                    
+                
+
             
         case 'Patentamiento':
             const queryPat = () => {

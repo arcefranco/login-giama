@@ -11,5 +11,4 @@ OficialesRouter.delete('/', deleteOficiales)
 OficialesRouter.post('/id', getOficialesById)
 OficialesRouter.post('/create', createOficiales)
 OficialesRouter.put('/id', updateOficiales)
-OficialesRouter.get('/endCommit', endCommit)
 export default OficialesRouter
