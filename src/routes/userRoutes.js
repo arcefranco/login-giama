@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getAllUsers, login, logout } from "../controllers/userController";
-import connection from "../database";
+
 const passport = require('passport')
 require('../config/passport')(passport)
 
@@ -19,7 +19,7 @@ UserRouter.use((req, res, next) => {
 
   
 UserRouter.route('/').get(getAllUsers)
-UserRouter.post('/', connection, login)
+UserRouter.route('/').post(login)
 UserRouter.post('/logout', logout)
 
 export default UserRouter
