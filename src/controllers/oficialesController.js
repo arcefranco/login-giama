@@ -575,6 +575,8 @@ export const getOficialesById = async (req, res) => {
     switch (categoria) {
         case 'Licitaciones':
             console.log('TRANSACTION BEFORE', transaction)
+
+            if(transaction.id) return 
             transaction =  await dbGiama.transaction({
                 isolationLevel: Sequelize.Transaction.SERIALIZABLE,
                 autocommit:false
