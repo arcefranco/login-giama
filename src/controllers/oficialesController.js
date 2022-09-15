@@ -390,8 +390,8 @@ export const updateOficiales = async (req, res) => {
 
 export const endCommit = async (req, res) => {
     if(transaction){
-        console.log('transaction in progress: ', transaction.id)
-        if(Object.keys(transaction).find(e => e.finished)){
+        console.log('transaction in progress: ', transaction.id, 'finished: ', transaction.finished)
+        if(transaction.finished){
             console.log('transaction state: ', transaction.finished)
             if(transaction.finished === 'commit'){
                 return res.send('Fueron guardados los cambios')
@@ -569,14 +569,16 @@ export const getOficialesById = async (req, res) => {
 
     const {categoria, Codigo} = req.body
     const dbGiama = app.get('db')
-    transaction =  await dbGiama.transaction({
-        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-        autocommit:false
-      }).catch(() => console.log('entro catch transaction'))
+
 
 
     switch (categoria) {
         case 'Licitaciones':
+            transaction =  await dbGiama.transaction({
+                isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+                autocommit:false
+              }).catch(() => console.log('entro catch transaction'))
+
             const queryLic = () => {
                 return new Promise(async (resolve, reject) => {
                     let oficial = dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ? FOR UPDATE", 
@@ -588,9 +590,6 @@ export const getOficialesById = async (req, res) => {
                     
                     resolve(oficial)
                     reject('esto')
-                }).catch((error) => {
-                    console.log('entro al catch querylic')
-                   
                 })
             }
             const responseLic = await awaitWithTimeout(4000, queryLic()).catch(() => transaction.rollback())
