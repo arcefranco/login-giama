@@ -576,13 +576,11 @@ export const getOficialesById = async (req, res) => {
         case 'Licitaciones':
             console.log('TRANSACTION BEFORE', transaction)
 
-            if(transaction) return 
-            transaction =  await dbGiama.transaction({
-                isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-                autocommit:false
-              }).catch(() => console.log('entro catch transaction'))
-
-            const queryLic = () => {
+            const queryLic = async () => {
+                transaction =  await dbGiama.transaction({
+                    isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+                    autocommit:false
+                  }).catch(() => console.log('entro catch transaction'))
                 return new Promise(async (resolve, reject) => {
                     let oficial = dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ? FOR UPDATE", 
                     {
