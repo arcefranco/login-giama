@@ -1,23 +1,44 @@
 import {app} from '../index'
 import { verifyPass } from "../helpers/passwords/verifyPass";
 const jwt = require('jsonwebtoken')
+import Sequelize from 'sequelize';
 import { QueryTypes } from "sequelize";
 
 
 
 
+
 export const getAllUsers = async (req, res) => {
-  const dbGiama = app.get('db')
+  
     const allUsers = await dbGiama.query("SELECT * FROM usuarios")
     return res.send(allUsers)
 } 
 
 export const login = async (req, res) => {
-    const dbGiama = app.get('db')
+    
     const {login} = req.body
     const {password} = req.body
     const {empresa} = req.body
-    const {empresaReal} = req.body
+    console.log(empresa)
+    let dbGiama = {};
+    if(empresa === 'pa7'){
+      dbGiama.sequelize = new Sequelize('pa7', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+        host: process.env.DB_HOST,
+        dialect: process.env.DB_DIALECT
+    })
+    }else if(empresa === 'pa7_gf_test_2'){
+      dbGiama.sequelize = new Sequelize('pa7_gf_test_2', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+        host: process.env.DB_HOST,
+        dialect: process.env.DB_DIALECT
+    })
+      
+    }
+
+
+    dbGiama = dbGiama.sequelize
+
+
+
     const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
     {
       replacements: [login],
@@ -28,7 +49,7 @@ export const login = async (req, res) => {
 
 if (user[0]) {
 if (!login || !password) {
-  app.disable('db')   
+   
     return res.status(400).send({
         status: false,
         message: "Email & password are requiered"
@@ -69,9 +90,8 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
         username: user[0].login,
         newUser: user[0].newuserBoolean,
         roles: roles,
-        empresa: empresa,
         token: token,
-        empresaReal: empresaReal
+        db: empresa
 
       
     })
@@ -82,15 +102,14 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
     })
 }
 }else {
-  app.disable('db')
+  
    return res.status(400).send('El usuario no existe')
   
 }
 }
 
 export const logout = (req, res) => {
-  app.disable('db')
-  console.log(app.get('db'))
+
   res.send('LOGOUT OK!')
 }
 

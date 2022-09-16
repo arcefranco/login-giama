@@ -6,7 +6,7 @@ import UserRouter from "./routes/userRoutes";
 import GerentesRouter from './routes/gerentesRoutes'
 import resetRouter from "./routes/resetRoutes";
 import usuariosRoutes from "./routes/usuariosRoutes";
-
+import db from './database'
 require('dotenv').config()
 
 import RolesRouter from "./routes/rolesRoutes";

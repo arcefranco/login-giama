@@ -1,4 +1,3 @@
-import {app} from '../index'
 const jwt = require('jsonwebtoken')
 import { QueryTypes } from "sequelize";
 require('dotenv').config()
@@ -8,7 +7,7 @@ require('dotenv').config()
 
 export const verifyToken = async (req, res, next) => { //Este middleware verifica el estado del token enviado a la ruta
     const {id, token} = req.params
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     if(!id) {
       return res.send('Invalid ID')
   }

@@ -2,16 +2,31 @@ import {app} from '../index'
 const jwt = require('jsonwebtoken')
 import { sendEmail } from "../helpers/email/sendEmail";
 import { createPass } from "../helpers/passwords/createPass";
-import { QueryTypes } from "sequelize";
+import { QueryTypes, Sequelize } from "sequelize";
 require('dotenv').config()
 
 
 
 
 export const forgotPassword = async (req, res) => {
-  const dbGiama = app.get('db')
-  console.log(dbGiama)
- const {username} = req.body //Tomo el nombre de usuario y lo busco en la DB
+ const {username, empresa} = req.body //Tomo el nombre de usuario y lo busco en la DB
+ console.log(empresa)
+ let dbGiama = {};
+ if(empresa === 'pa7'){
+   dbGiama.sequelize = new Sequelize('pa7', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+     host: process.env.DB_HOST,
+     dialect: process.env.DB_DIALECT
+ })
+ }else if(empresa === 'pa7_gf_test_2'){
+   dbGiama.sequelize = new Sequelize('pa7_gf_test_2', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+     host: process.env.DB_HOST,
+     dialect: process.env.DB_DIALECT
+ })
+   
+ }
+
+
+ dbGiama = dbGiama.sequelize
  const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
  {
    replacements: [username],
@@ -33,7 +48,7 @@ const token = jwt.sign(payload, secret, {expiresIn: '3h'}) //Una vez que lo encu
 
 sendEmail(emailtest, ID, token)
 
-return res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contraseña!`, username: userDb.login})
+return res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contraseña!`, username: userDb.login, db: empresa})
 }
 
 
@@ -54,7 +69,7 @@ export const tokenStatus = async (req, res) => { //Para enviar el estado del tok
 }
 
 export const updatePass = async (req, res) => { //Recibo su nueva contraseña y segun su id lo encuentro la DB 
-  const dbGiama = app.get('db')
+  const dbGiama = req.db
   const {newPass, confirmPass, id} = req.body
   if(newPass !== confirmPass) {
    return res.json({message: 'Las contraseñas no coinciden', status: false})

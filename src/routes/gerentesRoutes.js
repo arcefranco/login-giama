@@ -1,16 +1,17 @@
 import { Router } from "express";
-import {  getGerentes, getGerentesById, postGerentes, updateGerentes,deleteGerentes, endCommit, getGerentesActivos } from "../controllers/gerentesController";
-import { errorHandling } from "../middlewares/errorHandling";
+import {  getGerentes, getGerentesById, getGerentesActivos, postGerentes, updateGerentes, deleteGerentes} from "../controllers/gerentesController";
+import { testConnection } from "../middlewares/testConnection";
 const GerentesRouter = Router()
 
-GerentesRouter.use(errorHandling)
+GerentesRouter.use(testConnection)
+
 GerentesRouter.route('/').get(getGerentes);
-GerentesRouter.route('/activos').get(getGerentesActivos);
+ GerentesRouter.route('/activos').get(getGerentesActivos);
 GerentesRouter.route('/id').post(getGerentesById);
 GerentesRouter.route('/').post(postGerentes);
 GerentesRouter.route('/').put(updateGerentes);
 GerentesRouter.route('/').delete(deleteGerentes);
-GerentesRouter.get('/endCommit', endCommit)
+
 
 
 export default GerentesRouter
