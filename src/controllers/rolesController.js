@@ -9,7 +9,7 @@ import { logout } from './userController';
 
 
 export const getRoles = async (req, res) => {
-    const dbGiama = app.get('db')
+     const dbGiama = req.db
     console.log('el body', req.body)
     const {rol} = req.body
     if(!rol){
@@ -260,7 +260,7 @@ export const getRoles = async (req, res) => {
 export const getUserRoles = async (req, res) => {
     try {
         const {user} = req.body
-    const dbGiama = app.get('db')
+     const dbGiama = req.db
     if(!user){
         return res.send('No user provided')
     }else{
@@ -282,7 +282,7 @@ export const getUserRoles = async (req, res) => {
 export const addRol = async (req, res) => {
     try {
     const {rol, Usuario} = req.body
-    const dbGiama = app.get('db')
+     const dbGiama = req.db
     if(!rol || !Usuario){
         return res.send('Faltan datos')
     }else{
@@ -304,7 +304,7 @@ export const addRol = async (req, res) => {
 }
 export const deleteRol = async (req, res) => {
     try {
-        const dbGiama = app.get('db')
+         const dbGiama = req.db
     
     const {rol, Usuario} = req.body
     if(!rol || !Usuario){
@@ -327,7 +327,7 @@ export const deleteRol = async (req, res) => {
 
 export const copyRoles = async (req, res) => {
     try {
-    const dbGiama = app.get('db')
+     const dbGiama = req.db
     const {userFrom, userTo} = req.body 
     if(!userFrom || !userTo){
         return res.send('Faltan datos')
@@ -361,7 +361,7 @@ export const copyRoles = async (req, res) => {
 export const replaceRoles = async (req, res) => {
     const {userFrom, userTo} = req.body  
     try {
-    const dbGiama = app.get('db') 
+     const dbGiama = req.db 
     if(!userFrom || !userTo){
         return res.send('Faltan datos')
     }else{
@@ -392,7 +392,7 @@ export const giveMaster = async (req, res) => {
     const {Usuario} = req.body
     try {
         
-        const dbGiama = app.get('db') 
+         const dbGiama = req.db 
         const userHasRoles = await dbGiama.query(`SELECT * FROM usuarios_has_roles WHERE us_login = ? AND rl_codigo = "1"`,{
             replacements: [Usuario],
             type: QueryTypes.SELECT

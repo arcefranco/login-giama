@@ -1,21 +1,21 @@
 import { Router } from "express";
 
-import { endCommit, getAllOficialesMoraActivos, getAllOficialesScoringActivos } from "../controllers/vendedoresController";
+import { getAllOficialesMoraActivos, getAllOficialesScoringActivos } from "../controllers/vendedoresController";
 import {  getVendedores, getVendedoresById, postVendedores, updateVendedores,deleteVendedores,  getAllEscalas, getAllOficialesScoring, getAllOficialesMora } from "../controllers/vendedoresController";
-import { errorHandling } from "../middlewares/errorHandling";
 
+import { testConnection } from "../middlewares/testConnection";
 
 const VendedoresRouter = Router()
 
-VendedoresRouter.use(errorHandling)
 
+VendedoresRouter.use(testConnection)
 
 VendedoresRouter.route('/').get(getVendedores);
 VendedoresRouter.route('/id').post(getVendedoresById);
 VendedoresRouter.route('/').post(postVendedores);
 VendedoresRouter.route('/').put(updateVendedores);
 VendedoresRouter.route('/').delete(deleteVendedores);
-VendedoresRouter.get('/endCommit', endCommit);
+
 
 //get escalas, oficiales scoring y mora
 VendedoresRouter.route('/escalas').get(getAllEscalas)
