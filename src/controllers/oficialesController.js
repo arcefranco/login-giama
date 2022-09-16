@@ -546,7 +546,7 @@ export const getOficialesById = async (req, res) => {
     const {categoria, Codigo} = req.body
     const dbGiama = req.db
     const {user} = req.usuario
-    console.log('USER', user)
+
       
       
       switch (categoria) {
@@ -558,7 +558,7 @@ export const getOficialesById = async (req, res) => {
                      type: QueryTypes.SELECT
                  })
                  if(oficialPrev[0].inUpdate) {
-                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                    return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
               
@@ -586,7 +586,7 @@ export const getOficialesById = async (req, res) => {
                      type: QueryTypes.SELECT
                  })
                  if(oficialPrev[0].inUpdate) {
-                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                    return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
               
@@ -613,7 +613,7 @@ export const getOficialesById = async (req, res) => {
                      type: QueryTypes.SELECT
                  })
                  if(oficialPrev[0].inUpdate) {
-                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                    return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
               
@@ -643,7 +643,7 @@ export const getOficialesById = async (req, res) => {
                      type: QueryTypes.SELECT
                  })
                  if(oficialPrev[0].inUpdate) {
-                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                    return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
               
@@ -671,7 +671,7 @@ export const getOficialesById = async (req, res) => {
                      type: QueryTypes.SELECT
                  })
                  if(oficialPrev[0].inUpdate) {
-                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                    return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
               
@@ -698,7 +698,7 @@ export const getOficialesById = async (req, res) => {
                      type: QueryTypes.SELECT
                  })
                  if(oficialPrev[0].inUpdate) {
-                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                    return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
               
@@ -727,7 +727,7 @@ export const getOficialesById = async (req, res) => {
                      type: QueryTypes.SELECT
                  })
                  if(oficialPrev[0].inUpdate) {
-                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                    return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
               
@@ -755,7 +755,7 @@ export const getOficialesById = async (req, res) => {
                          type: QueryTypes.SELECT
                      })
                      if(oficialPrev[0].inUpdate) {
-                        return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                        return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                      }
                 
                   
@@ -783,7 +783,7 @@ export const getOficialesById = async (req, res) => {
                      type: QueryTypes.SELECT
                  })
                  if(oficialPrev[0].inUpdate) {
-                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                    return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
               
@@ -811,7 +811,7 @@ export const getOficialesById = async (req, res) => {
                  type: QueryTypes.SELECT
              })
              if(oficialPrev[0].inUpdate) {
-                return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
              }
         
           

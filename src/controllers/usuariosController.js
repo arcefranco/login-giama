@@ -1,52 +1,38 @@
-import { QueryTypes, Transaction } from "sequelize";
-import {app} from '../index'
-import Sequelize from "sequelize";
+import { QueryTypes } from "sequelize";
 import { createPass } from "../helpers/passwords/createPass";
-import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
-
-
-let transaction;
-
 
 
 export const getUsuarioById = async (req, res) => {
     const dbGiama = req.db
    const {id} = req.body 
-   
+   const {user} = req.usuario
 
-
+   try {
+    const usuarioPrev = await dbGiama.query("SELECT usuarios.`inUpdate`, usuarios.`ID`, usuarios.`emailtest` AS 'email', usuarios.`login` AS 'Usuario', usuarios.`Nombre`, vendedores.`Codigo` AS 'Vendedor', teamleader.`Codigo` AS 'TeamLeader',sucursales.`Codigo` AS 'Supervisor', gerentes.`Codigo` AS 'Gerente', usuarios.`UsuarioAnura`, usuarios.`VerSoloScoringAsignado`, usuarios.`us_bloqueado`, usuarios.`us_activo` FROM usuarios LEFT JOIN gerentes ON usuarios.`CodigoGerente` = gerentes.`Codigo` LEFT JOIN teamleader ON usuarios.`CodigoTeamLeader` = teamleader.`Codigo` LEFT JOIN vendedores ON usuarios.`CodigoVendedor` = vendedores.`Codigo` LEFT JOIN sucursales ON usuarios.`CodigoSucursal` = sucursales.`Codigo` WHERE ID = ?", 
+     {
+         replacements: [id],
+         type: QueryTypes.SELECT
+     })
+     if(usuarioPrev[0].inUpdate) {
+        return res.send({status: false, message: `El registro esta siendo editado por ${usuarioPrev[0].inUpdate} `})
+     }
 
   
-  const query = () => {
-    return new Promise((resolve, reject) => 
-    {
-        let usuarios =  dbGiama 
-      .query
-      ("SELECT usuarios.`ID`, usuarios.`emailtest` AS 'email', usuarios.`login` AS 'Usuario', usuarios.`Nombre`, vendedores.`Codigo` AS 'Vendedor', teamleader.`Codigo` AS 'TeamLeader',sucursales.`Codigo` AS 'Supervisor', gerentes.`Codigo` AS 'Gerente', usuarios.`UsuarioAnura`, usuarios.`VerSoloScoringAsignado`, usuarios.`us_bloqueado`, usuarios.`us_activo` FROM usuarios LEFT JOIN gerentes ON usuarios.`CodigoGerente` = gerentes.`Codigo` LEFT JOIN teamleader ON usuarios.`CodigoTeamLeader` = teamleader.`Codigo` LEFT JOIN vendedores ON usuarios.`CodigoVendedor` = vendedores.`Codigo` LEFT JOIN sucursales ON usuarios.`CodigoSucursal` = sucursales.`Codigo` WHERE ID = ? FOR UPDATE",
-      {
+try {
+    await dbGiama.query("UPDATE usuarios SET inUpdate = ? WHERE ID = ?",  {
+        replacements: [user, id],
+        type: QueryTypes.UPDATE
+        })
 
-          replacements: [id],
-          type: QueryTypes.SELECT
+        return res.send(usuarioPrev)
+} catch (error) {
+  console.log('error:', error)
+    return res.send(error)
         }
-        )
-
-        resolve(usuarios)
-        
-    }
- 
-    )
-        
-        
-   
-  }
-
     
-const response = await awaitWithTimeout(4000, query()) 
-
-res.send(response)
-
-
-
+   }catch (error) {
+    console.log('2nd error', error)
+} 
 
 }
 
@@ -150,8 +136,7 @@ export const updateUsuario = async (req, res) => {
         try {
 
          
-            await dbGiama.query(`UPDATE usuarios SET login = ?, Nombre = ?, CodigoVendedor = ?,  CodigoSucursal = ?, CodigoTeamLeader = ?, CodigoGerente = ?, UsuarioAnura = ?, us_activo = ?, us_bloqueado = ?, VerSoloScoringAsignado = ?, emailtest = ?  WHERE ID = ?`, {
-                transaction: transaction,
+            await dbGiama.query(`UPDATE usuarios SET inUpdate = NULL, login = ?, Nombre = ?, CodigoVendedor = ?,  CodigoSucursal = ?, CodigoTeamLeader = ?, CodigoGerente = ?, UsuarioAnura = ?, us_activo = ?, us_bloqueado = ?, VerSoloScoringAsignado = ?, emailtest = ?  WHERE ID = ?`, {
                 replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
                 type: QueryTypes.UPDATE
             } 
@@ -207,6 +192,29 @@ export const deleteUsuario = async(req, res) => {
 }
 
 
+export const endUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM usuarios WHERE ID = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE usuarios SET inUpdate = NULL WHERE ID = ?", {
+                replacements: [Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send('endUpdate OK!')
+        }else{
+            return
+        }
+    } catch (error) {
+        return res.send(error)
+    }
+}
 
 export const getAllVendedores = async (req, res) => {
     const dbGiama = req.db
