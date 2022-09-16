@@ -97,9 +97,7 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
     })
 
 }else{
-   return res.status(400).send({
-        message: "Contraseña Incorrecta"
-    })
+   return res.status(400).send("Contraseña incorrecta")
 }
 }else {
   
