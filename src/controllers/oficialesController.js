@@ -10,7 +10,7 @@ import {app} from '../index'
 export const getOficialesByName = async (req, res) => {
 
     const {oficialName} = req.body
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
 
 
     switch (oficialName) {
@@ -62,7 +62,7 @@ export const getOficialesByName = async (req, res) => {
 export const deleteOficiales = async (req, res) => {
 
     const {oficialName, Codigo} = req.body
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     console.log(req.body)
 
     switch (oficialName) {
@@ -202,7 +202,7 @@ export const deleteOficiales = async (req, res) => {
 export const updateOficiales = async (req, res) => {
 
     const {categoria, Codigo, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HN, Supervisor} = req.body
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     console.log(req.body)
 
     switch (categoria) {
@@ -210,11 +210,11 @@ export const updateOficiales = async (req, res) => {
             try {
 
             
-                 await dbGiama.query("UPDATE oficialeslicitaciones SET Nombre = ?, IdUsuarioLogin = ?, Activo = ? WHERE Codigo = ?", {
+                 await dbGiama.query("UPDATE oficialeslicitaciones SET Nombre = ?, IdUsuarioLogin = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
                         
                         replacements: [Nombre, Usuario, Activo, Codigo],
                         type: QueryTypes.UPDATE
-                    }).then(() => console.log(('transaction')))
+                    })
 
                     return res.send({status: true, message: 'Actualizado correctamente!'})
                     
@@ -226,12 +226,12 @@ export const updateOficiales = async (req, res) => {
         case 'Adjudicacion':
                 try {
                     const Inactivo = Activo === 1 ? 0 : 1
-                    await dbGiama.query("UPDATE oficialesadjudicacion SET Nombre = ?, Inactivo = ? WHERE Codigo = ?", {
-                        transaction: transaction,
+                    await dbGiama.query("UPDATE oficialesadjudicacion SET Nombre = ?, Inactivo = ?, inUpdate = NULL WHERE Codigo = ?", {
+                    
                        replacements: [Nombre, Inactivo, Codigo],
                        type: QueryTypes.UPDATE
-                    }).then(() => transaction.commit()).catch((error) => {
-                        transaction.rollback()
+                    }).catch((error) => {
+                        
                          console.log(error)
                     })
                     return res.send({status: true, message: 'Actualizado correctamente!'})
@@ -244,12 +244,12 @@ export const updateOficiales = async (req, res) => {
         case 'Canje':
             try {
                 
-                await dbGiama.query("UPDATE oficialesplancanje SET Nombre = ?, Activo = ? WHERE Codigo = ?", {
-                    transaction: transaction,
+                await dbGiama.query("UPDATE oficialesplancanje SET Nombre = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
+              
                    replacements: [Nombre, Activo, Codigo],
                    type: QueryTypes.UPDATE
-                }).then(() => transaction.commit()).catch((error) => {
-                    transaction.rollback()
+                }).catch((error) => {
+                    
                     console.log(error)
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
@@ -264,13 +264,13 @@ export const updateOficiales = async (req, res) => {
                 const Inactivo = Activo === 1 ? 0 : 1
                 const ObjetivotoNum = Objetivo && parseInt(Objetivo)
                 console.log('inactivo: ', Inactivo)
-                await dbGiama.query("UPDATE oficialesscoring SET Nombre = ?, IdUsuarioLogin = ?, Inactivo = ?, Objetivo = ? WHERE Codigo = ?", {
-                    transaction: transaction,
+                await dbGiama.query("UPDATE oficialesscoring SET Nombre = ?, IdUsuarioLogin = ?, Inactivo = ?, Objetivo = ?, inUpdate = NULL WHERE Codigo = ?", {
+
                    replacements: [Nombre, Usuario, Inactivo, Objetivo? ObjetivotoNum : 0, Codigo],
                    type: QueryTypes.UPDATE
-                }).then(() => transaction.commit()).catch((error) => {
-                    console.log('error transaction: ', error)
-                    transaction.rollback()
+                }).catch((error) => {
+                    console.log(error)
+                    
                     
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
@@ -283,12 +283,11 @@ export const updateOficiales = async (req, res) => {
         case 'Mora':
             const toNumber = parseInt(TipoOficialMora)
             try {
-                await dbGiama.query("UPDATE oficialesmora SET Nombre = ?, IdUsuarioLogin = ?, TipoOficialMora = ?, Activo = ? WHERE Codigo = ?", {
-                    transaction: transaction,
+                await dbGiama.query("UPDATE oficialesmora SET Nombre = ?, IdUsuarioLogin = ?, TipoOficialMora = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
                        replacements: [Nombre, Usuario, toNumber, Activo, Codigo],
                        type: QueryTypes.UPDATE
-                    }).then(() => transaction.commit()).catch((error) => {
-                        transaction.rollback()
+                    }).catch((error) => {
+                        
                         console.log(error)
                         
                     })
@@ -303,12 +302,11 @@ export const updateOficiales = async (req, res) => {
             try {
                 const HNtoNumber = parseInt(HN)
                 const SupervisorToNumber = parseInt(Supervisor)
-                await dbGiama.query("UPDATE subite_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Supervisor = ?, Activo = ? WHERE Codigo = ?", {
-                    transaction: transaction,
+                await dbGiama.query("UPDATE subite_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Supervisor = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
                      replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber, Activo, Codigo],
                      type: QueryTypes.UPDATE
-                    }).then(() => transaction.commit()).catch((error) => {
-                        transaction.rollback()
+                    }).catch((error) => {
+                        
                         console.log(error)
                     })
                     return res.send({status: true, message: 'Actualizado correctamente!'})
@@ -321,12 +319,11 @@ export const updateOficiales = async (req, res) => {
         case 'Compra':
              const HNtoNumber = parseInt(HN) 
             try {
-                dbGiama.query("UPDATE comprar_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Activo = ? WHERE Codigo = ?", {
-                    transaction: transaction,
+                dbGiama.query("UPDATE comprar_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
                    replacements: [Nombre, Usuario, HN, Activo, Codigo],
                    type: QueryTypes.UPDATE
-                }).then(() => transaction.commit()).catch((error) => {
-                    transaction.rollback()
+                }).catch((error) => {
+                    
                     console.log(error)
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
@@ -352,12 +349,11 @@ export const updateOficiales = async (req, res) => {
             
         case 'Patentamiento':
             try {
-                await dbGiama.query("UPDATE oficialespatentamiento SET Nombre = ?, Activo = ? WHERE Codigo = ?", {
-                    transaction: transaction,
+                await dbGiama.query("UPDATE oficialespatentamiento SET Nombre = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
                    replacements: [Nombre, Activo, Codigo],
                    type: QueryTypes.UPDATE
-                }).then(() => transaction.commit()).catch((error) => {
-                    transaction.rollback()
+                }).catch((error) => {
+                    
                     console.log(error)
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
@@ -369,12 +365,12 @@ export const updateOficiales = async (req, res) => {
         
         case 'Asignacion': 
             try {
-                await dbGiama.query("UPDATE oficialesasignacion SET Nombre = ?, Activo = ? WHERE Codigo = ?", {
-                    transaction: transaction,
+                await dbGiama.query("UPDATE oficialesasignacion SET Nombre = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
+
                    replacements: [Nombre, Activo, Codigo],
                    type: QueryTypes.UPDATE
-                }).then(() => transaction.commit()).catch((error) => {
-                    transaction.rollback()
+                }).catch((error) => {
+                    
                     console.log(error)
                 })
                 return res.send({status: true, message: 'Actualizado correctamente!'})
@@ -399,7 +395,7 @@ export const updateOficiales = async (req, res) => {
 export const createOficiales = async (req, res) => {
 
     const {categoria, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HN, Supervisor}  = req.body
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
    
     console.log(req.body)
 
@@ -548,149 +544,210 @@ export const createOficiales = async (req, res) => {
 export const getOficialesById = async (req, res) => {
 
     const {categoria, Codigo} = req.body
-    const dbGiama = app.get('db')
-    const myName = app.get('myUser')
-
+    const dbGiama = req.db
+    const {user} = req.usuario
+    console.log('USER', user)
       
       
       switch (categoria) {
           case 'Licitaciones':
-              
-              dbGiama.transaction((t1) => {
-                session.get('transaction') === t1; // true
-              });
+            try {
+                const oficialPrev = await dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ?", 
+                 {
+                     replacements: [Codigo],
+                     type: QueryTypes.SELECT
+                 })
+                 if(oficialPrev[0].inUpdate) {
+                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                 }
             
-            session.run(someDeepNestedCallToGet())
-            const queryLic = () => {
-                return new Promise(async (resolve, reject) => {
-                     let oficial = 
-                        
-                         dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ? FOR UPDATE", 
-                        {   
-                           /*   transaction: session.get('transaction'), */
-                            replacements: [Codigo],
-                            type: QueryTypes.SELECT
-                        }) 
-                    
-                       
-                    
-                    
-                    resolve(oficial)
-                })
-            }
-            const responseLic = await awaitWithTimeout(4000, queryLic()).catch((error) => namespace.get('transaction').rollback())
-
-            return res.send(responseLic) 
-
-        case 'Adjudicacion':
-            const queryAdj = () => {
-                return new Promise((resolve, reject) => {
-                    let oficial = dbGiama.query("SELECT * FROM oficialesadjudicacion WHERE Codigo = ? FOR UPDATE", 
-                    {
-                        transaction: transaction,
-                        replacements: [Codigo],
-                        type: QueryTypes.SELECT
+              
+           try {
+                await dbGiama.query("UPDATE oficialeslicitaciones SET inUpdate = ? WHERE Codigo = ?",  {
+                    replacements: [user, Codigo],
+                    type: QueryTypes.UPDATE
                     })
-        
-                    resolve(oficial)
-                })
-            }
-            const responseAdj = await awaitWithTimeout(4000, queryAdj()) 
 
-            return res.send(responseAdj) 
+                    return res.send(oficialPrev)
+            } catch (error) {
+              console.log('error:', error)
+                return res.send(error)
+                    }
                 
-        
-        case 'Canje':
-            const queryCanje = () => {
-                return new Promise((resolve, reject) => {
-                    let oficial = dbGiama.query("SELECT * FROM oficialesplancanje WHERE Codigo = ? FOR UPDATE", 
-                    {
-                        transaction: transaction,
-                        replacements: [Codigo],
-                        type: QueryTypes.SELECT
-                    })
-        
-                    resolve(oficial)
-                })
-            }
-            const responseCanje = await awaitWithTimeout(4000, queryCanje()) 
+               }catch (error) {
+                console.log('2nd error', error)
+            } 
 
-            return res.send(responseCanje) 
+        case 'Adjudicaciones':
+            try {
+                const oficialPrev = await dbGiama.query("SELECT * FROM oficialesadjudicacion WHERE Codigo = ?", 
+                 {
+                     replacements: [Codigo],
+                     type: QueryTypes.SELECT
+                 })
+                 if(oficialPrev[0].inUpdate) {
+                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                 }
+            
+              
+           try {
+                await dbGiama.query("UPDATE oficialesadjudicacion SET inUpdate = ? WHERE Codigo = ?",  {
+                    replacements: [user, Codigo],
+                    type: QueryTypes.UPDATE
+                    })
+
+                    return res.send(oficialPrev)
+            } catch (error) {
+              console.log('error:', error)
+                return res.send(error)
+                    }
+                
+               }catch (error) {
+                console.log('2nd error', error)
+            } 
+        case 'Plan Canje':
+            try {
+                const oficialPrev = await dbGiama.query("SELECT * FROM oficialesplancanje WHERE Codigo = ?", 
+                 {
+                     replacements: [Codigo],
+                     type: QueryTypes.SELECT
+                 })
+                 if(oficialPrev[0].inUpdate) {
+                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                 }
+            
+              
+           try {
+                await dbGiama.query("UPDATE oficialesplancanje SET inUpdate = ? WHERE Codigo = ?",  {
+                    replacements: [user, Codigo],
+                    type: QueryTypes.UPDATE
+                    })
+
+                    return res.send(oficialPrev)
+            } catch (error) {
+              console.log('error:', error)
+                return res.send(error)
+                    }
+                
+               }catch (error) {
+                console.log('2nd error', error)
+            } 
+            
             
 
         case 'Scoring':
-            const queryScoring = () => {
-                return new Promise((resolve, reject) => {
-                    let oficial = dbGiama.query("SELECT * FROM oficialesscoring WHERE Codigo = ? FOR UPDATE", 
-                    {
-                        transaction: transaction,
-                        replacements: [Codigo],
-                        type: QueryTypes.SELECT
+            try {
+                const oficialPrev = await dbGiama.query("SELECT * FROM oficialesscoring WHERE Codigo = ?", 
+                 {
+                     replacements: [Codigo],
+                     type: QueryTypes.SELECT
+                 })
+                 if(oficialPrev[0].inUpdate) {
+                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                 }
+            
+              
+           try {
+                await dbGiama.query("UPDATE oficialesscoring SET inUpdate = ? WHERE Codigo = ?",  {
+                    replacements: [user, Codigo],
+                    type: QueryTypes.UPDATE
                     })
-        
-                    resolve(oficial)
-                })
-            }
-            const responseScoring = await awaitWithTimeout(4000, queryScoring()) 
 
-            return res.send(responseScoring) 
+                    return res.send(oficialPrev)
+            } catch (error) {
+              console.log('error:', error)
+                return res.send(error)
+                    }
+                
+               }catch (error) {
+                console.log('2nd error', error)
+            } 
             
         case 'Mora':
-            const queryMora = () => {
-                return new Promise((resolve, reject) => {
-                    let oficial = dbGiama.query("SELECT * FROM oficialesmora WHERE Codigo = ? FOR UPDATE", 
-                    {
-                        transaction: transaction,
-                        replacements: [Codigo],
-                        type: QueryTypes.SELECT
+            try {
+                const oficialPrev = await dbGiama.query("SELECT * FROM oficialesmora WHERE Codigo = ?", 
+                 {
+                     replacements: [Codigo],
+                     type: QueryTypes.SELECT
+                 })
+                 if(oficialPrev[0].inUpdate) {
+                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                 }
+            
+              
+           try {
+                await dbGiama.query("UPDATE oficialesmora SET inUpdate = ? WHERE Codigo = ?",  {
+                    replacements: [user, Codigo],
+                    type: QueryTypes.UPDATE
                     })
-        
-                    resolve(oficial)
-                })
-            }
-            const responseMora = await awaitWithTimeout(4000, queryMora()) 
 
-            return res.send(responseMora) 
-
+                    return res.send(oficialPrev)
+            } catch (error) {
+              console.log('error:', error)
+                return res.send(error)
+                    }
+                
+               }catch (error) {
+                console.log('2nd error', error)
+            } 
         case 'Subite':
-            const querySubite = () => {
-                return new Promise((resolve, reject) => {
-                    let oficial = dbGiama.query("SELECT * FROM subite_oficiales WHERE Codigo = ? FOR UPDATE", 
-                    {
-                        transaction: transaction,
-                        replacements: [Codigo],
-                        type: QueryTypes.SELECT
-                    })
-        
-                    resolve(oficial)
-                })
-            }
-            const responseSubite = await awaitWithTimeout(4000, querySubite()) 
-
-            return res.send(responseSubite) 
-
+            try {
+                const oficialPrev = await dbGiama.query("SELECT * FROM subite_oficiales WHERE Codigo = ?", 
+                 {
+                     replacements: [Codigo],
+                     type: QueryTypes.SELECT
+                 })
+                 if(oficialPrev[0].inUpdate) {
+                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                 }
             
-        case 'Compra':
-            const queryCompra = () => {
-                return new Promise((resolve, reject) => {
-                    let oficial = dbGiama.query("SELECT * FROM comprar_oficiales WHERE Codigo = ? FOR UPDATE", 
-                    {
-                        transaction: transaction,
-                        replacements: [Codigo],
-                        type: QueryTypes.SELECT
+              
+           try {
+                await dbGiama.query("UPDATE subite_oficiales SET inUpdate = ? WHERE Codigo = ?",  {
+                    replacements: [user, Codigo],
+                    type: QueryTypes.UPDATE
                     })
-        
-                    resolve(oficial)
-                })
-            }
-            const responseCompra = await awaitWithTimeout(4000, queryCompra()) 
 
-            return res.send(responseCompra) 
+                    return res.send(oficialPrev)
+            } catch (error) {
+              console.log('error:', error)
+                return res.send(error)
+                    }
+                
+               }catch (error) {
+                console.log('2nd error', error)
+            } 
+           
             
+        case 'Compra':      
+            try {
+                const oficialPrev = await dbGiama.query("SELECT * FROM comprar_oficiales WHERE Codigo = ?", 
+                 {
+                     replacements: [Codigo],
+                     type: QueryTypes.SELECT
+                 })
+                 if(oficialPrev[0].inUpdate) {
+                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                 }
+            
+              
+           try {
+                await dbGiama.query("UPDATE comprar_oficiales SET inUpdate = ? WHERE Codigo = ?",  {
+                    replacements: [user, Codigo],
+                    type: QueryTypes.UPDATE
+                    })
 
+                    return res.send(oficialPrev)
+            } catch (error) {
+              console.log('error:', error)
+                return res.send(error)
+                    }
+                
+               }catch (error) {
+                console.log('2nd error', error)
+            } 
+            
         case 'Carga': 
-        
-        console.log(myName)
                 try {
                     const oficialPrev = await dbGiama.query("SELECT * FROM oficialescarga WHERE Codigo = ?", 
                      {
@@ -704,7 +761,7 @@ export const getOficialesById = async (req, res) => {
                   
                try {
                await dbGiama.query("UPDATE oficialescarga SET inUpdate = ? WHERE Codigo = ?",  {
-              replacements: [myName, Codigo],
+              replacements: [user, Codigo],
                type: QueryTypes.UPDATE
                   })
 
@@ -717,45 +774,305 @@ export const getOficialesById = async (req, res) => {
                    }catch (error) {
                     console.log('2nd error', error)
                 } 
-                    
-                
-
-            
+                       
         case 'Patentamiento':
-            const queryPat = () => {
-                return new Promise((resolve, reject) => {
-                    let oficial = dbGiama.query("SELECT * FROM oficialespatentamiento WHERE Codigo = ? FOR UPDATE", 
-                    {
-                        transaction: transaction,
-                        replacements: [Codigo],
-                        type: QueryTypes.SELECT
-                    })
-        
-                    resolve(oficial)
-                })
-            }
-            const responsePat = await awaitWithTimeout(4000, queryPat()) 
-    
-            return res.send(responsePat) 
+            try {
+                const oficialPrev = await dbGiama.query("SELECT * FROM oficialespatentamiento WHERE Codigo = ?", 
+                 {
+                     replacements: [Codigo],
+                     type: QueryTypes.SELECT
+                 })
+                 if(oficialPrev[0].inUpdate) {
+                    return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+                 }
+            
+              
+           try {
+           await dbGiama.query("UPDATE oficialespatentamiento SET inUpdate = ? WHERE Codigo = ?",  {
+          replacements: [user, Codigo],
+           type: QueryTypes.UPDATE
+              })
+
+            return res.send(oficialPrev)
+           } catch (error) {
+              console.log('error:', error)
+           return res.send(error)
+                    }
+                
+               }catch (error) {
+                console.log('2nd error', error)
+            } 
             
         case 'Asignacion': 
-        const queryAs = () => {
-            return new Promise((resolve, reject) => {
-                let oficial = dbGiama.query("SELECT * FROM oficialesasignacion WHERE Codigo = ? FOR UPDATE", 
-                {
-                    transaction: transaction,
-                    replacements: [Codigo],
-                    type: QueryTypes.SELECT
-                })
-    
-                resolve(oficial)
-            })
-        }
-        const responseAs = await awaitWithTimeout(4000, queryAs()) 
+        try {
+            const oficialPrev = await dbGiama.query("SELECT * FROM oficialesasignacion WHERE Codigo = ? ", 
+             {
+                 replacements: [Codigo],
+                 type: QueryTypes.SELECT
+             })
+             if(oficialPrev[0].inUpdate) {
+                return res.send({status: false, message: `Campo ocupado por ${oficialPrev[0].inUpdate} `})
+             }
+        
+          
+       try {
+       await dbGiama.query("UPDATE oficialesasignacion SET inUpdate = ? WHERE Codigo = ?",  {
+      replacements: [user, Codigo],
+       type: QueryTypes.UPDATE
+          })
 
-        return res.send(responseAs) 
+        return res.send(oficialPrev)
+       } catch (error) {
+          console.log('error:', error)
+       return res.send(error)
+                }
+            
+           }catch (error) {
+            console.log('2nd error', error)
+        } 
+        
             
         default:
            return res.send({status: false, message: 'Error'})
+    }
+}
+
+export const endUpdate = async (req, res) => {
+    const {categoria, Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+
+    switch (categoria) {
+        case 'Licitaciones':
+            try {
+                const actualOficial = await dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ?", 
+                {
+                    replacements: [Codigo],
+                    type: QueryTypes.SELECT
+                })
+                if(actualOficial[0].inUpdate === user){
+                    await dbGiama.query("UPDATE oficialeslicitaciones SET inUpdate = NULL WHERE Codigo = ?", {
+                        replacements: [Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send('endUpdate OK!')
+                }else{
+                    return
+                }
+            } catch (error) {
+                return res.send(error)
+            }
+            case 'Adjudicaciones':
+                try {
+                    const actualOficial = await dbGiama.query("SELECT * FROM oficialesadjudicacion WHERE Codigo = ?", 
+                    {
+                        replacements: [Codigo],
+                        type: QueryTypes.SELECT
+                    })
+                    if(actualOficial[0].inUpdate === user){
+                        await dbGiama.query("UPDATE oficialesadjudicacion SET inUpdate = NULL WHERE Codigo = ?", {
+                            replacements: [Codigo],
+                            type: QueryTypes.UPDATE
+                        })
+                        return res.send('endUpdate OK!')
+                    }else{
+                        return
+                    }
+                } catch (error) {
+                    return res.send(error)
+                }
+                case 'Plan Canje':
+                    try {
+                        const actualOficial = await dbGiama.query("SELECT * FROM oficialesplancanje WHERE Codigo = ?", 
+                        {
+                            replacements: [Codigo],
+                            type: QueryTypes.SELECT
+                        })
+                        if(actualOficial[0].inUpdate === user){
+                            await dbGiama.query("UPDATE oficialesplancanje SET inUpdate = NULL WHERE Codigo = ?", {
+                                replacements: [Codigo],
+                                type: QueryTypes.UPDATE
+                            })
+                            return res.send('endUpdate OK!')
+                        }else{
+                            return
+                        }
+                    } catch (error) {
+                        return res.send(error)
+                    }
+                    case 'Scoring':
+                        try {
+                            const actualOficial = await dbGiama.query("SELECT * FROM oficialesscoring WHERE Codigo = ?", 
+                            {
+                                replacements: [Codigo],
+                                type: QueryTypes.SELECT
+                            })
+                            if(actualOficial[0].inUpdate === user){
+                                await dbGiama.query("UPDATE oficialesscoring SET inUpdate = NULL WHERE Codigo = ?", {
+                                    replacements: [Codigo],
+                                    type: QueryTypes.UPDATE
+                                })
+                                return res.send('endUpdate OK!')
+                            }else{
+                                return
+                            }
+                        } catch (error) {
+                           return res.send(error)
+                        }
+                        case 'Mora':
+                            try {
+                                const actualOficial = await dbGiama.query("SELECT * FROM oficialesmora WHERE Codigo = ?", 
+                                {
+                                    replacements: [Codigo],
+                                    type: QueryTypes.SELECT
+                                })
+                                if(actualOficial[0].inUpdate === user){
+                                    await dbGiama.query("UPDATE oficialesmora SET inUpdate = NULL WHERE Codigo = ?", {
+                                        replacements: [Codigo],
+                                        type: QueryTypes.UPDATE
+                                    })
+                                    return res.send('endUpdate OK!')
+                                }else{
+                                    return
+                                }
+                            } catch (error) {
+                                return res.send(error)
+                            }
+        case 'Subite':
+            try {
+                const actualOficial = await dbGiama.query("SELECT * FROM subite_oficiales WHERE Codigo = ?", 
+                {
+                    replacements: [Codigo],
+                    type: QueryTypes.SELECT
+                })
+                if(actualOficial[0].inUpdate === user){
+                    await dbGiama.query("UPDATE subite_oficiales SET inUpdate = NULL WHERE Codigo = ?", {
+                        replacements: [Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send('endUpdate OK!')
+                }else{
+                    return
+                }
+            } catch (error) {
+                return res.send(error)
+            }
+            case 'Compra':
+                try {
+                    const actualOficial = await dbGiama.query("SELECT * FROM comprar_oficiales WHERE Codigo = ?", 
+                    {
+                        replacements: [Codigo],
+                        type: QueryTypes.SELECT
+                    })
+                    if(actualOficial[0].inUpdate === user){
+                        await dbGiama.query("UPDATE comprar_oficiales SET inUpdate = NULL WHERE Codigo = ?", {
+                            replacements: [Codigo],
+                            type: QueryTypes.UPDATE
+                        })
+                        return res.send('endUpdate OK!')
+                    }else{
+                        return
+                    }
+                } catch (error) {
+                    return res.send(error)
+                }
+        case 'Compra':
+            try {
+                const actualOficial = await dbGiama.query("SELECT * FROM comprar_oficiales WHERE Codigo = ?", 
+                {
+                replacements: [Codigo],
+                type: QueryTypes.SELECT
+                })
+                if(actualOficial[0].inUpdate === user){
+                    await dbGiama.query("UPDATE comprar_oficiales SET inUpdate = NULL WHERE Codigo = ?", {
+                        replacements: [Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send('endUpdate OK!')
+            }else{
+                    return
+                }
+            } catch (error) {
+                    return res.send(error)
+            }
+        case 'Compra':
+            try {
+                const actualOficial = await dbGiama.query("SELECT * FROM comprar_oficiales WHERE Codigo = ?", 
+                {
+                replacements: [Codigo],
+                type: QueryTypes.SELECT
+                })
+                if(actualOficial[0].inUpdate === user){
+                    await dbGiama.query("UPDATE comprar_oficiales SET inUpdate = NULL WHERE Codigo = ?", {
+                        replacements: [Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send('endUpdate OK!')
+            }else{
+                    return
+                }
+            } catch (error) {
+                    return res.send(error)
+            }    
+        case 'Carga':
+            try {
+                const actualOficial = await dbGiama.query("SELECT * FROM oficialescarga WHERE Codigo = ?", 
+                {
+                replacements: [Codigo],
+                type: QueryTypes.SELECT
+                })
+                if(actualOficial[0].inUpdate === user){
+                    await dbGiama.query("UPDATE oficialescarga SET inUpdate = NULL WHERE Codigo = ?", {
+                        replacements: [Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send('endUpdate OK!')
+            }else{
+                    return
+                }
+            } catch (error) {
+                    return res.send(error)
+            }
+        case 'Patentamiento':
+                try {
+                    const actualOficial = await dbGiama.query("SELECT * FROM oficialespatentamiento WHERE Codigo = ?", 
+                    {
+                    replacements: [Codigo],
+                    type: QueryTypes.SELECT
+                    })
+                    if(actualOficial[0].inUpdate === user){
+                        await dbGiama.query("UPDATE oficialespatentamiento SET inUpdate = NULL WHERE Codigo = ?", {
+                            replacements: [Codigo],
+                            type: QueryTypes.UPDATE
+                        })
+                        return res.send('endUpdate OK!')
+                }else{
+                        return
+                    }
+                } catch (error) {
+                        return res.send(error)
+                }
+        case 'Asignacion':
+                try {
+                const actualOficial = await dbGiama.query("SELECT * FROM oficialesasignacion WHERE Codigo = ?", 
+                        {
+                        replacements: [Codigo],
+                        type: QueryTypes.SELECT
+                        })
+                        if(actualOficial[0].inUpdate === user){
+                            await dbGiama.query("UPDATE oficialesasignacion SET inUpdate = NULL WHERE Codigo = ?", {
+                                replacements: [Codigo],
+                                type: QueryTypes.UPDATE
+                            })
+                            return res.send('endUpdate OK!')
+                    }else{
+                            return res.send('error DB')
+                        }
+                    } catch (error) {
+                            return res.send(error)
+                    }
+    
+        default:
+           res.send('Some error endUpdate')
     }
 }

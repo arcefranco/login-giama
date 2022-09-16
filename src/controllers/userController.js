@@ -1,11 +1,12 @@
 import {app} from '../index'
 import { verifyPass } from "../helpers/passwords/verifyPass";
 const jwt = require('jsonwebtoken')
+import Sequelize from 'sequelize';
 import { QueryTypes } from "sequelize";
 
-import db from '../database';
 
-const dbGiama = db.sequelize
+
+
 
 export const getAllUsers = async (req, res) => {
   
@@ -17,6 +18,27 @@ export const login = async (req, res) => {
     
     const {login} = req.body
     const {password} = req.body
+    const {empresa} = req.body
+    console.log(empresa)
+    let dbGiama = {};
+    if(empresa === 'pa7'){
+      dbGiama.sequelize = new Sequelize('pa7', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+        host: process.env.DB_HOST,
+        dialect: process.env.DB_DIALECT
+    })
+    }else if(empresa === 'pa7_gf_test_2'){
+      dbGiama.sequelize = new Sequelize('pa7_gf_test_2', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+        host: process.env.DB_HOST,
+        dialect: process.env.DB_DIALECT
+    })
+      
+    }
+
+
+    dbGiama = dbGiama.sequelize
+
+
+
     const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
     {
       replacements: [login],
@@ -69,6 +91,7 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
         newUser: user[0].newuserBoolean,
         roles: roles,
         token: token,
+        db: empresa
 
       
     })
@@ -86,7 +109,7 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
 }
 
 export const logout = (req, res) => {
-  console.log(app.get('db'))
+
   res.send('LOGOUT OK!')
 }
 

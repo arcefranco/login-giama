@@ -1,14 +1,13 @@
 import {  QueryTypes } from "sequelize";
-import {app} from '../index'
 import Sequelize from "sequelize";
 require('dotenv').config()
 import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
-let transaction;
+
 
 export const getSupervisores = async (req, res) => {
 
-        const dbGiama = app.get('db')
+        const dbGiama = req.db
         const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo`  ")
         res.send(allSupervisores)
 
@@ -16,26 +15,22 @@ export const getSupervisores = async (req, res) => {
 
 export const getSupervisoresActivos = async (req, res) => {
 
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo` WHERE Inactivo = 0 ")
     res.send(allSupervisores)
 
 }
 export const getSupervisoresById = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const supervisores = req.body
     console.log(supervisores)
-    transaction = await dbGiama.transaction({
-        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-        autocommit:false
-      })
+
       const query = () => {
         return new Promise((resolve, reject) => {
     const allSupervisoresById = dbGiama
     .query
     ("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo` WHERE sucursales.`Codigo` = ? ",
     {
-        transaction: transaction,
       replacements: [supervisores.Codigo],
       type: QueryTypes.SELECT
     }
@@ -49,7 +44,7 @@ res.send(response)
 }
 
 export const postSupervisores = async (req, res, error) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     console.log(req.body)
     console.log(req.body.HechoPor) ;
     let {Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
@@ -88,7 +83,7 @@ try{
     
  
 export const updateSupervisores = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     console.log(req.body) 
     console.log(req.body.HechoPor) 
     let {Codigo, Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
@@ -123,17 +118,10 @@ export const updateSupervisores = async (req, res) => {
         console.log(err)
     }
 }
-export const endCommit = async (req, res) => {
-    if(transaction.finished === 'commit'){
-        res.send('Fueron guardados los cambios')
-    }else{
-        await transaction.rollback()
-        res.send('No fueron guardados los cambios')
-    }
-}
+
 
 export const deleteSupervisores = async (req, res, error) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const {Codigo} = req.body;
     
     const user = req.body.HechoPor;
@@ -153,7 +141,7 @@ export const deleteSupervisores = async (req, res, error) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     } 
-    const Supervisor = app.get('db').models.sucursales
+    const Supervisor =  dbGiama.models.sucursales
     try{await Supervisor.destroy({
         where: {Codigo: Codigo} 
         });
@@ -165,7 +153,7 @@ export const deleteSupervisores = async (req, res, error) => {
 
 
 export const getAllZonas = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const result = await dbGiama.query("SELECT * from zonas")
     res.send(result)
 }

@@ -40,7 +40,7 @@ app.use((req, res, next) => {
     next();
   });
 app.use(passport.initialize());
-db.sequelize; 
+
 app.use('/login', UserRouter)
 app.use('/gerentes', GerentesRouter)
 app.use('/reset', resetRouter)
