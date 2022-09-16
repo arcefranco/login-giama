@@ -2,17 +2,17 @@ import { Router } from "express";
 import { createUsuario, getAllTeamLeaders, getAllGerentes, getAllSupervisores, getAllUsuarios, 
     getAllVendedores, getUsuarioById, updateUsuario, deleteUsuario, endCommit } from "../controllers/usuariosController";
 import authentication from "../middlewares/authentication";
-import { errorHandling } from "../middlewares/errorHandling";
+import { testConnection } from "../middlewares/testConnection";
+
 
 const usuariosRoutes = Router()
 
-usuariosRoutes.use(errorHandling)
+usuariosRoutes.use(testConnection)
 
 usuariosRoutes.route('/id').post(getUsuarioById)
 usuariosRoutes.route('/todos').get(getAllUsuarios)
 usuariosRoutes.post('/', authentication, createUsuario) 
 usuariosRoutes.put('/', authentication, updateUsuario)
-usuariosRoutes.get('/endCommit', endCommit)
 usuariosRoutes.delete('/', authentication, deleteUsuario)
 
 //get vendedores, gerentes, teamleaders y supervisores

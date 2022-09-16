@@ -1,15 +1,18 @@
 import { Router } from "express";
-import { createOficiales, deleteOficiales, getOficialesById, getOficialesByName, updateOficiales, endCommit } from "../controllers/oficialesController";
-import { errorHandling } from "../middlewares/errorHandling";
+import { createOficiales, deleteOficiales, getOficialesById, getOficialesByName, updateOficiales, endUpdate } from "../controllers/oficialesController";
+import authentication from "../middlewares/authentication";
+import { testConnection } from "../middlewares/testConnection";
+
 
 
 const OficialesRouter = Router()
-OficialesRouter.use(errorHandling)
+
+OficialesRouter.use(testConnection)
 
 OficialesRouter.post('/', getOficialesByName)
 OficialesRouter.delete('/', deleteOficiales)
-OficialesRouter.post('/id', getOficialesById)
+OficialesRouter.post('/id', authentication, getOficialesById)
 OficialesRouter.post('/create', createOficiales)
 OficialesRouter.put('/id', updateOficiales)
-OficialesRouter.get('/endCommit', endCommit)
+OficialesRouter.post('/endUpdate', authentication, endUpdate)
 export default OficialesRouter

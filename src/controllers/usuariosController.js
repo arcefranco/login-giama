@@ -10,14 +10,11 @@ let transaction;
 
 
 export const getUsuarioById = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
    const {id} = req.body 
    
 
- transaction = await dbGiama.transaction({
-    isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-    autocommit:false
-  })
+
 
   
   const query = () => {
@@ -27,7 +24,7 @@ export const getUsuarioById = async (req, res) => {
       .query
       ("SELECT usuarios.`ID`, usuarios.`emailtest` AS 'email', usuarios.`login` AS 'Usuario', usuarios.`Nombre`, vendedores.`Codigo` AS 'Vendedor', teamleader.`Codigo` AS 'TeamLeader',sucursales.`Codigo` AS 'Supervisor', gerentes.`Codigo` AS 'Gerente', usuarios.`UsuarioAnura`, usuarios.`VerSoloScoringAsignado`, usuarios.`us_bloqueado`, usuarios.`us_activo` FROM usuarios LEFT JOIN gerentes ON usuarios.`CodigoGerente` = gerentes.`Codigo` LEFT JOIN teamleader ON usuarios.`CodigoTeamLeader` = teamleader.`Codigo` LEFT JOIN vendedores ON usuarios.`CodigoVendedor` = vendedores.`Codigo` LEFT JOIN sucursales ON usuarios.`CodigoSucursal` = sucursales.`Codigo` WHERE ID = ? FOR UPDATE",
       {
-          transaction: transaction,
+
           replacements: [id],
           type: QueryTypes.SELECT
         }
@@ -54,7 +51,7 @@ res.send(response)
 }
 
 export const getAllUsuarios = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     
   const usuarios = await 
   dbGiama
@@ -67,7 +64,7 @@ export const createUsuario = async (req, res) => {
     let {Nombre, Usuario, password, confirmPassword, Vendedor, Supervisor, 
         TeamLeader, Gerente, UsuarioAnura, us_activo, us_bloqueado, scoringAsignado, newUserBoolean, email } = req.body
      const {user} = req.usuario
-     const dbGiama = app.get('db')
+     const dbGiama = req.db
         try {
             const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
                 replacements: [user],
@@ -122,7 +119,7 @@ export const updateUsuario = async (req, res) => {
         TeamLeader, Gerente, UsuarioAnura, us_activo, us_bloqueado, scoringAsignado, newUserBoolean, email } = req.body
         
         const {user} = req.usuario
-        const dbGiama = app.get('db')
+        const dbGiama = req.db
         try {
             const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
                 replacements: [user],
@@ -158,8 +155,8 @@ export const updateUsuario = async (req, res) => {
                 replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
                 type: QueryTypes.UPDATE
             } 
-            ).then(() => transaction.commit()).catch((error) => {
-                transaction.rollback()
+            ).catch((error) => {
+         
                 return res.send(error)
             }) 
             
@@ -177,7 +174,7 @@ export const updateUsuario = async (req, res) => {
 export const deleteUsuario = async(req, res) => {
 
     const {id} = req.body.Codigo 
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     if(!id){
        return res.status(400).send({status: false, data: 'Ningun id provisto'})
     }
@@ -209,34 +206,25 @@ export const deleteUsuario = async(req, res) => {
     } 
 }
 
-export const endCommit = async (req, res) => {
-    if(transaction.finished === 'commit'){
-        res.send('Fueron guardados los cambios')
-    }else{
-        await transaction.rollback()
-        res.send('No fueron guardados los cambios')
-        
-    }
 
-}
 
 export const getAllVendedores = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
 const result = await dbGiama.query("SELECT Codigo, Nombre from vendedores")
 res.send(result[0])
 }
 export const getAllGerentes = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const result = await dbGiama.query("SELECT Codigo, Nombre from gerentes")
     res.send(result[0])
 }
 export const getAllSupervisores = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const result = await dbGiama.query("SELECT Codigo, Nombre from sucursales")
     res.send(result[0])
 }
 export const getAllTeamLeaders = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const result = await dbGiama.query("SELECT Codigo, Nombre from teamleader")
     res.send(result[0])
 }
