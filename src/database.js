@@ -123,6 +123,17 @@ timestamps:false,
 }) 
 Vendedores.removeAttribute('id')
 
+//MODELOS
+const Modelos = sequelize.define('modelos', {
+    Codigo: {
+        type:DataTypes.STRING,
+    },
+},{
+freezeTableName:true,
+timestamps:false,
+}) 
+Modelos.removeAttribute('id')
+
 const db = {}
 
 db.Sequelize = Sequelize
