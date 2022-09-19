@@ -16,27 +16,63 @@ export const getVendedores = async (req, res) => {
 export const getVendedoresById = async (req, res) => {
     const dbGiama = req.db
     const vendedores = req.body
-    console.log(vendedores)
-
-      const query = () => {
-        return new Promise((resolve, reject) => {
-    const allVendedoresById =   dbGiama
-    .query
-    ("SELECT vendedores.`Codigo`, vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Nombre` AS 'TeamLeader', Categoria, oficialesscoring.`Nombre` AS OficialScoring, oficialesmora.`Nombre` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%Y-%m-%d') AS 'FechaBaja', escalascomisionesvendedores.`Nombre` AS 'Escala' FROM vendedores LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` WHERE vendedores.`Codigo` = ? ",
-    {
-
-      replacements: [vendedores.Codigo],
-      type: QueryTypes.SELECT
+    const {user} = req.usuario
+    try {
+        const vendedor = await dbGiama
+        .query
+        ("SELECT vendedores.`inUpdate`, vendedores.`Codigo`, vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Nombre` AS 'TeamLeader', Categoria, oficialesscoring.`Nombre` AS OficialScoring, oficialesmora.`Nombre` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%Y-%m-%d') AS 'FechaBaja', escalascomisionesvendedores.`Nombre` AS 'Escala' FROM vendedores LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` WHERE vendedores.`Codigo` = ? ",
+        {
+          replacements: [vendedores.Codigo],
+          type: QueryTypes.SELECT
+        }
+       );
+       console.log('vendedor: ', vendedor)
+       
+         if(vendedor[0].inUpdate) {
+            return res.send({status: false, message: `El registro esta siendo editado por ${vendedor[0].inUpdate} `})
+         }
+    
+      
+        try {
+        await dbGiama.query("UPDATE vendedores SET inUpdate = ? WHERE Codigo = ?",  {
+            replacements: [user, vendedores.Codigo],
+            type: QueryTypes.UPDATE
+            })
+    
+            return res.send(vendedor[0])
+    }   catch (error) {
+            console.log('error:', error)
+            return res.send(error)
+            }
+        
+    }       catch (error) {
+            return res.send(error)
     }
-   );
-    resolve(allVendedoresById)
-    })
 
+}
+export const endUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    if(!Codigo) return 'ID required'
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM vendedores WHERE Codigo = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE vendedores SET inUpdate = NULL WHERE Codigo = ?", {
+                replacements: [Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send('endUpdate OK!')
+        }else{
+            return
+        }
+    } catch (error) {
+        return res.send(error)
     }
-    const response = await awaitWithTimeout(4000, query()) 
-
-    res.send(response)
-
 }
 
 export const postVendedores = async (req, res, error) => {
@@ -83,6 +119,7 @@ export const updateVendedores = async (req, res) => {
     console.log(req.body.HechoPor) 
     let {Codigo, Nombre,   Activo:Inactivo, TeamLeader, Categoria, OficialScoring, OficialMora, FechaBaja, Escala} = req.body;
     const user = req.body.HechoPor;
+    console.log('Inactivo: ', Inactivo)
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
             replacements: [user],
@@ -102,8 +139,8 @@ export const updateVendedores = async (req, res) => {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
     try{  
-    await dbGiama.query("UPDATE vendedores SET Nombre = ?,  Inactivo = NOT ?, TeamLeader = ?, Categoria = ?, OficialScoring = ?, OficialMora = ?, FechaBaja = ?, Escala = ?, UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
-        replacements: [Nombre,  Inactivo, TeamLeader, Categoria, OficialScoring, OficialMora, FechaBaja, Escala, user, Codigo ],
+    await dbGiama.query("UPDATE vendedores SET Nombre = ?,  Inactivo = NOT ?, TeamLeader = ?, Categoria = ?, OficialScoring = ?, OficialMora = ?, FechaBaja = ?, Escala = ?, UsuarioAltaRegistro = ?, inUpdate = NULL WHERE Codigo = ? ", {
+        replacements: [Nombre,  Inactivo, TeamLeader, Categoria, OficialScoring ? OficialScoring : null, OficialMora ? OficialMora : null, FechaBaja, Escala, user, Codigo ],
         type: QueryTypes.UPDATE
       });
       return res.send({status: true, data: 'Vendedor modificado con exito!'})
