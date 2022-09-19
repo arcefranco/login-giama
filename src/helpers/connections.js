@@ -26,6 +26,10 @@ const Gerente = pa7Connection.define('gerentes', {
    UsuarioAltaRegistro: {
     type:DataTypes.STRING,
        allowNull:false
+   },
+   inUpdate: {
+    type:DataTypes.STRING,
+       allowNull:true
    }
 },{
 freezeTableName:true,
@@ -69,7 +73,11 @@ const  Supervisor = pa7Connection.define('sucursales', {
     UsuarioAltaRegistro: {
         type:DataTypes.STRING,
            allowNull:false
-       }
+       },
+    inUpdate: {
+    type:DataTypes.STRING,
+        allowNull:true
+    }
 
 },{
 freezeTableName:true,
@@ -133,6 +141,10 @@ const GerenteGF = pa7gfConnection.define('gerentes', {
    UsuarioAltaRegistro: {
     type:DataTypes.STRING,
        allowNull:false
+   },
+   inUpdate: {
+    type:DataTypes.STRING,
+       allowNull:true
    }
 },{
 freezeTableName:true,
@@ -176,7 +188,11 @@ const  SupervisorGF = pa7gfConnection.define('sucursales', {
     UsuarioAltaRegistro: {
         type:DataTypes.STRING,
            allowNull:false
-       }
+       },
+    inUpdate: {
+    type:DataTypes.STRING,
+        allowNull:true
+    }
 
 },{
 freezeTableName:true,
