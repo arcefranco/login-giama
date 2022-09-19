@@ -1,9 +1,10 @@
 import { Router } from "express";
 
 import { getAllOficialesMoraActivos, getAllOficialesScoringActivos } from "../controllers/vendedoresController";
-import {  getVendedores, getVendedoresById, postVendedores, updateVendedores,deleteVendedores,  getAllEscalas, getAllOficialesScoring, getAllOficialesMora } from "../controllers/vendedoresController";
+import { endUpdate, getVendedores, getVendedoresById, postVendedores, updateVendedores,deleteVendedores,  getAllEscalas, getAllOficialesScoring, getAllOficialesMora } from "../controllers/vendedoresController";
 
 import { testConnection } from "../middlewares/testConnection";
+import authentication from "../middlewares/authentication";
 
 const VendedoresRouter = Router()
 
@@ -11,7 +12,8 @@ const VendedoresRouter = Router()
 VendedoresRouter.use(testConnection)
 
 VendedoresRouter.route('/').get(getVendedores);
-VendedoresRouter.route('/id').post(getVendedoresById);
+VendedoresRouter.post('/id', authentication, getVendedoresById)
+VendedoresRouter.post('/endUpdate', authentication, endUpdate)
 VendedoresRouter.route('/').post(postVendedores);
 VendedoresRouter.route('/').put(updateVendedores);
 VendedoresRouter.route('/').delete(deleteVendedores);

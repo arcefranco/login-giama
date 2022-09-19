@@ -20,30 +20,65 @@ export const getGerentes = async (req, res) => {
     const gerentes = req.body
     const dbGiama = req.db
     const gerentesModel = dbGiama.models.gerentes
-    console.log(gerentesModel)
+    const {user} = req.usuario
 
-      const query = () => {
-        return new Promise((resolve, reject) => {
-    const allGerentesById =  gerentesModel.findAll(
+try {
+    const allGerentesById =  await gerentesModel.findAll(
         {
 
         where:{Codigo:gerentes.Codigo}
     })
-    console.log(allGerentesById)
-    resolve(allGerentesById)
+    const gerenteFinded = allGerentesById[0].dataValues
+     if(gerenteFinded.inUpdate) {
+        return res.send({status: false, message: `El registro esta siendo editado por ${gerenteFinded.inUpdate} `})
+     }
 
+  
+    try {
+    await dbGiama.query("UPDATE gerentes SET inUpdate = ? WHERE Codigo = ?",  {
+        replacements: [user, gerentes.Codigo],
+        type: QueryTypes.UPDATE
+        })
+
+        return res.send(gerenteFinded)
+}   catch (error) {
+        console.log('error:', error)
+        return res.send(error)
+        }
     
-})
+}       catch (error) {
+        return res.send(error)
 }
-const response = await awaitWithTimeout(4000, query()).catch(err => console.log(err)) 
+}
 
-res.send(response)
-} 
+export const endUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    if(!Codigo) return 'ID required'
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM gerentes WHERE Codigo = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE gerentes SET inUpdate = NULL WHERE Codigo = ?", {
+                replacements: [Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send('endUpdate OK!')
+        }else{
+            return
+        }
+    } catch (error) {
+        return res.send(error)
+    }
+}
 
 
  export const postGerentes = async (req, res, error) => {
      let {Nombre, Activo} = req.body;
-     console.log(req.body) 
      const dbGiama = req.db;
      const user = req.body.HechoPor;
      try {
@@ -78,7 +113,6 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
  
  export const updateGerentes = async (req, res) => {
     const gerentes = req.body;
-    console.log(gerentes)
     const dbGiama = req.db
     const user = req.body.HechoPor;
     try {
@@ -102,6 +136,7 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
         Nombre: gerentes.Nombre,
         Activo: gerentes.Activo,
         UsuarioAltaRegistro: user,
+        inUpdate: null
     }
     ,{
         where: {Codigo: gerentes.Codigo}

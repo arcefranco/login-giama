@@ -28,24 +28,62 @@ export const getTeamLeadersActivos = async (req, res) => {
 export const getTeamLeadersById = async (req, res) => {
     const dbGiama = req.db
     const teamLeaders = req.body
-    console.log(teamLeaders)
-
-     const query = () => {
-        return new Promise((resolve, reject) => {
-    const allTeamLeadersById = dbGiama
-    .query
-    ("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   WHERE teamleader.`Codigo` = ? ",
-    {
-      replacements: [teamLeaders.Codigo],
-      type: QueryTypes.SELECT
+    const {user} = req.usuario
+    try {
+        const teamLeader = await dbGiama
+        .query
+        ("SELECT teamleader.`inUpdate`, teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   WHERE teamleader.`Codigo` = ? ",
+        {
+          replacements: [teamLeaders.Codigo],
+          type: QueryTypes.SELECT
+        }
+       );
+       
+         if(teamLeader[0].inUpdate) {
+            return res.send({status: false, message: `El registro esta siendo editado por ${teamLeader[0].inUpdate} `})
+         }
+    
+      
+        try {
+        await dbGiama.query("UPDATE teamleader SET inUpdate = ? WHERE Codigo = ?",  {
+            replacements: [user, teamLeaders.Codigo],
+            type: QueryTypes.UPDATE
+            })
+    
+            return res.send(teamLeader[0])
+    }   catch (error) {
+            console.log('error:', error)
+            return res.send(error)
+            }
+        
+    }       catch (error) {
+            return res.send(error)
     }
-   );
-    resolve(allTeamLeadersById)
-})
 }
-const response = await awaitWithTimeout(4000, query()) 
 
-res.send(response)
+export const endUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    if(!Codigo) return 'ID required'
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM teamleader WHERE Codigo = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE teamleader SET inUpdate = NULL WHERE Codigo = ?", {
+                replacements: [Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send('endUpdate OK!')
+        }else{
+            return
+        }
+    } catch (error) {
+        return res.send(error)
+    }
 }
 
 export const postTeamLeaders = async (req, res, error) => {
@@ -110,7 +148,7 @@ export const updateTeamLeaders = async (req, res) => {
     } 
 
     try{  
-    await dbGiama.query("UPDATE teamleader SET Nombre = ?,  Sucursal = ?, Inactivo = NOT CONVERT(?,BINARY), UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
+    await dbGiama.query("UPDATE teamleader SET inUpdate = NULL, Nombre = ?,  Sucursal = ?, Inactivo = NOT CONVERT(?,BINARY), UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
         replacements: [Nombre,  Supervisor? Supervisor:null, Inactivo, user , Codigo ],
         type: QueryTypes.UPDATE
       });
