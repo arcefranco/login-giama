@@ -1,55 +1,85 @@
 import {  QueryTypes, DataTypes } from "sequelize";
-import {app} from '../index'
 import Sequelize from "sequelize";
 require('dotenv').config()
 import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
-let transaction;
 
 export const getGerentes = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     
     const allGerentes = await dbGiama.query("SELECT Codigo, Nombre, Activo FROM gerentes")
     res.send(allGerentes)
 }
-export const getGerentesActivos = async (req, res) => {
-    const dbGiama = app.get('db')
+ export const getGerentesActivos = async (req, res) => {
+    const dbGiama = req.db
     
     const allGerentes = await dbGiama.query("SELECT Codigo, Nombre, Activo FROM gerentes WHERE Activo = 1")
     res.send(allGerentes)
-}    
-export const getGerentesById = async (req, res) => {
+}     
+ export const getGerentesById = async (req, res) => {
     const gerentes = req.body
-    const dbGiama = app.get('db')
-    const gerentesModel = app.get('db').models.gerentes
-    console.log(gerentes)
-    transaction = await dbGiama.transaction({
-        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-        autocommit:false
-      })
-      const query = () => {
-        return new Promise((resolve, reject) => {
-    const allGerentesById =  gerentesModel.findAll(
+    const dbGiama = req.db
+    const gerentesModel = dbGiama.models.gerentes
+    const {user} = req.usuario
+
+try {
+    const allGerentesById =  await gerentesModel.findAll(
         {
-        transaction: transaction,
+
         where:{Codigo:gerentes.Codigo}
     })
-    console.log(allGerentesById)
-    resolve(allGerentesById)
+    const gerenteFinded = allGerentesById[0].dataValues
+     if(gerenteFinded.inUpdate) {
+        return res.send({status: false, message: `El registro esta siendo editado por ${gerenteFinded.inUpdate} `})
+     }
 
+  
+    try {
+    await dbGiama.query("UPDATE gerentes SET inUpdate = ? WHERE Codigo = ?",  {
+        replacements: [user, gerentes.Codigo],
+        type: QueryTypes.UPDATE
+        })
+
+        return res.send(gerenteFinded)
+}   catch (error) {
+        console.log('error:', error)
+        return res.send(error)
+        }
     
-})
+}       catch (error) {
+        return res.send(error)
 }
-const response = await awaitWithTimeout(4000, query()) 
-
-res.send(response)
 }
 
+export const endUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    if(!Codigo) return 'ID required'
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM gerentes WHERE Codigo = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE gerentes SET inUpdate = NULL WHERE Codigo = ?", {
+                replacements: [Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send('endUpdate OK!')
+        }else{
+            return
+        }
+    } catch (error) {
+        return res.send(error)
+    }
+}
 
-export const postGerentes = async (req, res, error) => {
+
+ export const postGerentes = async (req, res, error) => {
      let {Nombre, Activo} = req.body;
-     console.log(req.body) 
-     const dbGiama = app.get('db');
+     const dbGiama = req.db;
      const user = req.body.HechoPor;
      try {
          const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
@@ -78,13 +108,12 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
     }catch(err){
         console.log(err)
     } }
-
+ 
     
  
-export const updateGerentes = async (req, res) => {
+ export const updateGerentes = async (req, res) => {
     const gerentes = req.body;
-    console.log(gerentes)
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const user = req.body.HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
@@ -101,12 +130,13 @@ export const updateGerentes = async (req, res) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     }
-    const Gerente = app.get('db').models.gerentes;
+    const Gerente = dbGiama.models.gerentes;
     try{ await Gerente?.update(
     {
         Nombre: gerentes.Nombre,
         Activo: gerentes.Activo,
         UsuarioAltaRegistro: user,
+        inUpdate: null
     }
     ,{
         where: {Codigo: gerentes.Codigo}
@@ -118,20 +148,13 @@ export const updateGerentes = async (req, res) => {
         console.log(err)
     }
 }
+ 
 
-export const endCommit = async (req, res) => {
-    if(transaction.finished === 'commit'){
-        res.send('Fueron guardados los cambios')
-    }else{
-        await transaction.rollback()
-        res.send('No fueron guardados los cambios')
-    }
-}
-
-export const deleteGerentes = async (req, res, error) => {
+ export const deleteGerentes = async (req, res, error) => {
+    console.log(req.body)
     const {Codigo} = req.body;
-    console.log(Codigo)
-    const dbGiama = app.get('db')
+    console.log('codigo delete gerentes: ', Codigo)
+    const dbGiama = req.db
     const user = req.body.HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
@@ -148,7 +171,7 @@ export const deleteGerentes = async (req, res, error) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     }
-    const Gerente = app.get('db').models.gerentes
+    const Gerente = dbGiama.models.gerentes
     try{await Gerente?.destroy({
         where: {Codigo: Codigo} 
         });
@@ -156,7 +179,7 @@ export const deleteGerentes = async (req, res, error) => {
         }catch(err){
             console.log(err)
         }
-}
+} 
 
 
 

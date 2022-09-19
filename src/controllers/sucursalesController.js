@@ -1,49 +1,85 @@
-import {app} from '../index'
 import { QueryTypes } from "sequelize";
-import Sequelize from "sequelize";
 require('dotenv').config()
 import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
 
-let transaction;
+
 
 export const getAllSucursales = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const allSucursales = await dbGiama.query("SELECT sucursalreal.`Codigo` AS 'Codigo', sucursalreal.`Nombre`, sucursalreal.`UsuarioAltaRegistro` FROM sucursalreal")
     res.send(allSucursales[0])
 }
 
 export const getSucursalesById = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const {id} = req.body
-    transaction = await dbGiama.transaction({
-        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-        autocommit:false
-      })
-    const query = () => {
-        return new Promise((resolve, reject) => {
-            let sucursalById = dbGiama.query("SELECT sucursalreal.`Codigo` AS 'Codigo', sucursalreal.`Nombre`, sucursalreal.`UsuarioAltaRegistro` FROM sucursalreal WHERE sucursalreal.`Codigo` = ? FOR UPDATE", 
-            {
-                transaction: transaction,
-                replacements: [id],
-                type: QueryTypes.SELECT
+    const {user} = req.usuario
+    try {
+        const sucursal = await dbGiama
+        .query
+        ("SELECT sucursalreal.`Codigo` AS 'Codigo', sucursalreal.`Nombre`, sucursalreal.`UsuarioAltaRegistro`, sucursalreal.`inUpdate` FROM sucursalreal WHERE sucursalreal.`Codigo` = ?",
+        {
+          replacements: [id],
+          type: QueryTypes.SELECT
+        }
+       );
+       console.log('supervisor: ', sucursal)
+       
+         if(sucursal[0].inUpdate) {
+            return res.send({status: false, message: `El registro esta siendo editado por ${sucursal[0].inUpdate} `})
+         }
+    
+      
+        try {
+        await dbGiama.query("UPDATE sucursalreal SET inUpdate = ? WHERE Codigo = ?",  {
+            replacements: [user, id],
+            type: QueryTypes.UPDATE
             })
-
-            resolve(sucursalById)
-        })
+    
+            return res.send(sucursal)
+    }   catch (error) {
+            console.log('error:', error)
+            return res.send(error)
+            }
+        
+    }       catch (error) {
+            return res.send(error)
     }
+    
+    
+}
 
- 
-    const response = await awaitWithTimeout(4000, query()) 
-
-    res.send(response)
+export const endUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    if(!Codigo) return 'ID required'
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM sucursalreal WHERE Codigo = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE sucursalreal SET inUpdate = NULL WHERE Codigo = ?", {
+                replacements: [Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send('endUpdate OK!')
+        }else{
+            return
+        }
+    } catch (error) {
+        return res.send(error)
+    }
 }
 
 export const deleteSucursal = async(req, res) => {
 
     const {id} = req.body.id
     
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     if(!id){
        return res.status(400).send({status: false, data: 'Ningun id provisto'})
     }
@@ -78,7 +114,7 @@ export const deleteSucursal = async(req, res) => {
 export const updateSucursal = async (req, res) => {
     const {Codigo, Nombre} = req.body
     
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     if(!Codigo){
        return res.status(400).send({status: false, data: 'Ningun id provisto'})
     }
@@ -100,11 +136,11 @@ export const updateSucursal = async (req, res) => {
 
     try {
         await dbGiama.query('UPDATE sucursalreal SET Nombre = ? WHERE Codigo = ?', {
-            transaction: transaction,
+
             replacements: [Nombre, Codigo],
             type: QueryTypes.UPDATE
-        }).then(() => transaction.commit()).catch((error) => {
-            transaction.rollback()
+        }).catch((error) => {
+          
             return res.send(error)
         }) 
         return res.send({status: true, data: 'Sucursal actualizada correctamente!'}) 
@@ -113,21 +149,14 @@ export const updateSucursal = async (req, res) => {
         return res.status(400).send({status: false, data: 'error en la DB'})
     }
 }
-export const endCommit = async (req, res) => {
-    if(transaction.finished === 'commit'){
-        res.send('Fueron guardados los cambios')
-    }else{
-        await transaction.rollback()
-        res.send('No fueron guardados los cambios')
-        
-    }
 
-}
+
+
 
 export const createSucursal = async (req, res) => {
     const {Nombre, UsuarioAltaRegistro} = req.body
     
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const {user} = req.usuario
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {

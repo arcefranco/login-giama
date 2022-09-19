@@ -1,16 +1,16 @@
 import {  QueryTypes } from "sequelize";
-import {app} from '../index'
+
 import Sequelize from "sequelize";
 require('dotenv').config()
 import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
 
-let transaction;
+
 
 
 export const getTeamLeaders = async (req, res) => {
 
-        const dbGiama = app.get('db')
+        const dbGiama = req.db
         // const allTeamLeaders = await dbGiama.query("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre' ,  sucursales.`Nombre` AS 'Supervisor', NOT Inactivo AS Activo,  FROM teamleader LEFT JOIN sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   ")
         const allTeamLeaders = await dbGiama.query("SELECT teamleader. `Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`  ")
         res.send(allTeamLeaders)
@@ -18,7 +18,7 @@ export const getTeamLeaders = async (req, res) => {
 }
 export const getTeamLeadersActivos = async (req, res) => {
 
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     // const allTeamLeaders = await dbGiama.query("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre' ,  sucursales.`Nombre` AS 'Supervisor', NOT Inactivo AS Activo,  FROM teamleader LEFT JOIN sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   ")
     const allTeamLeaders = await dbGiama.query("SELECT teamleader. `Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo` WHERE CONVERT(teamleader.`Inactivo`, DECIMAL) = 0 ")
     res.send(allTeamLeaders)
@@ -26,34 +26,68 @@ export const getTeamLeadersActivos = async (req, res) => {
 }
 
 export const getTeamLeadersById = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const teamLeaders = req.body
-    console.log(teamLeaders)
-    transaction = await dbGiama.transaction({
-        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-        autocommit:false
-      })
-     const query = () => {
-        return new Promise((resolve, reject) => {
-    const allTeamLeadersById = dbGiama
-    .query
-    ("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   WHERE teamleader.`Codigo` = ? ",
-    {
-      transaction: transaction,
-      replacements: [teamLeaders.Codigo],
-      type: QueryTypes.SELECT
+    const {user} = req.usuario
+    try {
+        const teamLeader = await dbGiama
+        .query
+        ("SELECT teamleader.`inUpdate`, teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   WHERE teamleader.`Codigo` = ? ",
+        {
+          replacements: [teamLeaders.Codigo],
+          type: QueryTypes.SELECT
+        }
+       );
+       
+         if(teamLeader[0].inUpdate) {
+            return res.send({status: false, message: `El registro esta siendo editado por ${teamLeader[0].inUpdate} `})
+         }
+    
+      
+        try {
+        await dbGiama.query("UPDATE teamleader SET inUpdate = ? WHERE Codigo = ?",  {
+            replacements: [user, teamLeaders.Codigo],
+            type: QueryTypes.UPDATE
+            })
+    
+            return res.send(teamLeader[0])
+    }   catch (error) {
+            console.log('error:', error)
+            return res.send(error)
+            }
+        
+    }       catch (error) {
+            return res.send(error)
     }
-   );
-    resolve(allTeamLeadersById)
-})
 }
-const response = await awaitWithTimeout(4000, query()) 
 
-res.send(response)
+export const endUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    if(!Codigo) return 'ID required'
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM teamleader WHERE Codigo = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE teamleader SET inUpdate = NULL WHERE Codigo = ?", {
+                replacements: [Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send('endUpdate OK!')
+        }else{
+            return
+        }
+    } catch (error) {
+        return res.send(error)
+    }
 }
 
 export const postTeamLeaders = async (req, res, error) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     console.log(req.body)
     console.log(req.body.HechoPor) ;
     let {Nombre, Supervisor, Activo:Inactivo, } = req.body;
@@ -92,7 +126,7 @@ try{
     
  
 export const updateTeamLeaders = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     console.log(req.body) 
     console.log(req.body.HechoPor) 
     let {Codigo, Nombre,  Supervisor, Activo:Inactivo, } = req.body;
@@ -114,7 +148,7 @@ export const updateTeamLeaders = async (req, res) => {
     } 
 
     try{  
-    await dbGiama.query("UPDATE teamleader SET Nombre = ?,  Sucursal = ?, Inactivo = NOT CONVERT(?,BINARY), UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
+    await dbGiama.query("UPDATE teamleader SET inUpdate = NULL, Nombre = ?,  Sucursal = ?, Inactivo = NOT CONVERT(?,BINARY), UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
         replacements: [Nombre,  Supervisor? Supervisor:null, Inactivo, user , Codigo ],
         type: QueryTypes.UPDATE
       });
@@ -125,17 +159,10 @@ export const updateTeamLeaders = async (req, res) => {
         console.log(err)
     }
 }
-export const endCommit = async (req, res) => {
-    if(transaction.finished === 'commit'){
-        res.send('Fueron guardados los cambios')
-    }else{
-        await transaction.rollback()
-        res.send('No fueron guardados los cambios')
-    }
-}
+
 
 export const deleteTeamLeaders = async (req, res, error) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const {Codigo} = req.body;
     
     const user = req.body.HechoPor;
@@ -155,7 +182,7 @@ export const deleteTeamLeaders = async (req, res, error) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     } 
-    const TeamLeaders = app.get('db').models.teamleader
+    const TeamLeaders = dbGiama.models.teamleader
     try{await TeamLeaders.destroy({
         where: {Codigo: Codigo} 
         });
@@ -167,7 +194,7 @@ export const deleteTeamLeaders = async (req, res, error) => {
 
 
 export const getAllZonas = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const result = await dbGiama.query("SELECT * from zonas")
     res.send(result)
 }
