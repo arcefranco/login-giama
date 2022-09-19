@@ -19,6 +19,7 @@ import TeamLeadersRouter from "./routes/teamLeadersRoutes";
 import OficialesRouter from "./routes/oficialesRoutes";
 
 import VendedoresRouter from "./routes/vendedoresRoutes";
+import ModelosRouter from "./routes/modelosRoutes";
 
 
 
@@ -54,7 +55,7 @@ app.use('/teamleaders', TeamLeadersRouter)
 app.use('/roles', RolesRouter)
 app.use('/vendedores', VendedoresRouter)
 app.use('/supervisores', supervisoresRoutes)
-
+app.use('/modelos', ModelosRouter)
 app.use('/oficiales', OficialesRouter)
 
 app.listen(process.env.PORT, () => {
