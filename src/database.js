@@ -120,6 +120,11 @@ timestamps:false,
 }) 
 Vendedores.removeAttribute('id') */
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 8a029afd216379359bda51a72fd904038862d3e0
 //MODELOS
 const Modelos = sequelize.define('modelos', {
     Codigo: {
@@ -132,7 +137,7 @@ timestamps:false,
 Modelos.removeAttribute('id')
 
 
- 
+
 /*const db = {}
 
 db.Sequelize = Sequelize
