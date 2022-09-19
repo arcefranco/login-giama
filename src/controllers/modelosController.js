@@ -8,14 +8,13 @@ let transaction;
 
 
 export const getTipoPlan = async (req, res) => {
-    const dbGiama = app.get('db')
-    
+    const dbGiama = req.db
     const allModelos = await dbGiama.query("SELECT  * FROM tipoplan ")
     res.send(allModelos)
 }
 
 export const getModelos = async (req, res) => {
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const allModelos = await dbGiama.query(`
     SELECT modelos.Marca, modelos.Codigo, modelos.Nombre, modelos.Coeficiente, 
                 modelos.FechaAltaRegistro, modelos.UsuarioAltaRegistro, modelos.NacionalImportado, modelos.Activo,
@@ -35,8 +34,8 @@ export const getModelos = async (req, res) => {
 
 export const getModelosById = async (req, res) => {
     const Modelos = req.body
-    const dbGiama = app.get('db')
-    const ModelosModel = app.get('db').models.modelos
+    const dbGiama = req.db
+    // const ModelosModel = dbGiama.models.modelos
     console.log(Modelos)
     transaction = await dbGiama.transaction({
         isolationLevel: Sequelize.Transaction.SERIALIZABLE,
@@ -78,7 +77,7 @@ res.send(response)
 export const postModelos = async (req, res, error) => {
      let {Nombre, Activo} = req.body;
      console.log(req.body) 
-     const dbGiama = app.get('db');
+     const dbGiama = req.db
      const user = req.body.HechoPor;
      try {
          const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
@@ -113,7 +112,7 @@ try{    await dbGiama.query("INSERT INTO modelos (Nombre, Activo, UsuarioAltaReg
 export const updateModelos = async (req, res) => {
     const {Codigo, Nombre, Activo, NacionalImportado, CuotaTerminal, CuotaACobrarA, CuotaACobrar, Cuota1, Cuota2} = req.body;
     console.log(req.body)
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const user = req.body.HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
@@ -166,7 +165,7 @@ export const endCommit = async (req, res) => {
 export const deleteModelos = async (req, res, error) => {
     const {Codigo} = req.body;
     console.log(Codigo)
-    const dbGiama = app.get('db')
+    const dbGiama = req.db
     const user = req.body.HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {

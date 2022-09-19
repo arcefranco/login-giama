@@ -1,9 +1,11 @@
 import { Router } from "express";
 import {  getModelos, getModelosById, postModelos, updateModelos,deleteModelos, endCommit, getTipoPlan, getModelosActivos, getCuotas } from "../controllers/modelosController";
-import { errorHandling } from "../middlewares/errorHandling";
+import { testConnection } from "../middlewares/testConnection";
+
 const ModelosRouter = Router()
 
-ModelosRouter.use(errorHandling)
+ModelosRouter.use(testConnection)
+
 ModelosRouter.route('/').get(getModelos);
 // ModelosRouter.route('/cuotas').get(getCuotas);
 

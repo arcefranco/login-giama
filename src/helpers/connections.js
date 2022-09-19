@@ -125,6 +125,17 @@ export const pa7gfConnection = new Sequelize('pa7_gf_test_2', process.env.DB_USE
     dialect: process.env.DB_DIALECT    
 })
 
+//MODELOS
+const Modelos = pa7Connection.define('modelos', {
+    Codigo: {
+        type:DataTypes.STRING,
+    },
+},{
+freezeTableName:true,
+timestamps:false,
+}) 
+Modelos.removeAttribute('id')
+
 ////////GERENTE
 const GerenteGF = pa7gfConnection.define('gerentes', {
     Codigo: {
@@ -234,6 +245,17 @@ freezeTableName:true,
 timestamps:false,
 }) 
 VendedoresGF.removeAttribute('id')
+
+//MODELOS
+const ModelosGF = pa7gfConnection.define('modelos', {
+    Codigo: {
+        type:DataTypes.STRING,
+    },
+},{
+freezeTableName:true,
+timestamps:false,
+}) 
+ModelosGF.removeAttribute('id')
 
 pa7Connection.authenticate()
 pa7gfConnection.authenticate()
