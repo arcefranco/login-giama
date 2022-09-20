@@ -16,9 +16,8 @@ export const getAllUsers = async (req, res) => {
 
 export const login = async (req, res) => {
     
-    const {login} = req.body
-    const {password} = req.body
-    const {empresa} = req.body
+    const {login, password, empresa, empresaReal} = req.body
+
     console.log(empresa)
     let dbGiama = {};
     if(empresa === 'pa7'){
@@ -91,8 +90,8 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
         newUser: user[0].newuserBoolean,
         roles: roles,
         token: token,
-        db: empresa
-
+        db: empresa,
+        empresaReal: empresaReal
       
     })
 
