@@ -75,7 +75,7 @@ res.send(response)
 
 
 export const postModelos = async (req, res, error) => {
-     let {Nombre, Activo} = req.body;
+     let {Codigo, Nombre, Activo, NacionalImportado, TipoPlan, CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2} = req.body;
      console.log(req.body) 
      const dbGiama = req.db
      const user = req.body.HechoPor;
@@ -98,10 +98,17 @@ export const postModelos = async (req, res, error) => {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
      
-try{    await dbGiama.query("INSERT INTO modelos (Nombre, Activo, UsuarioAltaRegistro) VALUES (?,?,?)",{
-        replacements: [Nombre, Activo? Activo : 0, user],
+try{    await dbGiama.query("INSERT INTO modelos (Nombre, Activo, NacionalImportado ,UsuarioAltaRegistro) VALUES (?,?,?,?)",{
+        replacements: [Nombre, Activo? Activo : 0, NacionalImportado? NacionalImportado : null, user],
         type: QueryTypes.INSERT,    
-    });
+    })
+    // await dbGiama.query(`
+    // INSERT INTO modelosvalorescuotas
+    //  (TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
+    //   VALUES (?,?,?,?,?,?,?) WHERE Codigo = ?`,
+    //   { replacements: [TipoPlan, CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2,  Codigo],
+    //     type: QueryTypes.INSERT,    
+    // });
     return res.send({status: true, data: 'Modelo creado!'})
     }catch(err){
         console.log(err)
@@ -152,16 +159,30 @@ export const updateModelos = async (req, res) => {
         console.log(err)
     }
 }
-
-export const endCommit = async (req, res) => {
-    if(transaction.finished === 'commit'){
-        res.send('Fueron guardados los cambios')
-    }else{
-        await transaction.rollback()
-        res.send('No fueron guardados los cambios')
+export const endUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    if(!Codigo) return 'ID required'
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM modelos WHERE Codigo = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE modelosvalorescuotas SET inUpdate = NULL WHERE Codigo = ?", {
+                replacements: [Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send('endUpdate OK!')
+        }else{
+            return
+        }
+    } catch (error) {
+        return res.send(error)
     }
 }
-
 export const deleteModelos = async (req, res, error) => {
     const {Codigo} = req.body;
     console.log(Codigo)
