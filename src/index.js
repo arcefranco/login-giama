@@ -6,7 +6,6 @@ import UserRouter from "./routes/userRoutes";
 import GerentesRouter from './routes/gerentesRoutes'
 import resetRouter from "./routes/resetRoutes";
 import usuariosRoutes from "./routes/usuariosRoutes";
-import db from './database'
 require('dotenv').config()
 
 import RolesRouter from "./routes/rolesRoutes";
@@ -19,6 +18,7 @@ import TeamLeadersRouter from "./routes/teamLeadersRoutes";
 import OficialesRouter from "./routes/oficialesRoutes";
 
 import VendedoresRouter from "./routes/vendedoresRoutes";
+import ModelosRouter from "./routes/modelosRoutes";
 
 
 
@@ -54,7 +54,7 @@ app.use('/teamleaders', TeamLeadersRouter)
 app.use('/roles', RolesRouter)
 app.use('/vendedores', VendedoresRouter)
 app.use('/supervisores', supervisoresRoutes)
-
+app.use('/modelos', ModelosRouter)
 app.use('/oficiales', OficialesRouter)
 
 app.listen(process.env.PORT, () => {
