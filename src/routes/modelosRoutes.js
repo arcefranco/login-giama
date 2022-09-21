@@ -1,6 +1,8 @@
 import { Router } from "express";
-import {  getModelos, getModelosById, postModelos, updateModelos,deleteModelos, endCommit, getTipoPlan, getModelosActivos, getCuotas } from "../controllers/modelosController";
+import {  getModelos, getModelosById, postModelos, updateModelos,deleteModelos, endCommit, getTipoPlan, endUpdate,getModelosActivos, getCuotas } from "../controllers/modelosController";
 import { testConnection } from "../middlewares/testConnection";
+import authentication from "../middlewares/authentication";
+
 
 const ModelosRouter = Router()
 
@@ -15,7 +17,6 @@ ModelosRouter.route('/id').post(getModelosById);
 ModelosRouter.route('/').post(postModelos);
 ModelosRouter.route('/').put(updateModelos);
 ModelosRouter.route('/').delete(deleteModelos);
-ModelosRouter.get('/endCommit', endCommit)
-
+ModelosRouter.post('/endUpdate', authentication, endUpdate)
 
 export default ModelosRouter
