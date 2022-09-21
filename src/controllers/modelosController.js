@@ -4,7 +4,7 @@ import Sequelize from "sequelize";
 require('dotenv').config()
 import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
-let transaction;
+// let transaction;
 
 
 export const getTipoPlan = async (req, res) => {
@@ -37,10 +37,10 @@ export const getModelosById = async (req, res) => {
     const dbGiama = req.db
     // const ModelosModel = dbGiama.models.modelos
     console.log(Modelos)
-    transaction = await dbGiama.transaction({
-        isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-        autocommit:false
-      })
+    // transaction = await dbGiama.transaction({
+    //     isolationLevel: Sequelize.Transaction.SERIALIZABLE,
+    //     autocommit:false
+    //   })
       const query = () => {
         return new Promise((resolve, reject) => {
     const allModelosById =  dbGiama.query(
@@ -55,7 +55,7 @@ export const getModelosById = async (req, res) => {
         LEFT JOIN tipoplan ON modelosvalorescuotas.tipoplan = tipoplan.ID
         WHERE modelosvalorescuotas.Codigo = ?`,
         {
-        transaction: transaction,
+        // transaction: transaction,
         replacements:[Modelos.Codigo],
         type: QueryTypes.SELECT
     })
@@ -75,7 +75,10 @@ res.send(response)
 
 
 export const postModelos = async (req, res, error) => {
-     let {Codigo, Nombre, Activo, NacionalImportado, TipoPlan, CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2} = req.body;
+    // const allPlanes = await dbGiama.query("SELECT  * FROM tipoplan ") 
+    console.log(req.body.length)
+    console.log(req.body[1])
+    let {Codigo, Nombre, Activo, NacionalImportado, TipoPlan} = req.body;
      console.log(req.body) 
      const dbGiama = req.db
      const user = req.body.HechoPor;
@@ -98,17 +101,26 @@ export const postModelos = async (req, res, error) => {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
      
-try{    await dbGiama.query("INSERT INTO modelos (Nombre, Activo, NacionalImportado ,UsuarioAltaRegistro) VALUES (?,?,?,?)",{
+try{ 
+       /*await dbGiama.query("INSERT INTO modelos (Nombre, Activo, NacionalImportado ,UsuarioAltaRegistro) VALUES (?,?,?,?)",{
         replacements: [Nombre, Activo? Activo : 0, NacionalImportado? NacionalImportado : null, user],
         type: QueryTypes.INSERT,    
+    })*/
+    for(let i=1; i<req.body.length; i++){
+    // allPlanes.map(plan=>
+    let {CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2} = req.body[i];
+        await dbGiama.query(`
+    INSERT INTO modelosvalorescuotas
+     (TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
+      VALUES (?,?,?,?,?,?,?) WHERE Codigo = ?`,
+      { replacements: [ TipoPlan , CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2,  Codigo],
+        type: QueryTypes.INSERT,    
     })
-    // await dbGiama.query(`
-    // INSERT INTO modelosvalorescuotas
-    //  (TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
-    //   VALUES (?,?,?,?,?,?,?) WHERE Codigo = ?`,
-    //   { replacements: [TipoPlan, CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2,  Codigo],
-    //     type: QueryTypes.INSERT,    
-    // });
+    }
+
+
+    // )
+    
     return res.send({status: true, data: 'Modelo creado!'})
     }catch(err){
         console.log(err)
@@ -117,7 +129,8 @@ try{    await dbGiama.query("INSERT INTO modelos (Nombre, Activo, NacionalImport
     
  
 export const updateModelos = async (req, res) => {
-    const {Codigo, Nombre, Activo, NacionalImportado, CuotaTerminal, CuotaACobrarA, CuotaACobrar, Cuota1, Cuota2} = req.body;
+    const {Codigo, Nombre, Activo, NacionalImportado, CuotaTerminal, CuotaACobrarA, CuotaACobrar, Cuota1, Cuota2, TipoPlan} = req.body;
+    console.log(req.body.length)
     console.log(req.body)
     const dbGiama = req.db
     const user = req.body.HechoPor;
@@ -136,22 +149,24 @@ export const updateModelos = async (req, res) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     }
-    const Modelo = app.get('db').models.modelos;
-    try{ await Modelo?.update(
-    {
-        Nombre: Nombre,
-        Activo: Activo,
-        NacionalImportado: NacionalImportado,
-        CuotaTerminal: CuotaTerminal,
-        CuotaACobrar: CuotaACobrar,
-        CuotaACobrarA: CuotaACobrarA,
-        Cuota1: Cuota1,
-        Cuota2: Cuota2,
-        UsuarioAltaRegistro: user,
-    }
-    ,{
-        where: {Codigo: Codigo}
-    });
+    try{ 
+        // await dbGiama.query(
+        // `UPDATE modelos 
+        // SET Nombre = ? , Activo = ?, NacionalImportado = ? 
+        // WHERE Codigo = ?`,{
+        // replacements: [Nombre, Activo, NacionalImportado, Codigo],
+        // type: QueryTypes.UPDATE
+        // } )
+
+    // await dbGiama.query(
+    //     `UPDATE modelosvalorescuotas 
+    //     SET Nombre = ? , Activo = ?, NacionalImportado = ? 
+    //     WHERE Codigo = ? AND TipoPlan = ?`,{
+    //     replacements: [Nombre, Activo, NacionalImportado, Codigo, TipoPlan],
+    //     type: QueryTypes.UPDATE
+    //     }
+    // )
+
     return res.send({status: true, data: 'Modelo actualizado correctamente!'})
         
     }
