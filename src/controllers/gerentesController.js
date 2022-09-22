@@ -29,7 +29,7 @@ try {
         where:{Codigo:gerentes.Codigo}
     })
     const gerenteFinded = allGerentesById[0].dataValues
-     if(gerenteFinded.inUpdate) {
+     if(gerenteFinded.inUpdate  && gerenteFinded.inUpdate !== user) {
         return res.send({status: false, message: `El registro esta siendo editado por ${gerenteFinded.inUpdate} `})
      }
 
