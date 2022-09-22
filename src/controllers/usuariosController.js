@@ -13,7 +13,7 @@ export const getUsuarioById = async (req, res) => {
          replacements: [id],
          type: QueryTypes.SELECT
      })
-     if(usuarioPrev[0].inUpdate) {
+     if(usuarioPrev[0].inUpdate  && usuarioPrev[0].inUpdate !== user) {
         return res.send({status: false, message: `El registro esta siendo editado por ${usuarioPrev[0].inUpdate} `})
      }
 
