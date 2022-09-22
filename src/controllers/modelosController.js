@@ -214,7 +214,9 @@ export const endUpdate = async (req, res) => {
     const {Codigo} = req.body
     const dbGiama = req.db
     const {user} = req.usuario
-    if(!Codigo) return 'ID required'
+    if(!Codigo) {
+        console.log('aca')
+        return res.status(404).send('ID required')}
     try {
         const actualUsuario = await dbGiama.query("SELECT inUpdate FROM modelos WHERE Codigo = ?", 
         {

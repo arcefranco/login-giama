@@ -34,7 +34,7 @@ try {
     }
    );
    
-     if(allSupervisoresById[0].inUpdate) {
+     if(allSupervisoresById[0].inUpdate && allSupervisoresById[0].inUpdate !== user) {
         return res.send({status: false, message: `El registro esta siendo editado por ${allSupervisoresById[0].inUpdate} `})
      }
 
