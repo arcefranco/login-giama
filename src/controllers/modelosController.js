@@ -77,8 +77,8 @@ res.send(response)
 export const postModelos = async (req, res, error) => {
     // const allPlanes = await dbGiama.query("SELECT  * FROM tipoplan ") 
     console.log(req.body.length)
-    console.log(req.body[1])
-    let {Codigo, Nombre, Activo, NacionalImportado, TipoPlan} = req.body;
+    console.log(req.body[0])
+    let {Nombre, Activo, NacionalImportado, TipoPlan} = req.body;
      console.log(req.body) 
      const dbGiama = req.db
      const user = req.body.HechoPor;
@@ -106,17 +106,21 @@ try{
         replacements: [Nombre, Activo? Activo : 0, NacionalImportado? NacionalImportado : null, user],
         type: QueryTypes.INSERT,    
     })*/
-    for(let i=1; i<req.body.length; i++){
-    // allPlanes.map(plan=>
-    let {CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2} = req.body[i];
-        await dbGiama.query(`
-    INSERT INTO modelosvalorescuotas
-     (TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
-      VALUES (?,?,?,?,?,?,?) WHERE Codigo = ?`,
-      { replacements: [ TipoPlan , CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2,  Codigo],
-        type: QueryTypes.INSERT,    
-    })
-    }
+//    const Codigo = await dbGiama.query("SELECT Codigo FROM modelos WHERE Nombre = ? ",{
+//         replacements:[Nombre],
+//         type:QueryTypes.SELECT
+//     })
+//     for(let i=1; i<req.body.length; i++){
+//     // allPlanes.map(plan=>
+//     let {CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2} = req.body[i];
+//         await dbGiama.query(`
+//     INSERT INTO modelosvalorescuotas
+//      (TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
+//       VALUES (?,?,?,?,?,?,?) WHERE Codigo = ?`,
+//       { replacements: [ TipoPlan , CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2,  Codigo],
+//         type: QueryTypes.INSERT,    
+//     })
+//     }
 
 
     // )
