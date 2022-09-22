@@ -16,9 +16,9 @@ export const getAllUsers = async (req, res) => {
 
 export const login = async (req, res) => {
     
-    const {login, password, empresa, empresaReal} = req.body
+    const {login, password, empresa, empresaReal, codigoMarca, marca} = req.body
 
-    console.log(empresa)
+    console.log(req.body)
     let dbGiama = {};
     if(empresa === 'pa7'){
       dbGiama.sequelize = new Sequelize('pa7', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
@@ -91,7 +91,9 @@ if(verifyPass(pwdsalt) === user[0].password_hash){
         roles: roles,
         token: token,
         db: empresa,
-        empresaReal: empresaReal
+        empresaReal: empresaReal,
+        codigoMarca: codigoMarca,
+        marca: marca,
       
     })
 

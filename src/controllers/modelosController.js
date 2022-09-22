@@ -49,9 +49,9 @@ export const getModelosById = async (req, res) => {
         modelosvalorescuotas.tipoplan AS Codtipoplan, tipoplan.Descripcion AS Nomtipoplan, 
         modelosvalorescuotas.CuotaTerminal, modelosvalorescuotas.CuotaACobrar, modelosvalorescuotas.CuotaACobrarA, 
         modelosvalorescuotas.Cuota2, modelosvalorescuotas.Cuota1 
-        FROM pa7.modelos 
-        LEFT JOIN modelosvalorescuotas ON modelos.Marca = modelosvalorescuotas.Marca 
-        AND modelos.Codigo = modelosvalorescuotas.Codigo 
+        FROM modelos 
+        LEFT JOIN modelosvalorescuotas ON 
+         modelos.Codigo = modelosvalorescuotas.Codigo 
         LEFT JOIN tipoplan ON modelosvalorescuotas.tipoplan = tipoplan.ID
         WHERE modelosvalorescuotas.Codigo = ?`,
         {
@@ -77,11 +77,12 @@ res.send(response)
 export const postModelos = async (req, res, error) => {
     // const allPlanes = await dbGiama.query("SELECT  * FROM tipoplan ") 
     console.log(req.body.length)
-    console.log(req.body[1])
-    let {Codigo, Nombre, Activo, NacionalImportado, TipoPlan} = req.body;
-     console.log(req.body) 
+    console.log(req.body)
+    let {Nombre, Activo, NacionalImportado, CodigoMarca} = req.body[0];
+    
+    //  console.log(req.body) 
      const dbGiama = req.db
-     const user = req.body.HechoPor;
+     const user = req.body[0].HechoPor;
      try {
          const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
              replacements: [user],
@@ -102,24 +103,35 @@ export const postModelos = async (req, res, error) => {
     }
      
 try{ 
-       /*await dbGiama.query("INSERT INTO modelos (Nombre, Activo, NacionalImportado ,UsuarioAltaRegistro) VALUES (?,?,?,?)",{
-        replacements: [Nombre, Activo? Activo : 0, NacionalImportado? NacionalImportado : null, user],
-        type: QueryTypes.INSERT,    
-    })*/
-    for(let i=1; i<req.body.length; i++){
-    // allPlanes.map(plan=>
-    let {CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2} = req.body[i];
-        await dbGiama.query(`
-    INSERT INTO modelosvalorescuotas
-     (TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
-      VALUES (?,?,?,?,?,?,?) WHERE Codigo = ?`,
-      { replacements: [ TipoPlan , CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2,  Codigo],
+       await dbGiama.query("INSERT INTO modelos (Marca, Nombre, Activo, NacionalImportado ,UsuarioAltaRegistro) VALUES (?,?,?,?,?)",{
+        replacements: [CodigoMarca, Nombre, Activo? Activo : 0, NacionalImportado? NacionalImportado : null, user],
         type: QueryTypes.INSERT,    
     })
+   let request = await dbGiama.query("SELECT Codigo FROM modelos WHERE Nombre = ? ",{
+        replacements:[Nombre],
+        type:QueryTypes.SELECT
+    })
+    let Codigo = request[0].Codigo
+    console.log(Codigo)
+    for(let i=1; i<req.body.length; i++){
+    let {CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2, TipoPlan} = req.body[i];
+    let TipoPlanReal = parseInt(TipoPlan) + 1 ;
+    if(CuotaTerminal == 0 && CuotaACobrar == 0 && CuotaACobrarA == 0 && Cuota1 ==0 && Cuota2 == 0){
+        console.log("Este objeto no se inserta en la tabla")
+    } else {
+            await dbGiama.query(`
+        INSERT INTO modelosvalorescuotas
+        (Marca, Codigo, TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
+        VALUES (?,?,?,?,?,?,?,?) `,
+        { replacements: [CodigoMarca, Codigo, TipoPlanReal , CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2],
+            type: QueryTypes.INSERT,    
+        })
+    }
     }
 
 
-    // )
+
+    
     
     return res.send({status: true, data: 'Modelo creado!'})
     }catch(err){
@@ -129,11 +141,11 @@ try{
     
  
 export const updateModelos = async (req, res) => {
-    const {Codigo, Nombre, Activo, NacionalImportado, CuotaTerminal, CuotaACobrarA, CuotaACobrar, Cuota1, Cuota2, TipoPlan} = req.body;
     console.log(req.body.length)
-    console.log(req.body)
+    console.log(req.body[3])
+    let {Codigo,Nombre, Activo, NacionalImportado, CodigoMarca} = req.body[0];
     const dbGiama = req.db
-    const user = req.body.HechoPor;
+    const user = req.body[0].HechoPor;
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
             replacements: [user],
@@ -150,22 +162,46 @@ export const updateModelos = async (req, res) => {
         return res.status(400).send({status: false, data: error})
     }
     try{ 
-        // await dbGiama.query(
-        // `UPDATE modelos 
-        // SET Nombre = ? , Activo = ?, NacionalImportado = ? 
-        // WHERE Codigo = ?`,{
-        // replacements: [Nombre, Activo, NacionalImportado, Codigo],
-        // type: QueryTypes.UPDATE
-        // } )
+        await dbGiama.query(
+        `UPDATE modelos 
+        SET Nombre = ? , Activo = ?, NacionalImportado = ? 
+        WHERE Codigo = ?`,{
+        replacements: [Nombre, Activo, NacionalImportado, Codigo],
+        type: QueryTypes.UPDATE
+        } )
+        
 
-    // await dbGiama.query(
-    //     `UPDATE modelosvalorescuotas 
-    //     SET Nombre = ? , Activo = ?, NacionalImportado = ? 
-    //     WHERE Codigo = ? AND TipoPlan = ?`,{
-    //     replacements: [Nombre, Activo, NacionalImportado, Codigo, TipoPlan],
-    //     type: QueryTypes.UPDATE
-    //     }
-    // )
+        for(let i=1; i<req.body.length; i++){
+            let {CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2, TipoPlan} = req.body[i];
+            let TipoPlanReal = parseInt(TipoPlan) + 1 ;
+            let request = await dbGiama.query("SELECT * FROM modelosvalorescuotas WHERE Codigo = ? AND TipoPlan = ? ",{
+                replacements:[Codigo, TipoPlanReal ],
+                type:QueryTypes.SELECT
+            })
+            
+            if(CuotaTerminal == 0 && CuotaACobrar == 0 && CuotaACobrarA == 0 && Cuota1 ==0 && Cuota2 == 0){
+                console.log("Este objeto no se inserta en la tabla")
+            } else {
+                if(request == 0){
+                    await dbGiama.query(`
+            INSERT INTO modelosvalorescuotas
+            (Marca, Codigo, TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
+            VALUES (?,?,?,?,?,?,?) `,
+            { replacements: [CodigoMarca, Codigo, TipoPlanReal , CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2],
+                type: QueryTypes.INSERT,    
+            })
+                } else {
+                await dbGiama.query(
+                    `UPDATE modelosvalorescuotas 
+                    SET CuotaTerminal = ? , CuotaACobrar = ?, CuotaACobrarA = ?, Cuota1 = ?, Cuota2 = ? 
+                    WHERE Codigo = ? AND TipoPlan = ?`,{
+                    replacements: [CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2, Codigo, TipoPlan],
+                    type: QueryTypes.UPDATE
+                    }
+                )
+            }
+        }
+    }
 
     return res.send({status: true, data: 'Modelo actualizado correctamente!'})
         
@@ -178,7 +214,9 @@ export const endUpdate = async (req, res) => {
     const {Codigo} = req.body
     const dbGiama = req.db
     const {user} = req.usuario
-    if(!Codigo) return 'ID required'
+    if(!Codigo) {
+        console.log('aca')
+        return res.status(404).send('ID required')}
     try {
         const actualUsuario = await dbGiama.query("SELECT inUpdate FROM modelos WHERE Codigo = ?", 
         {
@@ -200,7 +238,7 @@ export const endUpdate = async (req, res) => {
 }
 export const deleteModelos = async (req, res, error) => {
     const {Codigo} = req.body;
-    console.log(Codigo)
+    console.log(req.body)
     const dbGiama = req.db
     const user = req.body.HechoPor;
     try {
@@ -218,10 +256,17 @@ export const deleteModelos = async (req, res, error) => {
         console.log(error)
         return res.status(400).send({status: false, data: error})
     }
-    const Modelo = app.get('db').models.modelos
-    try{await Modelo?.destroy({
-        where: {Codigo: Codigo} 
+    
+    try{
+        await dbGiama.query(`DELETE FROM modelosvalorescuotas WHERE Codigo = ?`,{
+            replacements: [Codigo],
+            type:QueryTypes.DELETE 
+            });
+        await dbGiama.query(`DELETE FROM modelos WHERE Codigo = ?`,{
+        replacements: [Codigo],
+        type:QueryTypes.DELETE 
         });
+        
         return res.send({status: true, data: 'Modelo Borrado!'})
         }catch(err){
             console.log(err)
