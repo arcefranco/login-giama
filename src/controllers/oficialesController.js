@@ -413,7 +413,7 @@ export const createOficiales = async (req, res) => {
                     return res.send({status: false, message: 'Hubo un problema'})
                 }   
 
-        case 'Adjudicaciones':
+        case 'Adjudicacion':
                 try {
                     const Inactivo = Activo === 1 ? 0 : 1
                     await dbGiama.query("INSERT INTO oficialesadjudicacion (Nombre, Inactivo) VALUES (?,?)", {
@@ -470,10 +470,10 @@ export const createOficiales = async (req, res) => {
 
         case 'Subite':
                 const HNtoNumber = parseInt(HN)
-                const SupervisorToNumber = parseInt(Supervisor)
+                const SupervisorToNumber = Supervisor && parseInt(Supervisor)
             try {
                 await dbGiama.query("INSERT INTO subite_oficiales (Nombre, login, HNMayor40, Supervisor, Activo) VALUES (?,?,?,?,?)", {
-                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber, Activo],
+                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber? SupervisorToNumber: null, Activo],
                      type: QueryTypes.INSERT
                     })
                     return res.send({status: true, message: 'Creado correctamente!'})
@@ -537,7 +537,7 @@ export const createOficiales = async (req, res) => {
             }
 
         default:
-           return res.send({status: false, message: 'Error'})
+           return res.send({status: false, message: 'Categoría inexistente o no seleccionada'})
     }
 }
 
@@ -557,7 +557,7 @@ export const getOficialesById = async (req, res) => {
                      replacements: [Codigo],
                      type: QueryTypes.SELECT
                  })
-                 if(oficialPrev[0].inUpdate) {
+                 if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                     return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
@@ -578,14 +578,14 @@ export const getOficialesById = async (req, res) => {
                 console.log('2nd error', error)
             } 
 
-        case 'Adjudicaciones':
+        case 'Adjudicacion':
             try {
                 const oficialPrev = await dbGiama.query("SELECT * FROM oficialesadjudicacion WHERE Codigo = ?", 
                  {
                      replacements: [Codigo],
                      type: QueryTypes.SELECT
                  })
-                 if(oficialPrev[0].inUpdate) {
+                 if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                     return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
@@ -605,14 +605,14 @@ export const getOficialesById = async (req, res) => {
                }catch (error) {
                 console.log('2nd error', error)
             } 
-        case 'Plan Canje':
+        case 'Canje':
             try {
                 const oficialPrev = await dbGiama.query("SELECT * FROM oficialesplancanje WHERE Codigo = ?", 
                  {
                      replacements: [Codigo],
                      type: QueryTypes.SELECT
                  })
-                 if(oficialPrev[0].inUpdate) {
+                 if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                     return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
@@ -642,7 +642,7 @@ export const getOficialesById = async (req, res) => {
                      replacements: [Codigo],
                      type: QueryTypes.SELECT
                  })
-                 if(oficialPrev[0].inUpdate) {
+                 if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                     return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
@@ -670,7 +670,7 @@ export const getOficialesById = async (req, res) => {
                      replacements: [Codigo],
                      type: QueryTypes.SELECT
                  })
-                 if(oficialPrev[0].inUpdate) {
+                 if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                     return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
@@ -697,7 +697,7 @@ export const getOficialesById = async (req, res) => {
                      replacements: [Codigo],
                      type: QueryTypes.SELECT
                  })
-                 if(oficialPrev[0].inUpdate) {
+                 if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                     return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
@@ -726,7 +726,7 @@ export const getOficialesById = async (req, res) => {
                      replacements: [Codigo],
                      type: QueryTypes.SELECT
                  })
-                 if(oficialPrev[0].inUpdate) {
+                 if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                     return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
@@ -754,7 +754,7 @@ export const getOficialesById = async (req, res) => {
                          replacements: [Codigo],
                          type: QueryTypes.SELECT
                      })
-                     if(oficialPrev[0].inUpdate) {
+                     if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                         return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                      }
                 
@@ -782,7 +782,7 @@ export const getOficialesById = async (req, res) => {
                      replacements: [Codigo],
                      type: QueryTypes.SELECT
                  })
-                 if(oficialPrev[0].inUpdate) {
+                 if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                     return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
                  }
             
@@ -810,7 +810,7 @@ export const getOficialesById = async (req, res) => {
                  replacements: [Codigo],
                  type: QueryTypes.SELECT
              })
-             if(oficialPrev[0].inUpdate) {
+             if(oficialPrev[0].inUpdate  && oficialPrev[0].inUpdate !== user) {
                 return res.send({status: false, message: `El registro esta siendo editado por ${oficialPrev[0].inUpdate} `})
              }
         
@@ -833,7 +833,7 @@ export const getOficialesById = async (req, res) => {
         
             
         default:
-           return res.send({status: false, message: 'Error'})
+           return res.send({status: false, message: 'Categoria inexistente o no seleccionada'})
     }
 }
 

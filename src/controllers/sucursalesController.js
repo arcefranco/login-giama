@@ -26,7 +26,7 @@ export const getSucursalesById = async (req, res) => {
        );
        console.log('supervisor: ', sucursal)
        
-         if(sucursal[0].inUpdate) {
+         if(sucursal[0].inUpdate   && sucursal[0].inUpdate !== user) {
             return res.send({status: false, message: `El registro esta siendo editado por ${sucursal[0].inUpdate} `})
          }
     

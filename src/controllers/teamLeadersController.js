@@ -39,7 +39,7 @@ export const getTeamLeadersById = async (req, res) => {
         }
        );
        
-         if(teamLeader[0].inUpdate) {
+         if(teamLeader[0].inUpdate  && teamLeader[0].inUpdate !== user) {
             return res.send({status: false, message: `El registro esta siendo editado por ${teamLeader[0].inUpdate} `})
          }
     

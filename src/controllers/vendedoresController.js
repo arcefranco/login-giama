@@ -28,7 +28,7 @@ export const getVendedoresById = async (req, res) => {
        );
        console.log('vendedor: ', vendedor)
        
-         if(vendedor[0].inUpdate) {
+         if(vendedor[0].inUpdate  && vendedor[0].inUpdate !== user) {
             return res.send({status: false, message: `El registro esta siendo editado por ${vendedor[0].inUpdate} `})
          }
     
