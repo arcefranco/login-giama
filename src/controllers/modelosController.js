@@ -195,7 +195,7 @@ export const updateModelos = async (req, res) => {
                     `UPDATE modelosvalorescuotas 
                     SET CuotaTerminal = ? , CuotaACobrar = ?, CuotaACobrarA = ?, Cuota1 = ?, Cuota2 = ? 
                     WHERE Codigo = ? AND TipoPlan = ?`,{
-                    replacements: [CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2, Codigo, TipoPlan],
+                    replacements: [CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2, Codigo, TipoPlanReal],
                     type: QueryTypes.UPDATE
                     }
                 )
