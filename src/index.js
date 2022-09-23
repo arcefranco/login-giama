@@ -1,24 +1,19 @@
 import express from "express";
 import cors from 'cors'
 import morgan from "morgan";
-import connection from "./database";
 import UserRouter from "./routes/userRoutes";
 import GerentesRouter from './routes/gerentesRoutes'
 import resetRouter from "./routes/resetRoutes";
 import usuariosRoutes from "./routes/usuariosRoutes";
-require('dotenv').config()
-
 import RolesRouter from "./routes/rolesRoutes";
 import supervisoresRoutes from "./routes/supervisoresRoutes";
-
 import SucursalesRouter from "./routes/sucursalesRoutes";
-
 import TeamLeadersRouter from "./routes/teamLeadersRoutes";
-
 import OficialesRouter from "./routes/oficialesRoutes";
-
 import VendedoresRouter from "./routes/vendedoresRoutes";
 import ModelosRouter from "./routes/modelosRoutes";
+import puntosVentaRouter from "./routes/puntosventaRoutes";
+require('dotenv').config()
 
 
 
@@ -56,6 +51,7 @@ app.use('/vendedores', VendedoresRouter)
 app.use('/supervisores', supervisoresRoutes)
 app.use('/modelos', ModelosRouter)
 app.use('/oficiales', OficialesRouter)
+app.use('/puntosDeVenta', puntosVentaRouter)
 
 app.listen(process.env.PORT, () => {
 
