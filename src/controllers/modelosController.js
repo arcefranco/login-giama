@@ -85,61 +85,70 @@ export const getModelosById = async (req, res) => {
 
 export const postModelos = async (req, res, error) => {
     // const allPlanes = await dbGiama.query("SELECT  * FROM tipoplan ") 
-    console.log(req.body.length)
-    console.log(req.body)
     let {Nombre, Activo, NacionalImportado, CodigoMarca} = req.body[0];
-    
-    //  console.log(req.body) 
+    let arr = []
      const dbGiama = req.db
      const user = req.body[0].HechoPor;
 
-     if(!Nombre ) {
+     if(!Nombre) {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
      
 try{ 
-       await dbGiama.query("INSERT INTO modelos (Marca, Nombre, Activo, NacionalImportado ,UsuarioAltaRegistro) VALUES (?,?,?,?,?)",{
+    await dbGiama.query("INSERT INTO modelos (Marca, Nombre, Activo, NacionalImportado ,UsuarioAltaRegistro) VALUES (?,?,?,?,?)",{
         replacements: [CodigoMarca, Nombre, Activo? Activo : 0, NacionalImportado? NacionalImportado : null, user],
         type: QueryTypes.INSERT,    
     })
-   let request = await dbGiama.query("SELECT Codigo FROM modelos WHERE Nombre = ? ",{
-        replacements:[Nombre],
-        type:QueryTypes.SELECT
-    })
-    let Codigo = request[0].Codigo
-    console.log(Codigo)
-    for(let i=1; i<req.body.length; i++){
-    let {CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2, TipoPlan} = req.body[i];
-    let TipoPlanReal = parseInt(TipoPlan) + 1 ;
-    if(CuotaTerminal == 0 && CuotaACobrar == 0 && CuotaACobrarA == 0 && Cuota1 ==0 && Cuota2 == 0){
-        console.log("Este objeto no se inserta en la tabla")
-    } else {
-            await dbGiama.query(`
-        INSERT INTO modelosvalorescuotas
-        (Marca, Codigo, TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
-        VALUES (?,?,?,?,?,?,?,?) `,
-        { replacements: [CodigoMarca, Codigo, TipoPlanReal , CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2],
-            type: QueryTypes.INSERT,    
+
+    for(let i = 1; i<req.body.length; i++){
+        arr.push(req.body[i])
+    }
+    arr = arr.
+    filter
+    (e =>  
+        e.CuotaTerminal !== '0.00' ||
+      e.CuotaACobrar !== '0.00' ||  
+      e.CuotaACobrarA !== '0.00' ||  
+      e.Cuota1 !== '0.00'||  
+      e.Cuota2 !== '0.00'
+     
+     ) 
+      try {
+        let request = await dbGiama.query("SELECT Codigo FROM modelos WHERE Nombre = ? ",{
+            replacements:[Nombre],
+            type:QueryTypes.SELECT
         })
-    }
-    }
+        let Codigo = request[0].Codigo
+        arr.forEach(async function(e){
+            await dbGiama.query(`
+            INSERT INTO modelosvalorescuotas
+            (Marca, Codigo, TipoPlan, CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
+            VALUES (?,?,?,?,?,?,?,?) `,
+            { replacements: [e.CodigoMarca, Codigo, parseInt(e.TipoPlan) + 1, e.CuotaTerminal, e.CuotaACobrar, e.CuotaACobrarA, e.Cuota1, e.Cuota2],
+                type: QueryTypes.INSERT,    
+            })
+            
+        })
+        
+      } catch (error) {
+        console.log(error)
+        return res.send(error)
+      }    
 
-
-
-    
-    
     return res.send({status: true, data: 'Modelo creado!'})
-    }catch(err){
+    
+}catch(err){
         console.log(err)
-    } }
+    } 
+
+}
 
     
  
 export const updateModelos = async (req, res) => {
-    console.log('BODY: ', req.body)
     let {Codigo,Nombre, Activo, NacionalImportado, CodigoMarca} = req.body[0];
     const dbGiama = req.db
-
+    let arr = []
 
     try{ 
         await dbGiama.query(
@@ -150,41 +159,46 @@ export const updateModelos = async (req, res) => {
         type: QueryTypes.UPDATE
         })
         
-
-        for(let i=1; i<req.body.length; i++){
-            let {CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2, TipoPlan} = req.body[i];
-            let TipoPlanReal = parseInt(TipoPlan) + 1 ;
-            let request = await dbGiama.query("SELECT * FROM modelosvalorescuotas WHERE Codigo = ? AND TipoPlan = ? ",{
-                replacements:[Codigo, TipoPlanReal],
-                type:QueryTypes.SELECT
-            })
-            
-            if(CuotaTerminal == 0 && CuotaACobrar == 0 && CuotaACobrarA == 0 && Cuota1 ==0 && Cuota2 == 0){
-                console.log("Este objeto no se inserta en la tabla")
-            } else {
-                if(request == 0){
-                    await dbGiama.query(`
-            INSERT INTO modelosvalorescuotas
-            (Marca, Codigo, TipoPlan, CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
-            VALUES (?,?,?,?,?,?,?,?) `,
-            { replacements: [CodigoMarca, Codigo, TipoPlanReal , CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2],
-                type: QueryTypes.INSERT,    
-            })
-                } else {
-                await dbGiama.query(
-                    `UPDATE modelosvalorescuotas 
-                    SET CuotaTerminal = ? , CuotaACobrar = ?, CuotaACobrarA = ?, Cuota1 = ?, Cuota2 = ? 
-                    WHERE Codigo = ? AND TipoPlan = ?`,{
-                    replacements: [CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2, Codigo, TipoPlanReal],
-                    type: QueryTypes.UPDATE
-                    }
-                )
-            }
+        for(let i = 1; i<req.body.length; i++){
+            arr.push(req.body[i])
         }
-    }
+        arr = arr.
+        filter
+        (e =>  
+            e.CuotaTerminal !== '0.00' ||
+          e.CuotaACobrar !== '0.00' ||  
+          e.CuotaACobrarA !== '0.00' ||  
+          e.Cuota1 !== '0.00'||  
+          e.Cuota2 !== '0.00'
+         
+         ) 
+        try {
+            await dbGiama.query('DELETE FROM modelosvalorescuotas WHERE Marca = ? AND Codigo = ?', {
+                replacements: [CodigoMarca, Codigo],
+                type: QueryTypes.DELETE
+            })
+        } catch (error) {
+            return res.send(error)
+        }
 
-    return res.send({status: true, data: 'Modelo actualizado correctamente!'})
-        
+        try {
+            arr.forEach(async function(e){
+                await dbGiama.query(`
+                INSERT INTO modelosvalorescuotas
+                (Marca, Codigo, TipoPlan, CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
+                VALUES (?,?,?,?,?,?,?,?) `,
+                { replacements: [e.CodigoMarca, Codigo, parseInt(e.TipoPlan) + 1, e.CuotaTerminal, e.CuotaACobrar, e.CuotaACobrarA, e.Cuota1, e.Cuota2],
+                    type: QueryTypes.INSERT,    
+                })
+                
+            })
+            return res.send({status: true, data: 'Modelo actualizado correctamente!'})
+
+           
+        } catch (error) {
+            console.log(error)
+            return res.send('Error')
+        }
     }
     catch(err) {
         console.log(err)
@@ -227,7 +241,6 @@ export const deleteModelos = async (req, res, error) => {
             type: QueryTypes.SELECT
 
         })
-        console.log('roles: ', roles)
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.3')
         if(!finded){
             return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
