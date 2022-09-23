@@ -1,6 +1,6 @@
 import { QueryTypes } from "sequelize";
 require('dotenv').config()
-import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
+
 
 
 
@@ -24,7 +24,6 @@ export const getSucursalesById = async (req, res) => {
           type: QueryTypes.SELECT
         }
        );
-       console.log('supervisor: ', sucursal)
        
          if(sucursal[0].inUpdate   && sucursal[0].inUpdate !== user) {
             return res.send({status: false, message: `El registro esta siendo editado por ${sucursal[0].inUpdate} `})
