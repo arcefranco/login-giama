@@ -9,7 +9,7 @@ import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
 export const getTipoPlan = async (req, res) => {
     const dbGiama = req.db
-    const allModelos = await dbGiama.query("SELECT  * FROM tipoplan ")
+    const allModelos = await dbGiama.query("SELECT  * FROM tipoplan")
     res.send(allModelos)
 }
 
@@ -35,42 +35,51 @@ export const getModelos = async (req, res) => {
 export const getModelosById = async (req, res) => {
     const Modelos = req.body
     const dbGiama = req.db
-    // const ModelosModel = dbGiama.models.modelos
-    console.log(Modelos)
-    // transaction = await dbGiama.transaction({
-    //     isolationLevel: Sequelize.Transaction.SERIALIZABLE,
-    //     autocommit:false
-    //   })
-      const query = () => {
-        return new Promise((resolve, reject) => {
-    const allModelosById =  dbGiama.query(
-        `SELECT modelos.Marca, modelos.Codigo, modelos.Nombre, modelos.Coeficiente, 
-        modelos.FechaAltaRegistro, modelos.UsuarioAltaRegistro, modelos.NacionalImportado, modelos.Activo,
-        modelosvalorescuotas.tipoplan AS Codtipoplan, tipoplan.Descripcion AS Nomtipoplan, 
-        modelosvalorescuotas.CuotaTerminal, modelosvalorescuotas.CuotaACobrar, modelosvalorescuotas.CuotaACobrarA, 
-        modelosvalorescuotas.Cuota2, modelosvalorescuotas.Cuota1 
-        FROM modelos 
-        LEFT JOIN modelosvalorescuotas ON 
-         modelos.Codigo = modelosvalorescuotas.Codigo 
-        LEFT JOIN tipoplan ON modelosvalorescuotas.tipoplan = tipoplan.ID
-        WHERE modelosvalorescuotas.Codigo = ?`,
-        {
-        // transaction: transaction,
-        replacements:[Modelos.Codigo],
-        type: QueryTypes.SELECT
-    })
-    console.log(allModelosById)
-    resolve(allModelosById)
+    const {user} = req.usuario
+    try {
 
+        const tryModelo = await dbGiama.query('SELECT inUpdate from modelos WHERE Codigo = ?', {
+            replacements: [Modelos.Codigo],
+            type: QueryTypes.SELECT
+        })
+       if (tryModelo[0].inUpdate && tryModelo[0].inUpdate !== user) {
+        return res.send([{status: false, message: `El registro esta siendo editado por ${tryModelo[0].inUpdate}`}])
+       }
+
+       try {
+        await dbGiama.query('UPDATE modelos SET inUpdate = ? WHERE Codigo = ?', {
+            replacements: [user, Modelos.Codigo],
+            type: QueryTypes.UPDATE
+        })
+        
+        const allModelosById = await dbGiama.query(
+            `SELECT modelos.Marca, modelos.Codigo, modelos.Nombre, modelos.Coeficiente, 
+            modelos.FechaAltaRegistro, modelos.UsuarioAltaRegistro, modelos.NacionalImportado, modelos.Activo,
+            modelosvalorescuotas.tipoplan AS Codtipoplan, tipoplan.Descripcion AS Nomtipoplan, 
+            modelosvalorescuotas.CuotaTerminal, modelosvalorescuotas.CuotaACobrar, modelosvalorescuotas.CuotaACobrarA, 
+            modelosvalorescuotas.Cuota2, modelosvalorescuotas.Cuota1 
+            FROM modelos 
+            LEFT JOIN modelosvalorescuotas ON 
+             modelos.Codigo = modelosvalorescuotas.Codigo 
+            LEFT JOIN tipoplan ON modelosvalorescuotas.tipoplan = tipoplan.ID
+            WHERE modelosvalorescuotas.Codigo = ?`,
+            {
+        
+            replacements:[Modelos.Codigo],
+            type: QueryTypes.SELECT
+        })
     
-})    
-}
-
-
-
-const response = await awaitWithTimeout(4000, query()) 
-
-res.send(response)
+        return res.send(allModelosById)
+       } catch (error) {
+            console.log('error in update inUpdate')
+            return res.send(error)
+       }    
+        
+    } catch (error) {
+        console.log(error)
+        return res.send (error)
+    }  
+    
 }
 
 
@@ -83,21 +92,7 @@ export const postModelos = async (req, res, error) => {
     //  console.log(req.body) 
      const dbGiama = req.db
      const user = req.body[0].HechoPor;
-     try {
-         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
-             replacements: [user],
-             type: QueryTypes.SELECT
- 
-         })
-         console.log('roles: ', roles)
-         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.1')
-         if(!finded){
-             return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
-         }
-     } catch (error) {
-         console.log(error)
-         return res.status(400).send({status: false, data: error})
-     }
+
      if(!Nombre ) {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
@@ -141,41 +136,26 @@ try{
     
  
 export const updateModelos = async (req, res) => {
-    console.log(req.body.length)
-    console.log(req.body[3])
+    console.log('BODY: ', req.body)
     let {Codigo,Nombre, Activo, NacionalImportado, CodigoMarca} = req.body[0];
     const dbGiama = req.db
-    const user = req.body[0].HechoPor;
-    try {
-        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
-            replacements: [user],
-            type: QueryTypes.SELECT
 
-        })
-        console.log('roles: ', roles)
-        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.2')
-        if(!finded){
-            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
-        }
-    } catch (error) {
-        console.log(error)
-        return res.status(400).send({status: false, data: error})
-    }
+
     try{ 
         await dbGiama.query(
         `UPDATE modelos 
-        SET Nombre = ? , Activo = ?, NacionalImportado = ? 
+        SET Nombre = ? , Activo = ?, NacionalImportado = ?, inUpdate = NULL 
         WHERE Codigo = ?`,{
         replacements: [Nombre, Activo, NacionalImportado, Codigo],
         type: QueryTypes.UPDATE
-        } )
+        })
         
 
         for(let i=1; i<req.body.length; i++){
             let {CuotaTerminal, CuotaACobrar, CuotaACobrarA,Cuota1,Cuota2, TipoPlan} = req.body[i];
             let TipoPlanReal = parseInt(TipoPlan) + 1 ;
             let request = await dbGiama.query("SELECT * FROM modelosvalorescuotas WHERE Codigo = ? AND TipoPlan = ? ",{
-                replacements:[Codigo, TipoPlanReal ],
+                replacements:[Codigo, TipoPlanReal],
                 type:QueryTypes.SELECT
             })
             
@@ -185,8 +165,8 @@ export const updateModelos = async (req, res) => {
                 if(request == 0){
                     await dbGiama.query(`
             INSERT INTO modelosvalorescuotas
-            (Marca, Codigo, TipoPlan,CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
-            VALUES (?,?,?,?,?,?,?) `,
+            (Marca, Codigo, TipoPlan, CuotaTerminal, CuotaACobrar, CuotaACobrarA ,Cuota1, Cuota2)
+            VALUES (?,?,?,?,?,?,?,?) `,
             { replacements: [CodigoMarca, Codigo, TipoPlanReal , CuotaTerminal, CuotaACobrar, CuotaACobrarA, Cuota1, Cuota2],
                 type: QueryTypes.INSERT,    
             })
@@ -208,6 +188,7 @@ export const updateModelos = async (req, res) => {
     }
     catch(err) {
         console.log(err)
+        return res.send({status: false, data: 'Hubo un error'})
     }
 }
 export const endUpdate = async (req, res) => {
@@ -215,7 +196,6 @@ export const endUpdate = async (req, res) => {
     const dbGiama = req.db
     const {user} = req.usuario
     if(!Codigo) {
-        console.log('aca')
         return res.status(404).send('ID required')}
     try {
         const actualUsuario = await dbGiama.query("SELECT inUpdate FROM modelos WHERE Codigo = ?", 
@@ -224,7 +204,7 @@ export const endUpdate = async (req, res) => {
             type: QueryTypes.SELECT
         })
         if(actualUsuario[0].inUpdate === user){
-            await dbGiama.query("UPDATE modelosvalorescuotas SET inUpdate = NULL WHERE Codigo = ?", {
+            await dbGiama.query("UPDATE modelos SET inUpdate = NULL WHERE Codigo = ?", {
                 replacements: [Codigo],
                 type: QueryTypes.UPDATE
             })

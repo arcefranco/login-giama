@@ -13,7 +13,7 @@ ModelosRouter.route('/').get(getModelos);
 
 ModelosRouter.route('/tipoplan').get(getTipoPlan);
 // ModelosRouter.route('/activos').get(getModelosActivos);
-ModelosRouter.route('/id').post(getModelosById);
+ModelosRouter.post('/id', authentication, getModelosById)
 ModelosRouter.route('/').post(postModelos);
 ModelosRouter.route('/').put(updateModelos);
 ModelosRouter.route('/').delete(deleteModelos);
