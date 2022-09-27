@@ -117,6 +117,7 @@ try{
     return res.send({status: true, data: 'Supervisor creado con exito!'})
     }catch(err){
         console.log(err)
+        return res.send({status: false, data: err.name})
     } }
 
     

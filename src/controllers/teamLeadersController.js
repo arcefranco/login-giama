@@ -121,6 +121,7 @@ try{
     return res.send({status: true, data: 'Team Leader creado con exito!'})
     }catch(err){
         console.log(err)
+        return res.send({status: false, data: err.name})
     } }
 
     

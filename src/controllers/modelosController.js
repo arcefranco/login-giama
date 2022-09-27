@@ -138,6 +138,7 @@ try{
     
 }catch(err){
         console.log(err)
+        return res.send({status: false, data: err.name})
     } 
 
 }
