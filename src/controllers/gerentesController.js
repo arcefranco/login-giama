@@ -1,7 +1,5 @@
-import {  QueryTypes, DataTypes } from "sequelize";
-import Sequelize from "sequelize";
+import {  QueryTypes } from "sequelize";
 require('dotenv').config()
-import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
 
 export const getGerentes = async (req, res) => {
