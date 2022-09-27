@@ -26,7 +26,6 @@ export const getVendedoresById = async (req, res) => {
           type: QueryTypes.SELECT
         }
        );
-       console.log('vendedor: ', vendedor)
        
          if(vendedor[0].inUpdate  && vendedor[0].inUpdate !== user) {
             return res.send({status: false, message: `El registro esta siendo editado por ${vendedor[0].inUpdate} `})
@@ -109,6 +108,7 @@ try{
     return res.send({status: true, data: 'Vendedor creado con exito!'})
     }catch(err){
         console.log(err)
+        return res.send({status: false, data: err.name})
     } }
 
     

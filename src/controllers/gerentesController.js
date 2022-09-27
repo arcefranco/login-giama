@@ -105,6 +105,7 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
     return res.send({status: true, data: 'Gerente creado!'})
     }catch(err){
         console.log(err)
+        return res.send({status: false, data: err.name})
     } }
  
     
