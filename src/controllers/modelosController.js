@@ -1,8 +1,7 @@
-import {  QueryTypes, DataTypes } from "sequelize";
-import {app} from '../index'
-import Sequelize from "sequelize";
+import { QueryTypes } from "sequelize";
 require('dotenv').config()
-import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
+
+
 
 // let transaction;
 
