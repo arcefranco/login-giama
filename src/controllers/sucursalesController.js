@@ -153,7 +153,7 @@ export const updateSucursal = async (req, res) => {
 
 
 export const createSucursal = async (req, res) => {
-    const {Nombre, UsuarioAltaRegistro} = req.body
+    const {Nombre } = req.body
     
     const dbGiama = req.db
     const {user} = req.usuario
@@ -174,7 +174,7 @@ export const createSucursal = async (req, res) => {
 
     try {
         await dbGiama.query('INSERT INTO sucursalreal (Nombre, UsuarioAltaRegistro) VALUES ( ? , ? )', {
-            replacements: [Nombre, UsuarioAltaRegistro],
+            replacements: [Nombre, user],
             type: QueryTypes.INSERT
         })
         return res.send({status: true, data: 'Sucursal creada!'}) 

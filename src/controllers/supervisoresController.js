@@ -101,11 +101,11 @@ export const postSupervisores = async (req, res, error) => {
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, data: error})
+        return res.send({status: false, data: error})
     } 
      
     if(!Nombre || !Email ) {
-        return res.status(400).send({status: false, data: 'Faltan campos'})
+        return res.send({status: false, data: 'Faltan campos'})
     }
 try{  
     await dbGiama.query("INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona, UsuarioAltaRegistro ) VALUES (?,?,?,NOT ?,?,?,?,?) ", {
@@ -141,10 +141,10 @@ export const updateSupervisores = async (req, res) => {
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, data: error})
+        return res.send({status: false, data: error})
     } 
     if(!Nombre || !Email ) {
-        return res.status(400).send({status: false, data: 'Faltan campos'})
+        return res.send({status: false, data: 'Faltan campos'})
     }
     try{  
     await dbGiama.query("UPDATE sucursales SET Nombre = ?, Email = ?, Gerente = ?, Inactivo = NOT ?, EsMiniEmprendedor = ?, ValorPromedioMovil = ?, Zona = ?, inUpdate = NULL, UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
