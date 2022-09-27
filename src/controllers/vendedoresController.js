@@ -140,7 +140,7 @@ export const updateVendedores = async (req, res) => {
     }
     try{  
     await dbGiama.query("UPDATE vendedores SET Nombre = ?,  Inactivo = NOT ?, TeamLeader = ?, Categoria = ?, OficialScoring = ?, OficialMora = ?, FechaBaja = ?, Escala = ?, UsuarioAltaRegistro = ?, inUpdate = NULL WHERE Codigo = ? ", {
-        replacements: [Nombre,  Inactivo, TeamLeader, Categoria, OficialScoring ? OficialScoring : null, OficialMora ? OficialMora : null, FechaBaja, Escala, user, Codigo ],
+        replacements: [Nombre,  Inactivo, TeamLeader ? TeamLeader : null, Categoria ? Categoria : null, OficialScoring ? OficialScoring : null, OficialMora ? OficialMora : null, FechaBaja ? FechaBaja : null, Escala ? Escala : null, user, Codigo ],
         type: QueryTypes.UPDATE
       });
       return res.send({status: true, data: 'Vendedor modificado con exito!'})
