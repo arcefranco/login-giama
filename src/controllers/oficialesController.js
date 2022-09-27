@@ -413,7 +413,7 @@ export const createOficiales = async (req, res) => {
                     return res.send({status: false, message: 'Hubo un problema'})
                 }   
 
-        case 'Adjudicacion':
+        case 'Adjudicaciones':
                 try {
                     const Inactivo = Activo === 1 ? 0 : 1
                     await dbGiama.query("INSERT INTO oficialesadjudicacion (Nombre, Inactivo) VALUES (?,?)", {
