@@ -14,11 +14,11 @@ export const getOficialesByName = async (req, res) => {
 
 
     switch (oficialName) {
-        case 'Licitaciones':
+        case 'Licitacion':
             const oficialLicitaciones = await dbGiama.query("SELECT * FROM oficialeslicitaciones")
             return res.send(oficialLicitaciones[0])
 
-        case 'Adjudicaciones':
+        case 'Adjudicacion':
             const oficialAdjudicaciones = await dbGiama.query("SELECT * FROM oficialesadjudicacion")
             return res.send(oficialAdjudicaciones[0])
         
@@ -66,7 +66,7 @@ export const deleteOficiales = async (req, res) => {
     console.log(req.body)
 
     switch (oficialName) {
-        case 'Licitaciones':
+        case 'Licitacion':
                 try {
                     await dbGiama.query("DELETE FROM oficialeslicitaciones WHERE Codigo = ?", {
                         replacements: [Codigo],
@@ -79,7 +79,7 @@ export const deleteOficiales = async (req, res) => {
                     return res.send({status: false, message: 'Hubo un problema'})
                 }   
 
-        case 'Adjudicaciones':
+        case 'Adjudicacion':
                 try {
                     await dbGiama.query("DELETE FROM oficialesadjudicacion WHERE Codigo = ?", {
                        replacements: [Codigo],
@@ -206,7 +206,7 @@ export const updateOficiales = async (req, res) => {
     console.log(req.body)
 
     switch (categoria) {
-        case 'Licitaciones':
+        case 'Licitacion':
             try {
 
             
@@ -241,7 +241,7 @@ export const updateOficiales = async (req, res) => {
                     return res.send({status: false, message: 'Hubo un problema'})
                 }
         
-        case 'Canje':
+        case 'Plan Canje':
             try {
                 
                 await dbGiama.query("UPDATE oficialesplancanje SET Nombre = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
@@ -263,7 +263,7 @@ export const updateOficiales = async (req, res) => {
             try {
                 const Inactivo = Activo === 1 ? 0 : 1
                 const ObjetivotoNum = Objetivo && parseInt(Objetivo)
-                console.log('inactivo: ', Inactivo)
+
                 await dbGiama.query("UPDATE oficialesscoring SET Nombre = ?, IdUsuarioLogin = ?, Inactivo = ?, Objetivo = ?, inUpdate = NULL WHERE Codigo = ?", {
 
                    replacements: [Nombre, Usuario, Inactivo, Objetivo? ObjetivotoNum : 0, Codigo],
@@ -302,8 +302,9 @@ export const updateOficiales = async (req, res) => {
             try {
                 const HNtoNumber = parseInt(HN)
                 const SupervisorToNumber = parseInt(Supervisor)
+                if(!Usuario)   return res.send({status: false, message: 'Faltan campos'})
                 await dbGiama.query("UPDATE subite_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Supervisor = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
-                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber, Activo, Codigo],
+                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber? SupervisorToNumber : null, Activo, Codigo],
                      type: QueryTypes.UPDATE
                     }).catch((error) => {
                         
@@ -318,9 +319,10 @@ export const updateOficiales = async (req, res) => {
         
         case 'Compra':
              const HNtoNumber = parseInt(HN) 
+             if(!Usuario)   return res.send({status: false, message: 'Faltan campos'})
             try {
                 dbGiama.query("UPDATE comprar_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
-                   replacements: [Nombre, Usuario, HN, Activo, Codigo],
+                   replacements: [Nombre, Usuario, HNtoNumber, Activo, Codigo],
                    type: QueryTypes.UPDATE
                 }).catch((error) => {
                     
@@ -396,14 +398,15 @@ export const createOficiales = async (req, res) => {
 
     const {categoria, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HN, Supervisor}  = req.body
     const dbGiama = req.db
+    const {user} = req.usuario
    
     console.log(req.body)
 
     switch (categoria) {
-        case 'Licitaciones':
+        case 'Licitacion':
                 try {
                     await dbGiama.query("INSERT INTO oficialeslicitaciones (Nombre, IdUsuarioLogin, Activo) VALUES (?,?,?)", {
-                        replacements: [Nombre, Usuario, Activo],
+                        replacements: [Nombre, user, Activo],
                         type: QueryTypes.INSERT
                     })
                     return res.send({status: true, message: 'Creado correctamente!'})
@@ -413,7 +416,7 @@ export const createOficiales = async (req, res) => {
                     return res.send({status: false, message: 'Hubo un problema'})
                 }   
 
-        case 'Adjudicaciones':
+        case 'Adjudicacion':
                 try {
                     const Inactivo = Activo === 1 ? 0 : 1
                     await dbGiama.query("INSERT INTO oficialesadjudicacion (Nombre, Inactivo) VALUES (?,?)", {
@@ -443,6 +446,7 @@ export const createOficiales = async (req, res) => {
         case 'Scoring':
             const Inactivo = Activo === 1 ? 0 : 1
             const ObjetivotoNum = Objetivo && parseInt(Objetivo)
+            if(!Usuario)  return res.send({status: false, message: 'Faltan campos'})
             try {
                 await dbGiama.query("INSERT INTO oficialesscoring (Nombre, IdUsuarioLogin, Inactivo, Objetivo) VALUES (?,?,?,?)", {
                    replacements: [Nombre, Usuario, Inactivo, Objetivo? ObjetivotoNum : 0],
@@ -457,6 +461,7 @@ export const createOficiales = async (req, res) => {
         
         case 'Mora':
             const toNumber = parseInt(TipoOficialMora)
+            if(!Usuario) return res.send({status: false, message: 'Faltan campos'})
             try {
                 await dbGiama.query("INSERT INTO oficialesmora (Nombre, IdUsuarioLogin, TipoOficialMora, Activo) VALUES (?,?,?,?)", {
                        replacements: [Nombre, Usuario, toNumber, Activo],
@@ -465,12 +470,14 @@ export const createOficiales = async (req, res) => {
                     return res.send({status: true, message: 'Creado correctamente!'})
                 
             } catch (error) {
-                
+                console.log(error)
+                return res.send({status: false, message: error})
             }
 
         case 'Subite':
                 const HNtoNumber = parseInt(HN)
                 const SupervisorToNumber = Supervisor && parseInt(Supervisor)
+                if(!Usuario) return res.send({status: false, message: 'Faltan campos'})
             try {
                 await dbGiama.query("INSERT INTO subite_oficiales (Nombre, login, HNMayor40, Supervisor, Activo) VALUES (?,?,?,?,?)", {
                      replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber? SupervisorToNumber: null, Activo],
@@ -485,6 +492,7 @@ export const createOficiales = async (req, res) => {
         
         case 'Compra':
             const HNCompratoNumber = parseInt(HN)
+            if(!Usuario)   return res.send({status: false, message: 'Faltan campos'})
             try {
                 dbGiama.query("INSERT INTO comprar_oficiales (Nombre, login, HNMayor40, Activo) VALUES (?,?,?,?)", {
                    replacements: [Nombre, Usuario, HNCompratoNumber, Activo],
@@ -550,7 +558,7 @@ export const getOficialesById = async (req, res) => {
       
       
       switch (categoria) {
-          case 'Licitaciones':
+          case 'Licitacion':
             try {
                 const oficialPrev = await dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ?", 
                  {
@@ -605,7 +613,7 @@ export const getOficialesById = async (req, res) => {
                }catch (error) {
                 console.log('2nd error', error)
             } 
-        case 'Canje':
+        case 'Plan Canje':
             try {
                 const oficialPrev = await dbGiama.query("SELECT * FROM oficialesplancanje WHERE Codigo = ?", 
                  {
@@ -843,7 +851,7 @@ export const endUpdate = async (req, res) => {
     const {user} = req.usuario
 
     switch (categoria) {
-        case 'Licitaciones':
+        case 'Licitacion':
             try {
                 const actualOficial = await dbGiama.query("SELECT * FROM oficialeslicitaciones WHERE Codigo = ?", 
                 {
@@ -862,7 +870,7 @@ export const endUpdate = async (req, res) => {
             } catch (error) {
                 return res.send(error)
             }
-            case 'Adjudicaciones':
+            case 'Adjudicacion':
                 try {
                     const actualOficial = await dbGiama.query("SELECT * FROM oficialesadjudicacion WHERE Codigo = ?", 
                     {
