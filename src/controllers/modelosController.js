@@ -82,7 +82,7 @@ export const getModelosById = async (req, res) => {
 }
 
 
-export const postModelos = async (req, res, error) => {
+export const postModelos = async (req, res) => {
     // const allPlanes = await dbGiama.query("SELECT  * FROM tipoplan ") 
     let {Nombre, Activo, NacionalImportado, CodigoMarca} = req.body[0];
     let arr = []
