@@ -6,7 +6,7 @@ import { queryModelosOnLista } from "../queries";
 export const getListas = async (req, res) => {
     const dbGiama = req.db
     try {
-       const listas =  await dbGiama.query('SELECT listasprecios.Codigo, listasprecios.Descripcion, listasprecios.VigenciaDesde, listasprecios.VigenciaHasta FROM listasprecios ORDER BY listasprecios.VigenciaDesde DESC', {
+       const listas =  await dbGiama.query('SELECT listasprecios.Codigo, listasprecios.Descripcion, DATE_FORMAT(listasprecios.VigenciaDesde, "%d-%m-%Y") AS `VigenciaDesde`, DATE_FORMAT(listasprecios.VigenciaHasta, "%d-%m-%Y") AS `VigenciaHasta` FROM listasprecios ORDER BY listasprecios.VigenciaDesde DESC', {
         type: QueryTypes.SELECT
        })
        return res.send(listas)
@@ -70,10 +70,10 @@ export const insertModeloLista = async (req, res) => {
             replacements: [Marca, Lista, Modelo, Precio],
             type: QueryTypes.INSERT
         })
-        return res.send({status: true, message: 'Modelo insertado en lista', lista: Lista})
+        return res.send({status: true, message: 'Modelo insertado en lista', lista: Lista, codigo: Modelo})
     } catch (error) {
          console.log(error)
-         return res.send({status: false, message: 'Hubo un error al insertar el modelo ):', lista: Lista})   
+         return res.send({status: false, message: 'Hubo un error al insertar el modelo ):', lista: Lista, codigo: Modelo})   
     }
 }
 
