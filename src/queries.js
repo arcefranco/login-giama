@@ -17,3 +17,7 @@ AND rl_codigo NOT LIKE '1.10.5%' AND rl_codigo NOT LIKE '1.10.6%' AND rl_codigo 
 AND rl_codigo NOT LIKE '1.10.8%';`
 
 export var queryEstructura = 'SELECT gerentes.`Activo` AS `ActivoGerentes`, sucursales.`Inactivo` AS `InactivoSucursales`, teamleader.`Inactivo` AS `InactivoTL`, vendedores.`Inactivo` AS `InactivoVendedores`, gerentes.`Codigo` AS `CodigoGerente`, gerentes.`Nombre` AS `NombreGerente`, sucursales.`Codigo` AS `CodigoSupervisor`, sucursales.`Nombre` AS `NombreSupervisor`, teamleader.`Codigo` AS `CodigoTL`, teamleader.`Nombre` AS `NombreTL`, vendedores.`Codigo` AS `CodigoVendedor`, vendedores.`Nombre` AS `NombreVendedor` FROM gerentes LEFT JOIN sucursales ON gerentes.`Codigo` = sucursales.`Gerente` LEFT JOIN teamleader ON sucursales.`Codigo` = teamleader.`Sucursal` LEFT JOIN vendedores ON teamleader.`Codigo` = vendedores.`TeamLeader`'
+
+export var queryListasPrecios = 'SELECT listasprecios.`Codigo`,listasprecios.`Descripcion`,modelos.`Nombre`, modelos.`Codigo` AS `CodigoModelo`, precios.`Precio`, listasprecios.`VigenciaDesde`, listasprecios.`VigenciaHasta` FROM listasprecios LEFT JOIN precios ON precios.`Codigo` = listasprecios.`Codigo` LEFT JOIN modelos ON precios.`CodigoModelo` = modelos.`Codigo`'
+
+export var queryModelosOnLista = 'SELECT modelos.Nombre, modelos.Codigo AS CodigoModelo, precios.Precio FROM listasprecios LEFT JOIN precios ON precios.Codigo = listasprecios.Codigo LEFT JOIN modelos ON modelos.Codigo = precios.CodigoModelo AND modelos.Marca = precios.Marca WHERE listasprecios.Codigo = ? AND listasprecios.Marca = ?'
