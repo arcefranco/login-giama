@@ -14,6 +14,7 @@ import VendedoresRouter from "./routes/vendedoresRoutes";
 import ModelosRouter from "./routes/modelosRoutes";
 import puntosVentaRouter from "./routes/puntosventaRoutes";
 import estructuraRouter from "./routes/estructuraRoutes";
+import ListasRouter from "./routes/listasRoutes";
 require('dotenv').config()
 
 
@@ -44,7 +45,7 @@ app.use('/usuarios', usuariosRoutes)
 
 app.use('/sucursales', SucursalesRouter)
 
-
+app.use('/listas', ListasRouter)
 app.use('/teamleaders', TeamLeadersRouter)
 app.use('/estructura', estructuraRouter)
 app.use('/roles', RolesRouter)
