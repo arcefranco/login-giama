@@ -1,5 +1,6 @@
 import {  QueryTypes } from "sequelize";
 require('dotenv').config()
+const moment = require('moment')
 import { queryModelosOnLista } from "../queries";
 
 
@@ -157,11 +158,16 @@ export const deleteLista = async (req, res) => {
 
 export const updateLista = async (req, res) => {
     const {Codigo, Descripcion, VigenciaD, VigenciaH} = req.body
-    const dbGiama = req.db
+    console.log(req.body)
+    let VigenciaDParse = Date.parse(VigenciaD.split('-').reverse().join('-'))
+    let realVigenciaD = new Date(VigenciaDParse).toISOString().slice(0, 19).replace('T', ' ');
+    let VigenciaHParse = VigenciaH && VigenciaH !== '00-00-0000' ? Date.parse(VigenciaH.split('-').reverse().join('-')) : null
+    let realVigenciaH = VigenciaH && VigenciaH !== '00-00-0000'  ? new Date(VigenciaHParse).toISOString().slice(0, 19).replace('T', ' ') : null;
+    const dbGiama = req.db 
 
     try {
         await dbGiama.query('UPDATE listasprecios SET Descripcion = ?, VigenciaDesde = ?, VigenciaHasta = ? WHERE Codigo = ?', {
-            replacements: [Descripcion, VigenciaD, VigenciaH, Codigo],
+            replacements: [Descripcion, realVigenciaD, realVigenciaH, Codigo],
             type: QueryTypes.UPDATE
         })
         return res.send({status: true, message: 'Lista actualizada correctamente!'})
