@@ -78,7 +78,7 @@ export const endUpdate = async (req, res) => {
  export const postGerentes = async (req, res, error) => {
      let {Nombre, Activo} = req.body;
      const dbGiama = req.db;
-     const user = req.body.HechoPor;
+     const {user} = req.usuario
      try {
          const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
              replacements: [user],
@@ -113,7 +113,7 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
  export const updateGerentes = async (req, res) => {
     const gerentes = req.body;
     const dbGiama = req.db
-    const user = req.body.HechoPor;
+    const {user} = req.usuario
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
             replacements: [user],
@@ -140,7 +140,7 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
     ,{
         where: {Codigo: gerentes.Codigo}
     });
-    return res.send({status: true, data: 'Gerente actualizado correctamente!'})
+    return res.send({status: true, data: 'Gerente actualizado correctamente!', codigo: gerentes.Codigo})
         
     }
     catch(err) {
@@ -150,33 +150,17 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
  
 
  export const deleteGerentes = async (req, res, error) => {
-    console.log(req.body)
     const {Codigo} = req.body;
-    console.log('codigo delete gerentes: ', Codigo)
     const dbGiama = req.db
-    const user = req.body.HechoPor;
-    try {
-        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
-            replacements: [user],
-            type: QueryTypes.SELECT
 
-        })
-        console.log('roles: ', roles)
-        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.3')
-        if(!finded){
-            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
-        }
-    } catch (error) {
-        console.log(error)
-        return res.status(400).send({status: false, data: error})
-    }
     const Gerente = dbGiama.models.gerentes
-    try{await Gerente?.destroy({
+    try{await Gerente?.desroy({
         where: {Codigo: Codigo} 
         });
         return res.send({status: true, data: 'Gerente Borrado!'})
         }catch(err){
             console.log(err)
+            return res.send({status: false, data: 'Hubo un error'})
         }
 } 
 
