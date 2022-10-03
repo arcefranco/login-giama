@@ -10,8 +10,8 @@ GerentesRouter.route('/').get(getGerentes);
 GerentesRouter.route('/activos').get(getGerentesActivos);
 GerentesRouter.post('/id', authentication, getGerentesById) 
 GerentesRouter.post('/endUpdate', authentication, endUpdate)
-GerentesRouter.route('/').post(postGerentes);
-GerentesRouter.route('/').put(updateGerentes);
+GerentesRouter.post('/', authentication, postGerentes);
+GerentesRouter.put('/', authentication, updateGerentes);
 GerentesRouter.route('/').delete(deleteGerentes);
 
 
