@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { getAllOficialesMoraActivos, getAllOficialesScoringActivos } from "../controllers/vendedoresController";
-import { endUpdate, getVendedores, getVendedoresById, postVendedores, updateVendedores,deleteVendedores,  getAllEscalas, getAllOficialesScoring, getAllOficialesMora } from "../controllers/vendedoresController";
+import { endUpdate, getVendedores, getVendedoresById, postVendedores, updateVendedores,deleteVendedores, beginUpdate,  getAllEscalas, getAllOficialesScoring, getAllOficialesMora } from "../controllers/vendedoresController";
 
 import { testConnection } from "../middlewares/testConnection";
 import authentication from "../middlewares/authentication";
@@ -14,8 +14,9 @@ VendedoresRouter.use(testConnection)
 VendedoresRouter.route('/').get(getVendedores);
 VendedoresRouter.post('/id', authentication, getVendedoresById)
 VendedoresRouter.post('/endUpdate', authentication, endUpdate)
+VendedoresRouter.post('/beginUpdate', authentication, beginUpdate)
 VendedoresRouter.route('/').post(postVendedores);
-VendedoresRouter.route('/').put(updateVendedores);
+VendedoresRouter.put('/', authentication, updateVendedores);
 VendedoresRouter.route('/').delete(deleteVendedores);
 
 
