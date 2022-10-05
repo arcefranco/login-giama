@@ -74,6 +74,31 @@ export const endUpdate = async (req, res) => {
     }
 }
 
+export const beginUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    if(!Codigo) return 'ID required'
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM gerentes WHERE Codigo = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE gerentes SET inUpdate = ? WHERE Codigo = ?", {
+                replacements: [user, Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send({status: true, codigo: Codigo})
+        }else{
+            return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+        }
+    } catch (error) {
+        return res.send({status: false, message: 'Error al comenzar modificaciones'})
+    }
+}
+
 
  export const postGerentes = async (req, res, error) => {
      let {Nombre, Activo} = req.body;
@@ -154,7 +179,7 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
     const dbGiama = req.db
 
     const Gerente = dbGiama.models.gerentes
-    try{await Gerente?.desroy({
+    try{await Gerente?.destroy({
         where: {Codigo: Codigo} 
         });
         return res.send({status: true, data: 'Gerente Borrado!'})
