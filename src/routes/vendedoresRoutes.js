@@ -15,9 +15,9 @@ VendedoresRouter.route('/').get(getVendedores);
 VendedoresRouter.post('/id', authentication, getVendedoresById)
 VendedoresRouter.post('/endUpdate', authentication, endUpdate)
 VendedoresRouter.post('/beginUpdate', authentication, beginUpdate)
-VendedoresRouter.route('/').post(postVendedores);
+VendedoresRouter.post('/', authentication, postVendedores);
 VendedoresRouter.put('/', authentication, updateVendedores);
-VendedoresRouter.route('/').delete(deleteVendedores);
+VendedoresRouter.delete('/', authentication, deleteVendedores);
 
 
 //get escalas, oficiales scoring y mora

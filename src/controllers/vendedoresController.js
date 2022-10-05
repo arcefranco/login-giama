@@ -1,15 +1,11 @@
 import {  QueryTypes } from "sequelize";
-import {app} from '../index'
-
 require('dotenv').config()
-import Sequelize from "sequelize";
-import awaitWithTimeout from '../helpers/transaction/awaitWithTimeout'
 
 
 export const getVendedores = async (req, res) => {
 
         const dbGiama = req.db
-        const allVendedores = await dbGiama.query("SELECT vendedores.`Codigo`, vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Nombre` AS 'TeamLeader', Categoria, oficialesscoring.`Codigo` AS OficialScoring, oficialesmora.`Nombre` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%d/%m/%Y') AS 'FechaBaja', escalascomisionesvendedores.`Nombre` AS 'Escala' FROM vendedores LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` ")
+        const allVendedores = await dbGiama.query("SELECT vendedores.`Codigo`, vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Codigo` AS 'TeamLeader', Categoria, oficialesscoring.`Codigo` AS OficialScoring, oficialesmora.`Codigo` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%d/%m/%Y') AS 'FechaBaja', escalascomisionesvendedores.`Codigo` AS 'Escala' FROM vendedores LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` ")
         res.send(allVendedores)
 
 }
@@ -60,14 +56,14 @@ export const beginUpdate = async (req, res) => {
             replacements: [Codigo],
             type: QueryTypes.SELECT
         })
-        if(actualUsuario[0].inUpdate === null){
+        if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
             await dbGiama.query("UPDATE vendedores SET inUpdate = ? WHERE Codigo = ?", {
                 replacements: [user, Codigo],
                 type: QueryTypes.UPDATE
             })
-            return res.send({status: true})
+            return res.send({status: true, codigo: Codigo})
         }else{
-            return
+            return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
         }
     } catch (error) {
         return res.send(error)
@@ -77,7 +73,7 @@ export const endUpdate = async (req, res) => {
     const {Codigo} = req.body
     const dbGiama = req.db
     const {user} = req.usuario
-    if(!Codigo) return 'ID required'
+    if(!Codigo) return 
     try {
         const actualUsuario = await dbGiama.query("SELECT inUpdate FROM vendedores WHERE Codigo = ?", 
         {
@@ -98,18 +94,16 @@ export const endUpdate = async (req, res) => {
     }
 }
 
-export const postVendedores = async (req, res, error) => {
+export const postVendedores = async (req, res) => {
    const dbGiama = req.db
-    console.log(req.body)
-    let {Nombre,   Activo:Inactivo, TeamLeader, Categoria, OficialScoring, OficialMora, FechaBaja, Escala} = req.body;
-    const user = req.body.HechoPor;
+    let {Nombre,   Activo:Inactivo, TeamLeader, Categoria, OficialS, OficialM, FechaBaja, Escala} = req.body;
+    const {user} = req.usuario
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
             replacements: [user],
             type: QueryTypes.SELECT
 
         })
-        console.log('roles: ', roles)
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.1')
         if(!finded){
             return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
@@ -124,10 +118,9 @@ export const postVendedores = async (req, res, error) => {
     }
 try{  
     await dbGiama.query("INSERT INTO vendedores (Nombre,  Inactivo, TeamLeader, Categoria, OficialScoring, OficialMora, FechaBaja, Escala, UsuarioAltaRegistro ) VALUES (?,NOT ?,?,?,?,?,?,?,?) ", {
-        replacements: [Nombre,  Inactivo? Inactivo : 0, TeamLeader? TeamLeader : null, Categoria? Categoria : null, OficialScoring? OficialScoring : null, OficialMora? OficialMora : null, FechaBaja? FechaBaja : null, Escala? Escala:null, user ],
+        replacements: [Nombre,  Inactivo? Inactivo : 0, TeamLeader? TeamLeader : null, Categoria? Categoria : null, OficialS? OficialS : null, OficialM? OficialM : null, FechaBaja? FechaBaja : null, Escala? Escala:null, user ],
         type: QueryTypes.INSERT
       });
-      console.log('roles')
 
     return res.send({status: true, data: 'Vendedor creado con exito!'})
     }catch(err){
@@ -162,7 +155,7 @@ export const updateVendedores = async (req, res) => {
         return res.status(400).send({status: false, data: 'Faltan campos'})
     }
     try{  
-    await dbGiama.query("UPDATE vendedores SET Nombre = ?,  Inactivo = NOT ?, TeamLeader = ?, Categoria = ?, OficialScoring = ?, OficialMora = ?, FechaBaja = ?, inUpdate = NULL WHERE Codigo = ? ", {
+    await dbGiama.query("UPDATE vendedores SET Nombre = ?,  Inactivo = NOT ?, TeamLeader = ?, Categoria = ?, OficialScoring = ?, OficialMora = ?, Escala = ?, FechaBaja = ?, inUpdate = NULL WHERE Codigo = ? ", {
         replacements: [Nombre,  Inactivo, TeamLeader ? TeamLeader : null, Categoria ? Categoria : null, OficialS ? OficialS : null, OficialM ? OficialM : null, Escala ? Escala : null, FechaBaja ? FechaBaja : null, Codigo ],
         type: QueryTypes.UPDATE
       });
@@ -180,16 +173,13 @@ export const updateVendedores = async (req, res) => {
 export const deleteVendedores = async (req, res, error) => {
    const dbGiama = req.db
     const {Codigo} = req.body;
-    
-    const user = req.body.HechoPor;
-    console.log(req.body)
+    const {user} = req.usuario
     try {
         const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
             replacements: [user],
             type: QueryTypes.SELECT
 
         })
-        console.log('roles: ', roles)
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.3')
         if(!finded){
             return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})

@@ -85,7 +85,7 @@ export const beginUpdate = async (req, res) => {
             replacements: [Codigo],
             type: QueryTypes.SELECT
         })
-        if(actualUsuario[0].inUpdate === null){
+        if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
             await dbGiama.query("UPDATE gerentes SET inUpdate = ? WHERE Codigo = ?", {
                 replacements: [user, Codigo],
                 type: QueryTypes.UPDATE
