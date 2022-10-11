@@ -49,11 +49,37 @@ export const getSucursalesById = async (req, res) => {
     
 }
 
+export const beginUpdate = async (req, res) => {
+    const {Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    
+    if(typeof Codigo !== 'number')  return res.send({status: false, message: 'Codigo no valido'})
+    try {
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM sucursalreal WHERE Codigo = ?", 
+        {
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE sucursalreal SET inUpdate = ? WHERE Codigo = ?", {
+                replacements: [user, Codigo],
+                type: QueryTypes.UPDATE
+            })
+            return res.send({codigo: Codigo})
+        }else{
+            return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+        }
+    } catch (error) {
+        return res.send({status: false, message: 'Error al comenzar modificaciones'})
+    }
+}
+
 export const endUpdate = async (req, res) => {
     const {Codigo} = req.body
     const dbGiama = req.db
     const {user} = req.usuario
-    if(!Codigo) return 'ID required'
+    if(typeof Codigo !== 'number') return 'ID required'
     try {
         const actualUsuario = await dbGiama.query("SELECT inUpdate FROM sucursalreal WHERE Codigo = ?", 
         {
@@ -70,17 +96,17 @@ export const endUpdate = async (req, res) => {
             return
         }
     } catch (error) {
-        return res.send(error)
+        return res.send({status: false, message: error})
     }
 }
 
 export const deleteSucursal = async(req, res) => {
 
-    const {id} = req.body.id
+    const {Codigo} = req.body
     
     const dbGiama = req.db
-    if(!id){
-       return res.status(400).send({status: false, data: 'Ningun id provisto'})
+    if(typeof Codigo !== 'number'){
+       return res.status(400).send({status: false, message: 'Ningun id provisto'})
     }
     const {user} = req.usuario
     try {
@@ -91,22 +117,22 @@ export const deleteSucursal = async(req, res) => {
         })
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3')
         if(!finded){
-            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, data: error})
+        return res.status(400).send({status: false, message: error})
     } 
 
     try {
         await dbGiama.query("DELETE FROM sucursalreal WHERE CODIGO = ?", {
-            replacements: [id],
+            replacements: [Codigo],
             type: QueryTypes.DELETE
              
         })
-       return res.send({status: true, data: 'Sucursal eliminada correctamente'})
+       return res.send({status: true, message: 'Sucursal eliminada correctamente'})
     } catch (error) {
-       return res.status(400).send({status: false, data: `error al eliminar en base de datos: ${error}` })
+       return res.status(400).send({status: false, message: `error al eliminar en base de datos: ${error}` })
     } 
 }
 
@@ -114,8 +140,8 @@ export const updateSucursal = async (req, res) => {
     const {Codigo, Nombre} = req.body
     
     const dbGiama = req.db
-    if(!Codigo){
-       return res.status(400).send({status: false, data: 'Ningun id provisto'})
+    if(typeof Codigo !== 'number'){
+       return res.status(400).send({status: false, message: 'Ningun id provisto'})
     }
     const {user} = req.usuario
     try {
@@ -126,15 +152,15 @@ export const updateSucursal = async (req, res) => {
         })
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3')
         if(!finded){
-            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, data: error})
+        return res.status(400).send({status: false, message: error})
     } 
 
     try {
-        await dbGiama.query('UPDATE sucursalreal SET Nombre = ? WHERE Codigo = ?', {
+        await dbGiama.query('UPDATE sucursalreal SET Nombre = ?, inUpdate = NULL WHERE Codigo = ?', {
 
             replacements: [Nombre, Codigo],
             type: QueryTypes.UPDATE
@@ -142,10 +168,10 @@ export const updateSucursal = async (req, res) => {
           
             return res.send(error)
         }) 
-        return res.send({status: true, data: 'Sucursal actualizada correctamente!'}) 
+        return res.send({status: true, message: 'Sucursal actualizada correctamente!'}) 
     }catch(error){
         console.log('error en la DB: ', error)
-        return res.status(400).send({status: false, data: 'error en la DB'})
+        return res.status(400).send({status: false, message: 'error en la DB'})
     }
 }
 
@@ -153,7 +179,7 @@ export const updateSucursal = async (req, res) => {
 
 
 export const createSucursal = async (req, res) => {
-    const {Nombre } = req.body
+    const {Nombre} = req.body
     
     const dbGiama = req.db
     const {user} = req.usuario
@@ -165,11 +191,11 @@ export const createSucursal = async (req, res) => {
         })
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.16.3')
         if(!finded){
-            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, data: error})
+        return res.status(400).send({status: false, message: error})
     }
 
     try {
@@ -177,9 +203,9 @@ export const createSucursal = async (req, res) => {
             replacements: [Nombre, user],
             type: QueryTypes.INSERT
         })
-        return res.send({status: true, data: 'Sucursal creada!'}) 
+        return res.send({status: true, message: 'Sucursal creada!'}) 
     } catch (error) {
         console.log('error en la DB: ', error)
-        return res.status(400).send({status: false, data: 'error en la DB'})
+        return res.status(400).send({status: false, message: 'error en la DB'})
     }
 } 
