@@ -90,7 +90,7 @@ export const beginUpdate = async (req, res) => {
                 replacements: [user, Codigo],
                 type: QueryTypes.UPDATE
             })
-            return res.send({status: true, codigo: Codigo})
+            return res.send({codigo: Codigo})
         }else{
             return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
         }
@@ -113,24 +113,24 @@ export const beginUpdate = async (req, res) => {
          console.log('roles: ', roles)
          const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.1')
          if(!finded){
-             return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+             return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
          }
      } catch (error) {
          console.log(error)
-         return res.status(400).send({status: false, data: error})
+         return res.status(400).send({status: false, message: error})
      }
      if(!Nombre ) {
-        return res.status(400).send({status: false, data: 'Faltan campos'})
+        return res.status(400).send({status: false, message: 'Faltan campos'})
     }
      
 try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRegistro) VALUES (?,?,?)",{
         replacements: [Nombre, Activo? Activo : 0, user],
         type: QueryTypes.INSERT,    
     });
-    return res.send({status: true, data: 'Gerente creado!'})
+    return res.send({status: true, message: 'Gerente creado!'})
     }catch(err){
         console.log(err)
-        return res.send({status: false, data: err.name})
+        return res.send({status: false, message: err.name})
     } }
  
     
@@ -148,11 +148,11 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
         console.log('roles: ', roles)
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.2')
         if(!finded){
-            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, data: error})
+        return res.status(400).send({status: false, message: error})
     }
     const Gerente = dbGiama.models.gerentes;
     try{ await Gerente?.update(
@@ -165,7 +165,7 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
     ,{
         where: {Codigo: gerentes.Codigo}
     });
-    return res.send({status: true, data: 'Gerente actualizado correctamente!', codigo: gerentes.Codigo})
+    return res.send({status: true, message: 'Gerente actualizado correctamente!', codigo: gerentes.Codigo})
         
     }
     catch(err) {
@@ -182,10 +182,10 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
     try{await Gerente?.destroy({
         where: {Codigo: Codigo} 
         });
-        return res.send({status: true, data: 'Gerente Borrado!'})
+        return res.send({status: true, message: 'Gerente Borrado!'})
         }catch(err){
             console.log(err)
-            return res.send({status: false, data: 'Hubo un error'})
+            return res.send({status: false, message: 'Hubo un error'})
         }
 } 
 
