@@ -141,11 +141,7 @@ export const updateUsuario = async (req, res) => {
             await dbGiama.query(`UPDATE usuarios SET inUpdate = NULL, login = ?, Nombre = ?, CodigoVendedor = ?,  CodigoSucursal = ?, CodigoTeamLeader = ?, CodigoGerente = ?, UsuarioAnura = ?, us_activo = ?, us_bloqueado = ?, VerSoloScoringAsignado = ?, emailtest = ?  WHERE ID = ?`, {
                 replacements: [Usuario, Nombre, Vendedor? Vendedor: null, Supervisor? Supervisor: null, TeamLeader? TeamLeader :null, Gerente? Gerente: null, UsuarioAnura? UsuarioAnura: null, us_activo? us_activo : 1, us_bloqueado? us_bloqueado :0, scoringAsignado? scoringAsignado: null, email? email: null, ID],
                 type: QueryTypes.UPDATE
-            } 
-            ).catch((error) => {
-         
-                return res.send(error)
-            }) 
+            })
             
             
 
@@ -247,20 +243,20 @@ export const endUpdate = async (req, res) => {
 export const getAllVendedores = async (req, res) => {
     const dbGiama = req.db
 const result = await dbGiama.query("SELECT Codigo, Nombre from vendedores")
-res.send(result[0])
+    return res.send(result[0])
 }
 export const getAllGerentes = async (req, res) => {
     const dbGiama = req.db
     const result = await dbGiama.query("SELECT Codigo, Nombre from gerentes")
-    res.send(result[0])
+    return res.send(result[0])
 }
 export const getAllSupervisores = async (req, res) => {
     const dbGiama = req.db
     const result = await dbGiama.query("SELECT Codigo, Nombre from sucursales")
-    res.send(result[0])
+    return res.send(result[0])
 }
 export const getAllTeamLeaders = async (req, res) => {
     const dbGiama = req.db
     const result = await dbGiama.query("SELECT Codigo, Nombre from teamleader")
-    res.send(result[0])
+    return res.send(result[0])
 }
