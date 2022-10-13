@@ -61,7 +61,7 @@ export const beginUpdate = async (req, res) => {
                 replacements: [user, Codigo],
                 type: QueryTypes.UPDATE
             })
-            return res.send({status: true, codigo: Codigo})
+            return res.send({codigo: Codigo})
         }else{
             return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
         }
@@ -106,15 +106,15 @@ export const postVendedores = async (req, res) => {
         })
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.1')
         if(!finded){
-            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, data: error})
+        return res.status(400).send({status: false, message: error})
     } 
      
     if(!Nombre ) {
-        return res.status(400).send({status: false, data: 'Faltan campos'})
+        return res.status(400).send({status: false, message: 'Faltan campos'})
     }
 try{  
     await dbGiama.query("INSERT INTO vendedores (Nombre,  Inactivo, TeamLeader, Categoria, OficialScoring, OficialMora, FechaBaja, Escala, UsuarioAltaRegistro ) VALUES (?,NOT ?,?,?,?,?,?,?,?) ", {
@@ -122,10 +122,10 @@ try{
         type: QueryTypes.INSERT
       });
 
-    return res.send({status: true, data: 'Vendedor creado con exito!'})
+    return res.send({status: true, message: 'Vendedor creado con exito!'})
     }catch(err){
         console.log(err)
-        return res.send({status: false, data: err.name})
+        return res.send({status: false, message: err.name})
     } }
 
     
@@ -145,26 +145,26 @@ export const updateVendedores = async (req, res) => {
     
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.2')
         if(!finded){
-            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, data: error})
+        return res.status(400).send({status: false, message: error})
     } 
     if(!Nombre ) {
-        return res.status(400).send({status: false, data: 'Faltan campos'})
+        return res.status(400).send({status: false, message: 'Faltan campos'})
     }
     try{  
     await dbGiama.query("UPDATE vendedores SET Nombre = ?,  Inactivo = NOT ?, TeamLeader = ?, Categoria = ?, OficialScoring = ?, OficialMora = ?, Escala = ?, FechaBaja = ?, inUpdate = NULL WHERE Codigo = ? ", {
         replacements: [Nombre,  Inactivo, TeamLeader ? TeamLeader : null, Categoria ? Categoria : null, OficialS ? OficialS : null, OficialM ? OficialM : null, Escala ? Escala : null, FechaBaja ? FechaBaja : null, Codigo ],
         type: QueryTypes.UPDATE
       });
-      return res.send({status: true, data: 'Vendedor modificado con exito!'})
+      return res.send({status: true, message: 'Vendedor modificado con exito!'})
         
     }
     catch(err) {
         console.log(err)
-        return res.send({status: false, data: 'Hubo un error'})
+        return res.send({status: false, message: 'Hubo un error'})
     }
 }
 
@@ -182,17 +182,17 @@ export const deleteVendedores = async (req, res, error) => {
         })
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.3')
         if(!finded){
-            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, data: error})
+        return res.status(400).send({status: false, message: error})
     } 
     const Vendedor = dbGiama.models.vendedores
     try{await Vendedor.destroy({
         where: {Codigo: Codigo} 
         });
-        return res.send({status: true, data: 'Vendedor Borrado!'})
+        return res.send({status: true, message: 'Vendedor Borrado!'})
         }catch(err){
             console.log(err)
         }

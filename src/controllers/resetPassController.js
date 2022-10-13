@@ -88,12 +88,9 @@ export const updatePass = async (req, res) => { //Recibo su nueva contraseña y 
 
 if(user.length) {
   
- await dbGiama.query('UPDATE usuarios SET password_hash = ?, salt = ?, newuserBoolean = ? WHERE ID = ?', 
-  {
-    replacements: [passHashed, newSalt, 0, id],
-    type: QueryTypes.UPDATE
-  }
- ); 
+ dbGiama
+  .query('CALL pa7_update_pass (:p_LOGIN, :p_SALT, :p_PASSWORD)', 
+        {replacements: { p_LOGIN: user[0].login, p_SALT: newSalt, p_PASSWORD: passHashed, }})
 return res.send({message: 'Password updated!', status: true})
 }else{
 return res.json({message: 'User does not exist', status: false})

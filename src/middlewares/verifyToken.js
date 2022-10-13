@@ -10,7 +10,8 @@ export const verifyToken = async (req, res, next) => { //Este middleware verific
     const dbGiama = req.db
     if(!id) {
       return res.send('Invalid ID')
-  }
+  } 
+  try {
   const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?',
   {
     replacements: [id],
@@ -19,13 +20,13 @@ export const verifyToken = async (req, res, next) => { //Este middleware verific
   );
   const secret = process.env.RESET_SECRET + user[0].password_hash
   
-   try {
+  
   
     jwt.verify(token, secret)
     next();
   
    } catch (error) {
     console.log(error)
-    return res.send({status: false})
+    return res.send({status: false, error: error})
    } 
   }

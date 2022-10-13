@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { createUsuario, getAllTeamLeaders, getAllGerentes, getAllSupervisores, getAllUsuarios, 
-    getAllVendedores, getUsuarioById, updateUsuario, deleteUsuario, endUpdate } from "../controllers/usuariosController";
+    getAllVendedores, getUsuarioById, updateUsuario, deleteUsuario, endUpdate, beginUpdate } from "../controllers/usuariosController";
 import authentication from "../middlewares/authentication";
 import { testConnection } from "../middlewares/testConnection";
 
@@ -15,6 +15,7 @@ usuariosRoutes.post('/', authentication, createUsuario)
 usuariosRoutes.put('/', authentication, updateUsuario)
 usuariosRoutes.delete('/', authentication, deleteUsuario)
 usuariosRoutes.post('/endUpdate', authentication, endUpdate)
+usuariosRoutes.post('/beginUpdate', authentication, beginUpdate)
 //get vendedores, gerentes, teamleaders y supervisores
 
 usuariosRoutes.route('/vendedores').get(getAllVendedores) 

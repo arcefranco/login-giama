@@ -41,32 +41,42 @@ export const login = async (req, res) => {
     const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
     {
       replacements: [login],
-      type: QueryTypes.SELECT
+      type: QueryTypes.SELECT 
     }
   ); 
  
 
 if (user[0]) {
 if (!login || !password) {
-   
+    
     return res.status(400).send({
         status: false,
         message: "Email & password are requiered"
     });
 }
-if(user[0].newuserBoolean === 1) {
-  return res.send({
-    newUser: true,
-    message: 'Tenes que actualizar tu contraseña'
-  })
-}
-const pwdsalt = password + user[0].salt
 
+const pwdsalt = password + user[0].salt
+const secret = process.env.RESET_SECRET + user[0].password_hash
+const payload = {
+    email: user[0].emailtest,
+    id: user[0].ID
+}
+const sendToken = jwt.sign(payload, secret, {expiresIn: '3h'})
 
 
 
 
 if(verifyPass(pwdsalt) === user[0].password_hash){
+
+  if(user[0].newuserBoolean === 1) {
+    return res.send({ 
+      newUser: true,
+      empresa: empresa,
+      link: '/reset-password/' + user[0].ID + '/' + sendToken + '',
+      message: 'Tenes que actualizar tu contraseña'
+    })
+  }
+
     const roles = await dbGiama.query('SELECT rl_codigo FROM usuarios_has_roles WHERE us_login = ?',
     {
       replacements: [login],
