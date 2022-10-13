@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {  getTeamLeaders, getTeamLeadersById, postTeamLeaders, updateTeamLeaders,deleteTeamLeaders, getTeamLeadersActivos, endUpdate } from "../controllers/teamLeadersController";
+import {  getTeamLeaders, beginUpdate, postTeamLeaders, updateTeamLeaders,deleteTeamLeaders, getTeamLeadersActivos, endUpdate } from "../controllers/teamLeadersController";
 import {  getGerentes} from "../controllers/gerentesController";
 import { testConnection } from "../middlewares/testConnection";
 import authentication from "../middlewares/authentication";
@@ -12,11 +12,11 @@ TeamLeadersRouter.use(testConnection)
 
 TeamLeadersRouter.route('/').get(getTeamLeaders);
 TeamLeadersRouter.route('/activos').get(getTeamLeadersActivos);
-TeamLeadersRouter.post('/id', authentication, getTeamLeadersById)
+TeamLeadersRouter.post('/beginUpdate', authentication, beginUpdate)
 TeamLeadersRouter.post('/endUpdate', authentication, endUpdate)
-TeamLeadersRouter.route('/').post(postTeamLeaders);
-TeamLeadersRouter.route('/').put(updateTeamLeaders);
-TeamLeadersRouter.route('/').delete(deleteTeamLeaders);
+TeamLeadersRouter.post('/', authentication, postTeamLeaders)
+TeamLeadersRouter.put('/', authentication, updateTeamLeaders);
+TeamLeadersRouter.delete('/', authentication, deleteTeamLeaders);
 
 
 export default TeamLeadersRouter
