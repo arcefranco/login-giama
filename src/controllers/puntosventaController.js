@@ -19,40 +19,29 @@ export const getAllPuntosDeVenta = async (req, res) => {
     }
 }
 
-export const getPuntoById = async (req, res) => {
-    const dbGiama = req.db
+export const beginUpdate = async (req, res) => {
     const {Codigo} = req.body
+    const dbGiama = req.db
     const {user} = req.usuario
-    if(!Codigo) return res.send('Falta el codigo')
+    
+    if(typeof Codigo !== 'number')  return res.send({status: false, message: 'Codigo no valido'})
     try {
-        const punto = await dbGiama
-        .query
-        ("SELECT * from pre_puntosventa WHERE Codigo = ?",
+        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM pre_puntosventa WHERE Codigo = ?", 
         {
-          replacements: [Codigo],
-          type: QueryTypes.SELECT
-        }
-       );
-       
-         if(punto[0].inUpdate   && punto[0].inUpdate !== user) {
-            return res.send({status: false, message: `El registro esta siendo editado por ${punto[0].inUpdate} `})
-         }
-    
-      
-        try {
-        await dbGiama.query("UPDATE pre_puntosventa SET inUpdate = ? WHERE Codigo = ?",  {
-            replacements: [user, Codigo],
-            type: QueryTypes.UPDATE
+            replacements: [Codigo],
+            type: QueryTypes.SELECT
+        })
+        if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+            await dbGiama.query("UPDATE pre_puntosventa SET inUpdate = ? WHERE Codigo = ?", {
+                replacements: [user, Codigo],
+                type: QueryTypes.UPDATE
             })
-    
-            return res.send(punto)
-    }   catch (error) {
-            console.log('error:', error)
-            return res.send(error)
-            }
-        
-    }       catch (error) {
-            return res.send(error)
+            return res.send({codigo: Codigo})
+        }else{
+            return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+        }
+    } catch (error) {
+        return res.send({status: false, message: 'Error al comenzar modificaciones'})
     }
 }
 
