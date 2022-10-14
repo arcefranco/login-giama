@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {  getSupervisores, getSupervisoresById, postSupervisores, updateSupervisores,deleteSupervisores, getAllZonas, getSupervisoresActivos, endUpdate } from "../controllers/supervisoresController";
+import {  getSupervisores, postSupervisores, updateSupervisores,deleteSupervisores, beginUpdate, getAllZonas, getSupervisoresActivos, endUpdate } from "../controllers/supervisoresController";
 import {  getGerentes, getGerentesActivos} from "../controllers/gerentesController";
 import { testConnection } from "../middlewares/testConnection";
 import authentication from "../middlewares/authentication";
@@ -13,11 +13,11 @@ SupervisoresRouter.use(testConnection)
 
 SupervisoresRouter.route('/').get(getSupervisores);
 SupervisoresRouter.route('/activos').get(getSupervisoresActivos);
-SupervisoresRouter.post('/id', authentication, getSupervisoresById)
 SupervisoresRouter.post('/endUpdate', authentication, endUpdate) 
-SupervisoresRouter.route('/').post(postSupervisores);
-SupervisoresRouter.route('/').put(updateSupervisores);
-SupervisoresRouter.route('/').delete(deleteSupervisores);
+SupervisoresRouter.post('/beginUpdate', authentication, beginUpdate)
+SupervisoresRouter.post('/', authentication, postSupervisores);
+SupervisoresRouter.put('/', authentication, updateSupervisores)
+SupervisoresRouter.delete('/', authentication, deleteSupervisores)
 
 
 //get gerentes, zonas
