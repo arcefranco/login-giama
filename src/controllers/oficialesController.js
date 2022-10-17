@@ -47,7 +47,7 @@ export const getOficialesByName = async (req, res) => {
             return res.send(oficialCarga[0])
             
         case 'Patentamiento': 
-            const oficialPatentamiento = await dbGiama.query("SELECT * FROM oficialespatentamiento")
+            const oficialPatentamiento = await dbGiama.query("SELECT * FROM oficialeUsuariospatentamiento")
             return res.send(oficialPatentamiento[0])
         
         case 'Asignacion': 
@@ -201,7 +201,7 @@ export const deleteOficiales = async (req, res) => {
 }
 export const updateOficiales = async (req, res) => {
 
-    const {categoria, Codigo, Nombre, Usuario, Activo, Inactivo, Objetivo, TipoOficialMora, HN, Supervisor} = req.body
+    const {categoria, Codigo, Nombre, Usuario, login, Activo, Inactivo, Objetivo, TipoOficialMora, HNMayor40, Supervisor} = req.body
     const dbGiama = req.db
     console.log(req.body)
 
@@ -299,11 +299,11 @@ export const updateOficiales = async (req, res) => {
 
         case 'Subite':
             try {
-                const HNtoNumber = parseInt(HN)
-                const SupervisorToNumber = parseInt(Supervisor)
-                if(!Usuario)   return res.send({status: false, message: 'Faltan campos'})
+/*                 const HNtoNumber = parseInt(HN)
+                const SupervisorToNumber = parseInt(Supervisor) */
+                if(!login)   return res.send({status: false, message: 'Faltan campos'})
                 await dbGiama.query("UPDATE subite_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Supervisor = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
-                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber? SupervisorToNumber : null, Activo, Codigo],
+                     replacements: [Nombre, login, HNMayor40, Supervisor? Supervisor : null, Activo, Codigo],
                      type: QueryTypes.UPDATE
                     }).catch((error) => {
                         
@@ -317,11 +317,11 @@ export const updateOficiales = async (req, res) => {
             }
         
         case 'Compra':
-             const HNtoNumber = parseInt(HN) 
-             if(!Usuario)   return res.send({status: false, message: 'Faltan campos'})
+/*              const HNtoNumber = parseInt(HN)  */
+             if(!login)   return res.send({status: false, message: 'Faltan campos'})
             try {
                 dbGiama.query("UPDATE comprar_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
-                   replacements: [Nombre, Usuario, HNtoNumber, Activo, Codigo],
+                   replacements: [Nombre, login, HNMayor40, Activo, Codigo],
                    type: QueryTypes.UPDATE
                 }).catch((error) => {
                     
@@ -395,7 +395,7 @@ export const updateOficiales = async (req, res) => {
 
 export const createOficiales = async (req, res) => {
 
-    const {categoria, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HN, Supervisor}  = req.body
+    const {categoria, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HNMayor40, Supervisor, login}  = req.body
     const dbGiama = req.db
     const {user} = req.usuario
    
@@ -474,12 +474,12 @@ export const createOficiales = async (req, res) => {
             }
 
         case 'Subite':
-                const HNtoNumber = parseInt(HN)
-                const SupervisorToNumber = Supervisor && parseInt(Supervisor)
+/*                 const HNtoNumber = parseInt(HN)
+                const SupervisorToNumber = Supervisor && parseInt(Supervisor) */
                 if(!Usuario) return res.send({status: false, message: 'Faltan campos'})
             try {
                 await dbGiama.query("INSERT INTO subite_oficiales (Nombre, login, HNMayor40, Supervisor, Activo) VALUES (?,?,?,?,?)", {
-                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber? SupervisorToNumber: null, Activo],
+                     replacements: [Nombre, Usuario, HNMayor40, Supervisor? Supervisor: null, Activo],
                      type: QueryTypes.INSERT
                     })
                     return res.send({status: true, message: 'Creado correctamente!'})
@@ -490,11 +490,11 @@ export const createOficiales = async (req, res) => {
             }
         
         case 'Compra':
-            const HNCompratoNumber = parseInt(HN)
+/*             const HNCompratoNumber = parseInt(HN) */
             if(!Usuario)   return res.send({status: false, message: 'Faltan campos'})
             try {
                 dbGiama.query("INSERT INTO comprar_oficiales (Nombre, login, HNMayor40, Activo) VALUES (?,?,?,?)", {
-                   replacements: [Nombre, Usuario, HNCompratoNumber, Activo],
+                   replacements: [Nombre, Usuario, HNMayor40, Activo],
                    type: QueryTypes.INSERT
                 })
                 return res.send({status: true, message: 'Creado correctamente!'})
