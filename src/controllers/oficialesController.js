@@ -47,7 +47,7 @@ export const getOficialesByName = async (req, res) => {
             return res.send(oficialCarga[0])
             
         case 'Patentamiento': 
-            const oficialPatentamiento = await dbGiama.query("SELECT * FROM oficialespatentamiento")
+            const oficialPatentamiento = await dbGiama.query("SELECT * FROM oficialeUsuariospatentamiento")
             return res.send(oficialPatentamiento[0])
         
         case 'Asignacion': 
@@ -201,7 +201,7 @@ export const deleteOficiales = async (req, res) => {
 }
 export const updateOficiales = async (req, res) => {
 
-    const {categoria, Codigo, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HN, Supervisor} = req.body
+    const {categoria, Codigo, Nombre, Usuario, login, Activo, Inactivo, Objetivo, TipoOficialMora, HNMayor40, Supervisor} = req.body
     const dbGiama = req.db
     console.log(req.body)
 
@@ -225,7 +225,6 @@ export const updateOficiales = async (req, res) => {
 
         case 'Adjudicacion':
                 try {
-                    const Inactivo = Activo === 1 ? 0 : 1
                     await dbGiama.query("UPDATE oficialesadjudicacion SET Nombre = ?, Inactivo = ?, inUpdate = NULL WHERE Codigo = ?", {
                     
                        replacements: [Nombre, Inactivo, Codigo],
@@ -300,11 +299,11 @@ export const updateOficiales = async (req, res) => {
 
         case 'Subite':
             try {
-                const HNtoNumber = parseInt(HN)
-                const SupervisorToNumber = parseInt(Supervisor)
-                if(!Usuario)   return res.send({status: false, message: 'Faltan campos'})
+/*                 const HNtoNumber = parseInt(HN)
+                const SupervisorToNumber = parseInt(Supervisor) */
+                if(!login)   return res.send({status: false, message: 'Faltan campos'})
                 await dbGiama.query("UPDATE subite_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Supervisor = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
-                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber? SupervisorToNumber : null, Activo, Codigo],
+                     replacements: [Nombre, login, HNMayor40, Supervisor? Supervisor : null, Activo, Codigo],
                      type: QueryTypes.UPDATE
                     }).catch((error) => {
                         
@@ -318,11 +317,11 @@ export const updateOficiales = async (req, res) => {
             }
         
         case 'Compra':
-             const HNtoNumber = parseInt(HN) 
-             if(!Usuario)   return res.send({status: false, message: 'Faltan campos'})
+/*              const HNtoNumber = parseInt(HN)  */
+             if(!login)   return res.send({status: false, message: 'Faltan campos'})
             try {
                 dbGiama.query("UPDATE comprar_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
-                   replacements: [Nombre, Usuario, HNtoNumber, Activo, Codigo],
+                   replacements: [Nombre, login, HNMayor40, Activo, Codigo],
                    type: QueryTypes.UPDATE
                 }).catch((error) => {
                     
@@ -396,7 +395,7 @@ export const updateOficiales = async (req, res) => {
 
 export const createOficiales = async (req, res) => {
 
-    const {categoria, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HN, Supervisor}  = req.body
+    const {categoria, Nombre, Usuario, Activo, Objetivo, TipoOficialMora, HNMayor40, Supervisor, login}  = req.body
     const dbGiama = req.db
     const {user} = req.usuario
    
@@ -475,12 +474,12 @@ export const createOficiales = async (req, res) => {
             }
 
         case 'Subite':
-                const HNtoNumber = parseInt(HN)
-                const SupervisorToNumber = Supervisor && parseInt(Supervisor)
+/*                 const HNtoNumber = parseInt(HN)
+                const SupervisorToNumber = Supervisor && parseInt(Supervisor) */
                 if(!Usuario) return res.send({status: false, message: 'Faltan campos'})
             try {
                 await dbGiama.query("INSERT INTO subite_oficiales (Nombre, login, HNMayor40, Supervisor, Activo) VALUES (?,?,?,?,?)", {
-                     replacements: [Nombre, Usuario, HNtoNumber, SupervisorToNumber? SupervisorToNumber: null, Activo],
+                     replacements: [Nombre, Usuario, HNMayor40, Supervisor? Supervisor: null, Activo],
                      type: QueryTypes.INSERT
                     })
                     return res.send({status: true, message: 'Creado correctamente!'})
@@ -491,11 +490,11 @@ export const createOficiales = async (req, res) => {
             }
         
         case 'Compra':
-            const HNCompratoNumber = parseInt(HN)
+/*             const HNCompratoNumber = parseInt(HN) */
             if(!Usuario)   return res.send({status: false, message: 'Faltan campos'})
             try {
                 dbGiama.query("INSERT INTO comprar_oficiales (Nombre, login, HNMayor40, Activo) VALUES (?,?,?,?)", {
-                   replacements: [Nombre, Usuario, HNCompratoNumber, Activo],
+                   replacements: [Nombre, Usuario, HNMayor40, Activo],
                    type: QueryTypes.INSERT
                 })
                 return res.send({status: true, message: 'Creado correctamente!'})
@@ -983,45 +982,7 @@ export const endUpdate = async (req, res) => {
                     }
                 } catch (error) {
                     return res.send(error)
-                }
-        case 'Compra':
-            try {
-                const actualOficial = await dbGiama.query("SELECT * FROM comprar_oficiales WHERE Codigo = ?", 
-                {
-                replacements: [Codigo],
-                type: QueryTypes.SELECT
-                })
-                if(actualOficial[0].inUpdate === user){
-                    await dbGiama.query("UPDATE comprar_oficiales SET inUpdate = NULL WHERE Codigo = ?", {
-                        replacements: [Codigo],
-                        type: QueryTypes.UPDATE
-                    })
-                    return res.send('endUpdate OK!')
-            }else{
-                    return
-                }
-            } catch (error) {
-                    return res.send(error)
-            }
-        case 'Compra':
-            try {
-                const actualOficial = await dbGiama.query("SELECT * FROM comprar_oficiales WHERE Codigo = ?", 
-                {
-                replacements: [Codigo],
-                type: QueryTypes.SELECT
-                })
-                if(actualOficial[0].inUpdate === user){
-                    await dbGiama.query("UPDATE comprar_oficiales SET inUpdate = NULL WHERE Codigo = ?", {
-                        replacements: [Codigo],
-                        type: QueryTypes.UPDATE
-                    })
-                    return res.send('endUpdate OK!')
-            }else{
-                    return
-                }
-            } catch (error) {
-                    return res.send(error)
-            }    
+                }    
         case 'Carga':
             try {
                 const actualOficial = await dbGiama.query("SELECT * FROM oficialescarga WHERE Codigo = ?", 
@@ -1082,5 +1043,209 @@ export const endUpdate = async (req, res) => {
     
         default:
            res.send('Some error endUpdate')
+    }
+}
+
+export const beginUpdate = async (req, res) => {
+    const {categoria, Codigo} = req.body
+    const dbGiama = req.db
+    const {user} = req.usuario
+    if(typeof Codigo !== 'number')  return res.send({status: false, message: 'Codigo no valido'})
+    switch (categoria) {
+        case 'Licitacion':
+           
+            try {
+                const actualUsuario = await dbGiama.query("SELECT inUpdate FROM oficialeslicitaciones WHERE Codigo = ?", 
+                {
+                    replacements: [Codigo],
+                    type: QueryTypes.SELECT
+                })
+                if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                    await dbGiama.query("UPDATE oficialeslicitaciones SET inUpdate = ? WHERE Codigo = ?", {
+                        replacements: [user, Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send({codigo: Codigo})
+                }else{
+                    return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                }
+            } catch (error) {
+                return res.send({status: false, message: 'Error al comenzar modificaciones'})
+            }
+            case 'Adjudicacion':
+                try {
+                    const actualUsuario = await dbGiama.query("SELECT inUpdate FROM oficialesadjudicacion WHERE Codigo = ?", 
+                    {
+                        replacements: [Codigo],
+                        type: QueryTypes.SELECT
+                    })
+                    if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                        await dbGiama.query("UPDATE oficialesadjudicacion SET inUpdate = ? WHERE Codigo = ?", {
+                            replacements: [user, Codigo],
+                            type: QueryTypes.UPDATE
+                        })
+                        return res.send({codigo: Codigo})
+                    }else{
+                        return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                    }
+                } catch (error) {
+                    return res.send({status: false, message: 'Error al comenzar modificaciones'})
+                }
+                case 'Plan Canje':
+                    try {
+                        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM oficialesplancanje WHERE Codigo = ?", 
+                        {
+                            replacements: [Codigo],
+                            type: QueryTypes.SELECT
+                        })
+                        if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                            await dbGiama.query("UPDATE oficialesplancanje SET inUpdate = ? WHERE Codigo = ?", {
+                                replacements: [user, Codigo],
+                                type: QueryTypes.UPDATE
+                            })
+                            return res.send({codigo: Codigo})
+                        }else{
+                            return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                        }
+                    } catch (error) {
+                        return res.send({status: false, message: 'Error al comenzar modificaciones'})
+                    }
+                    case 'Scoring':
+                        try {
+                            const actualUsuario = await dbGiama.query("SELECT inUpdate FROM oficialesscoring WHERE Codigo = ?", 
+                            {
+                                replacements: [Codigo],
+                                type: QueryTypes.SELECT
+                            })
+                            if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                                await dbGiama.query("UPDATE oficialesscoring SET inUpdate = ? WHERE Codigo = ?", {
+                                    replacements: [user, Codigo],
+                                    type: QueryTypes.UPDATE
+                                })
+                                return res.send({codigo: Codigo})
+                            }else{
+                                return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                            }
+                        } catch (error) {
+                            return res.send({status: false, message: 'Error al comenzar modificaciones'})
+                        }
+                        case 'Mora':
+                            try {
+                                const actualUsuario = await dbGiama.query("SELECT inUpdate FROM oficialesmora WHERE Codigo = ?", 
+                                {
+                                    replacements: [Codigo],
+                                    type: QueryTypes.SELECT
+                                })
+                                if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                                    await dbGiama.query("UPDATE oficialesmora SET inUpdate = ? WHERE Codigo = ?", {
+                                        replacements: [user, Codigo],
+                                        type: QueryTypes.UPDATE
+                                    })
+                                    return res.send({codigo: Codigo})
+                                }else{
+                                    return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                                }
+                            } catch (error) {
+                                return res.send({status: false, message: 'Error al comenzar modificaciones'})
+                            }
+        case 'Subite':
+            try {
+                const actualUsuario = await dbGiama.query("SELECT inUpdate FROM subite_oficiales WHERE Codigo = ?", 
+                {
+                    replacements: [Codigo],
+                    type: QueryTypes.SELECT
+                })
+                if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                    await dbGiama.query("UPDATE subite_oficiales SET inUpdate = ? WHERE Codigo = ?", {
+                        replacements: [user, Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send({codigo: Codigo})
+                }else{
+                    return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                }
+            } catch (error) {
+                return res.send({status: false, message: 'Error al comenzar modificaciones'})
+            }
+            case 'Compra':
+                try {
+                    const actualUsuario = await dbGiama.query("SELECT inUpdate FROM comprar_oficiales WHERE Codigo = ?", 
+                    {
+                        replacements: [Codigo],
+                        type: QueryTypes.SELECT
+                    })
+                    if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                        await dbGiama.query("UPDATE comprar_oficiales SET inUpdate = ? WHERE Codigo = ?", {
+                            replacements: [user, Codigo],
+                            type: QueryTypes.UPDATE
+                        })
+                        return res.send({codigo: Codigo})
+                    }else{
+                        return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                    }
+                } catch (error) {
+                    return res.send({status: false, message: 'Error al comenzar modificaciones'})
+                }
+   
+        case 'Carga':
+            try {
+                const actualUsuario = await dbGiama.query("SELECT inUpdate FROM oficialescarga WHERE Codigo = ?", 
+                {
+                    replacements: [Codigo],
+                    type: QueryTypes.SELECT
+                })
+                if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                    await dbGiama.query("UPDATE oficialescarga SET inUpdate = ? WHERE Codigo = ?", {
+                        replacements: [user, Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send({codigo: Codigo})
+                }else{
+                    return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                }
+            } catch (error) {
+                return res.send({status: false, message: 'Error al comenzar modificaciones'})
+            }
+        case 'Patentamiento':
+            try {
+                const actualUsuario = await dbGiama.query("SELECT inUpdate FROM oficialespatentamiento WHERE Codigo = ?", 
+                {
+                    replacements: [Codigo],
+                    type: QueryTypes.SELECT
+                })
+                if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                    await dbGiama.query("UPDATE oficialespatentamiento SET inUpdate = ? WHERE Codigo = ?", {
+                        replacements: [user, Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send({codigo: Codigo})
+                }else{
+                    return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                }
+            } catch (error) {
+                return res.send({status: false, message: 'Error al comenzar modificaciones'})
+            }
+        case 'Asignacion':
+            try {
+                const actualUsuario = await dbGiama.query("SELECT inUpdate FROM oficialesasignacion WHERE Codigo = ?", 
+                {
+                    replacements: [Codigo],
+                    type: QueryTypes.SELECT
+                })
+                if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
+                    await dbGiama.query("UPDATE oficialesasignacion SET inUpdate = ? WHERE Codigo = ?", {
+                        replacements: [user, Codigo],
+                        type: QueryTypes.UPDATE
+                    })
+                    return res.send({codigo: Codigo})
+                }else{
+                    return res.send({status: false, message: `El registro está siendo editado por ${actualUsuario[0].inUpdate}`})
+                }
+            } catch (error) {
+                return res.send({status: false, message: 'Error al comenzar modificaciones'})
+            }
+    
+        default:
+           res.send('Some error beginUpdate')
     }
 }

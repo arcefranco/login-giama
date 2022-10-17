@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createOficiales, deleteOficiales, getOficialesById, getOficialesByName, updateOficiales, endUpdate } from "../controllers/oficialesController";
+import { createOficiales, deleteOficiales, getOficialesById, getOficialesByName, beginUpdate, updateOficiales, endUpdate } from "../controllers/oficialesController";
 import authentication from "../middlewares/authentication";
 import { testConnection } from "../middlewares/testConnection";
 
@@ -13,6 +13,7 @@ OficialesRouter.post('/', getOficialesByName)
 OficialesRouter.delete('/', deleteOficiales)
 OficialesRouter.post('/id', authentication, getOficialesById)
 OficialesRouter.post('/create', authentication, createOficiales)
+OficialesRouter.post('/beginUpdate', authentication, beginUpdate)
 OficialesRouter.put('/id', updateOficiales)
 OficialesRouter.post('/endUpdate', authentication, endUpdate)
 export default OficialesRouter
