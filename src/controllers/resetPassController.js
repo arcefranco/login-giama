@@ -90,7 +90,7 @@ if(user.length) {
   
  dbGiama
   .query('CALL pa7_update_pass (:p_LOGIN, :p_SALT, :p_PASSWORD)', 
-        {replacements: { p_LOGIN: user[0].login, p_SALT: newSalt, p_PASSWORD: passHashed, }})
+        {replacements: { p_LOGIN: user[0].login, p_SALT: newSalt, p_PASSWORD: passHashed }})
 return res.send({message: 'Password updated!', status: true})
 }else{
 return res.json({message: 'User does not exist', status: false})
