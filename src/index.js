@@ -14,6 +14,7 @@ import VendedoresRouter from "./routes/vendedoresRoutes";
 import ModelosRouter from "./routes/modelosRoutes";
 import puntosVentaRouter from "./routes/puntosventaRoutes";
 import estructuraRouter from "./routes/estructuraRoutes";
+import ventasPreSol from "./routes/Reportes/Ventas/preSolRoutes";
 import ListasRouter from "./routes/listasRoutes";
 require('dotenv').config()
 
@@ -54,6 +55,7 @@ app.use('/supervisores', supervisoresRoutes)
 app.use('/modelos', ModelosRouter)
 app.use('/oficiales', OficialesRouter)
 app.use('/puntosDeVenta', puntosVentaRouter)
+app.use('/Reportes/Ventas/PreSol', ventasPreSol)
 
 app.listen(process.env.PORT, () => {
 
