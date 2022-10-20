@@ -1,10 +1,11 @@
 import { Router } from "express";
 
-import { getAllOficialesMoraActivos, getAllOficialesScoringActivos } from "../controllers/vendedoresController";
-import { endUpdate, getVendedores, getVendedoresById, postVendedores, updateVendedores,deleteVendedores, beginUpdate,  getAllEscalas, getAllOficialesScoring, getAllOficialesMora } from "../controllers/vendedoresController";
+import { getAllOficialesMoraActivos, getAllOficialesScoringActivos } from "../../controllers/ConfigDatosGenerales/vendedoresController";
+import { endUpdate, getVendedores, getVendedoresById, postVendedores, updateVendedores,
+    deleteVendedores, beginUpdate,  getAllEscalas, getAllOficialesScoring, getAllOficialesMora } from "../../controllers/ConfigDatosGenerales/vendedoresController";
 
-import { testConnection } from "../middlewares/testConnection";
-import authentication from "../middlewares/authentication";
+import { testConnection } from "../../middlewares/testConnection";
+import authentication from "../../middlewares/authentication";
 
 const VendedoresRouter = Router()
 

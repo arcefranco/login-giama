@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { getRoles, getUserRoles, addRol, deleteRol, copyRoles, replaceRoles, giveMaster } from "../controllers/rolesController";
-import { testConnection } from "../middlewares/testConnection";
+import { getRoles, getUserRoles, addRol, deleteRol, copyRoles, 
+    replaceRoles, giveMaster } from "../../controllers/ConfigDatosGenerales/rolesController";
+import { testConnection } from "../../middlewares/testConnection";
 
 
 const RolesRouter = Router()

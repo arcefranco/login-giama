@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { testConnection } from "../middlewares/testConnection";
-import authentication from "../middlewares/authentication";
-import { createPuntoDeVenta, deletePuntoDeVenta, endUpdate, getAllPuntosDeVenta, beginUpdate, updatePuntoDeVenta } from "../controllers/puntosventaController";
+import { testConnection } from "../../middlewares/testConnection";
+import authentication from "../../middlewares/authentication";
+import { createPuntoDeVenta, deletePuntoDeVenta, endUpdate, 
+    getAllPuntosDeVenta, beginUpdate, updatePuntoDeVenta } from "../../controllers/ConfigDatosGenerales/puntosventaController";
 const puntosVentaRouter = Router()
 
 puntosVentaRouter.use(testConnection)

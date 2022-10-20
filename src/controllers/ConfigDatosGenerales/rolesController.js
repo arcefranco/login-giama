@@ -1,8 +1,8 @@
 
-import {app} from '../index'
+import {app} from '../../index'
 import { QueryTypes } from "sequelize";
-import { queryMora, queryOperaciones, queryReportes} from "../queries";
-import { logout } from './userController';
+import { queryMora, queryOperaciones, queryReportes} from "../../queries";
+import { logout } from '../userController';
 
 
 

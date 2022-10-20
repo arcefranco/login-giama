@@ -1,7 +1,7 @@
 import { QueryTypes } from "sequelize";
-import { createPass } from "../helpers/passwords/createPass";
-import randomPass from "../helpers/passwords/randomPass";
-import { sendPass } from "../helpers/email/sendEmail";
+import { createPass } from "../../helpers/passwords/createPass";
+import randomPass from "../../helpers/passwords/randomPass";
+import { sendPass } from "../../helpers/email/sendEmail";
 
 
 export const getUsuarioById = async (req, res) => {

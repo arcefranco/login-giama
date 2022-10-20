@@ -1,8 +1,9 @@
 import { Router } from "express";
-import {  getSupervisores, postSupervisores, updateSupervisores,deleteSupervisores, beginUpdate, getAllZonas, getSupervisoresActivos, endUpdate } from "../controllers/supervisoresController";
-import {  getGerentes, getGerentesActivos} from "../controllers/gerentesController";
-import { testConnection } from "../middlewares/testConnection";
-import authentication from "../middlewares/authentication";
+import {  getSupervisores, postSupervisores, updateSupervisores,deleteSupervisores, 
+    beginUpdate, getAllZonas, getSupervisoresActivos, endUpdate } from "../../controllers/ConfigDatosGenerales/supervisoresController";
+import {  getGerentes, getGerentesActivos} from "../../controllers/ConfigDatosGenerales/gerentesController";
+import { testConnection } from "../../middlewares/testConnection";
+import authentication from "../../middlewares/authentication";
 
 
 
