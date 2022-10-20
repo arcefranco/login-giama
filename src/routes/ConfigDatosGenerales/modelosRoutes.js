@@ -1,7 +1,8 @@
 import { Router } from "express";
-import {  getModelos, getModelosById, postModelos, updateModelos,deleteModelos, endCommit, getTipoPlan, endUpdate,getModelosActivos, getCuotas } from "../controllers/modelosController";
-import { testConnection } from "../middlewares/testConnection";
-import authentication from "../middlewares/authentication";
+import {  getModelos, getModelosById, postModelos, updateModelos,deleteModelos, 
+    endCommit, getTipoPlan, endUpdate,getModelosActivos, getCuotas } from "../../controllers/ConfigDatosGenerales/modelosController";
+import { testConnection } from "../../middlewares/testConnection";
+import authentication from "../../middlewares/authentication";
 
 
 const ModelosRouter = Router()

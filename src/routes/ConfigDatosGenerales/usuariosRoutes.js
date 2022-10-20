@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { createUsuario, getAllTeamLeaders, getAllGerentes, getAllSupervisores, getAllUsuarios, 
-    getAllVendedores, getUsuarioById, updateUsuario, deleteUsuario, endUpdate, beginUpdate } from "../controllers/usuariosController";
-import authentication from "../middlewares/authentication";
-import { testConnection } from "../middlewares/testConnection";
+    getAllVendedores, getUsuarioById, updateUsuario, deleteUsuario, endUpdate, beginUpdate } from "../../controllers/ConfigDatosGenerales/usuariosController";
+import authentication from "../../middlewares/authentication";
+import { testConnection } from "../../middlewares/testConnection";
 
 
 const usuariosRoutes = Router()

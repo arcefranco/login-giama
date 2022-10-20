@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { createLista, deleteLista, deleteModeloFromLista, getListas, getModelos, insertModeloLista, modelosOnLista, updateLista, updatePrecioModelo } from "../controllers/listaspreciosController";
-import { testConnection } from "../middlewares/testConnection";
-import authentication from "../middlewares/authentication";
+import { createLista, deleteLista, deleteModeloFromLista, getListas, getModelos, insertModeloLista, modelosOnLista, 
+    updateLista, updatePrecioModelo } from "../../controllers/ConfigDatosGenerales/listaspreciosController";
+import { testConnection } from "../../middlewares/testConnection";
+import authentication from "../../middlewares/authentication";
 const ListasRouter = Router()
 
 ListasRouter.use(testConnection)

@@ -1,7 +1,7 @@
 import {  QueryTypes } from 'sequelize';
 import { Router } from 'express';
-import { testConnection } from '../middlewares/testConnection';
-import {queryEstructura} from '../queries'
+import { testConnection } from '../../middlewares/testConnection';
+import {queryEstructura} from '../../queries'
 require('dotenv').config()
 
 const estructuraRouter = Router()

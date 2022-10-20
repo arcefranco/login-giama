@@ -1,7 +1,9 @@
 import { Router } from "express";
-import {  getGerentes, getGerentesById, getGerentesActivos, postGerentes, updateGerentes, beginUpdate, deleteGerentes, endUpdate} from "../controllers/gerentesController";
-import { testConnection } from "../middlewares/testConnection";
-import authentication from "../middlewares/authentication";
+import {  getGerentes, getGerentesById, getGerentesActivos, postGerentes, 
+    updateGerentes, beginUpdate, deleteGerentes, endUpdate} from "../../controllers/ConfigDatosGenerales/gerentesController";
+
+import { testConnection } from "../../middlewares/testConnection";
+import authentication from "../../middlewares/authentication";
 const GerentesRouter = Router()
 
 GerentesRouter.use(testConnection)

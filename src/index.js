@@ -2,20 +2,20 @@ import express from "express";
 import cors from 'cors'
 import morgan from "morgan";
 import UserRouter from "./routes/userRoutes";
-import GerentesRouter from './routes/gerentesRoutes'
+import GerentesRouter from './routes/ConfigDatosGenerales/gerentesRoutes'
 import resetRouter from "./routes/resetRoutes";
-import usuariosRoutes from "./routes/usuariosRoutes";
-import RolesRouter from "./routes/rolesRoutes";
-import supervisoresRoutes from "./routes/supervisoresRoutes";
-import SucursalesRouter from "./routes/sucursalesRoutes";
-import TeamLeadersRouter from "./routes/teamLeadersRoutes";
-import OficialesRouter from "./routes/oficialesRoutes";
-import VendedoresRouter from "./routes/vendedoresRoutes";
-import ModelosRouter from "./routes/modelosRoutes";
-import puntosVentaRouter from "./routes/puntosventaRoutes";
-import estructuraRouter from "./routes/estructuraRoutes";
+import usuariosRoutes from "./routes/ConfigDatosGenerales/usuariosRoutes";
+import RolesRouter from "./routes/ConfigDatosGenerales/rolesRoutes";
+import supervisoresRoutes from "./routes/ConfigDatosGenerales/supervisoresRoutes";
+import SucursalesRouter from "./routes/ConfigDatosGenerales/sucursalesRoutes";
+import TeamLeadersRouter from "./routes/ConfigDatosGenerales/teamLeadersRoutes";
+import OficialesRouter from "./routes/ConfigDatosGenerales/oficialesRoutes";
+import VendedoresRouter from "./routes/ConfigDatosGenerales/vendedoresRoutes";
+import ModelosRouter from "./routes/ConfigDatosGenerales/modelosRoutes";
+import puntosVentaRouter from "./routes/ConfigDatosGenerales/puntosventaRoutes";
+import estructuraRouter from "./routes/ConfigDatosGenerales/estructuraRoutes";
 import ventasPreSol from "./routes/Reportes/Ventas/preSolRoutes";
-import ListasRouter from "./routes/listasRoutes";
+import ListasRouter from "./routes/ConfigDatosGenerales/listasRoutes";
 require('dotenv').config()
 
 
