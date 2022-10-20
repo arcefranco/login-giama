@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { createOficiales, deleteOficiales, getOficialesById, getOficialesByName, beginUpdate, updateOficiales, endUpdate } from "../controllers/oficialesController";
-import authentication from "../middlewares/authentication";
-import { testConnection } from "../middlewares/testConnection";
+import { createOficiales, deleteOficiales, getOficialesById, getOficialesByName, 
+    beginUpdate, updateOficiales, endUpdate } from "../../controllers/ConfigDatosGenerales/oficialesController";
+import authentication from "../../middlewares/authentication";
+import { testConnection } from "../../middlewares/testConnection";
 
 
 

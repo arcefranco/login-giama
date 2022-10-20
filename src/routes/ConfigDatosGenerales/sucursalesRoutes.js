@@ -1,8 +1,9 @@
 import { Router } from "express";
 
-import { createSucursal, deleteSucursal, getAllSucursales, getSucursalesById, updateSucursal, endUpdate, beginUpdate } from "../controllers/sucursalesController";
-import authentication from "../middlewares/authentication";
-import { testConnection } from "../middlewares/testConnection";
+import { createSucursal, deleteSucursal, getAllSucursales, 
+    getSucursalesById, updateSucursal, endUpdate, beginUpdate } from "../../controllers/ConfigDatosGenerales/sucursalesController";
+import authentication from "../../middlewares/authentication";
+import { testConnection } from "../../middlewares/testConnection";
 const SucursalesRouter = Router()
 
 

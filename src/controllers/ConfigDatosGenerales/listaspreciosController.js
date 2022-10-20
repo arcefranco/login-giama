@@ -1,7 +1,7 @@
 import {  QueryTypes } from "sequelize";
 require('dotenv').config()
 const moment = require('moment')
-import { queryModelosOnLista } from "../queries";
+import { queryModelosOnLista } from "../../queries";
 
 
 export const getListas = async (req, res) => {
