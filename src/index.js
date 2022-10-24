@@ -31,6 +31,10 @@ app.use(cors());
 app.use(express.urlencoded({extended:true}))
 app.use(morgan('dev'))
 
+
+
+// prueba en backend
+
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers-Origin, Origin, x-access-token, X-Requested-With, Content-Type, Accept, X-Auth-Token, Authorization');
