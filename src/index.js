@@ -33,7 +33,7 @@ app.use(morgan('dev'))
 
 
 
-// prueba en backend
+//prueba
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Credentials', 'true');
