@@ -18,7 +18,6 @@ export const login = async (req, res) => {
     
     const {login, password, empresa, empresaReal, codigoMarca, marca} = req.body
 
-    console.log(req.body)
     let dbGiama = {};
     if(empresa === 'pa7'){
       dbGiama.sequelize = new Sequelize('pa7', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
@@ -46,7 +45,7 @@ export const login = async (req, res) => {
   ); 
  
 
-if (user[0]) {
+if (user[0]) { 
 if (!login || !password) {
     
     return res.status(400).send({
