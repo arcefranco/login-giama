@@ -11,7 +11,7 @@ require('dotenv').config()
 export const forgotPassword = async (req, res) => {
  const {username, empresa} = req.body //Tomo el nombre de usuario y lo busco en la DB
  console.log(empresa)
- let dbGiama = {};
+ let dbGiama = {}; 
  if(empresa === 'pa7'){
    dbGiama.sequelize = new Sequelize('pa7', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
      host: process.env.DB_HOST,
