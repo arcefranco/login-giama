@@ -16,6 +16,7 @@ import puntosVentaRouter from "./routes/ConfigDatosGenerales/puntosventaRoutes";
 import estructuraRouter from "./routes/ConfigDatosGenerales/estructuraRoutes";
 import ventasPreSol from "./routes/Reportes/Ventas/preSolRoutes";
 import ListasRouter from "./routes/ConfigDatosGenerales/listasRoutes";
+import reporteZonalRouter from './routes/Reportes/Micro/reporteZonalRoutes'
 require('dotenv').config()
 
 
@@ -60,6 +61,7 @@ app.use('/modelos', ModelosRouter)
 app.use('/oficiales', OficialesRouter)
 app.use('/puntosDeVenta', puntosVentaRouter)
 app.use('/Reportes/Ventas/PreSol', ventasPreSol)
+app.use('/Reportes/Micro/Zonal', reporteZonalRouter)
 
 app.listen(process.env.PORT, () => {
 
