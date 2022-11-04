@@ -28,6 +28,7 @@ export const getDetalleIngresadas = async (req, res) => {
 
     const dbGiama = req.db
     const {fechaD, fechaH, pMarca, codSup} = req.body
+
     try {
         
         dbGiama.query('CALL net_estadisticopresoldetalleingresadas (:p_FECHAD, :p_FECHAH, :p_MARCA)', {
@@ -38,7 +39,7 @@ export const getDetalleIngresadas = async (req, res) => {
     } catch (error) {  
         console.log(error)
         return res.send({status: false, data: 'Error al buscar los datos'})
-    }
+    } 
 
 }
 

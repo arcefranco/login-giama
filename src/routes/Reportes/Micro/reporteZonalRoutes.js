@@ -9,6 +9,7 @@ reporteZonalRouter.use(testConnection)
 
 reporteZonalRouter.post('/', async (req, res) => {
     const dbGiama = req.db
+    console.log(req.body)
     const {fechaD, fechaH, pMes, pAnio} = req.body
     let fechaDConverted = fechaD.split("-").join("")
     let fechaHConverted = fechaH.split("-").join("") 
@@ -18,9 +19,9 @@ reporteZonalRouter.post('/', async (req, res) => {
               {replacements: { p_FECHAD: fechaDConverted, p_FECHAH: fechaHConverted, p_PERIODO_OBJ_MES: pMes, p_PERIODO_OBJ_ANIO: pAnio},
                 type: QueryTypes.SELECT})
               .then(data=> { 
-                return res.send({status: true, data: data})
+                return res.send({status: true, data: data}) 
             
-            });
+            }); 
          
        
         
@@ -32,6 +33,7 @@ reporteZonalRouter.post('/', async (req, res) => {
 
 
 )
+
 
 
 export default reporteZonalRouter
