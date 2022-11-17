@@ -2,7 +2,7 @@ import { Sequelize, DataTypes} from "sequelize";
 
 
 
-export const pa7Connection = new Sequelize('pa7', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+export const pa7Connection = new Sequelize('pa7_cg', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT    
 })
@@ -120,10 +120,10 @@ timestamps:false,
 }) 
 Vendedores.removeAttribute('id')
 
-export const pa7gfConnection = new Sequelize('pa7_gf_test_2', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+/* export const pa7gfConnection = new Sequelize('pa7_gf_test_2', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT    
-})
+}) */
 
 //MODELOS
 const Modelos = pa7Connection.define('modelos', {
@@ -136,7 +136,7 @@ timestamps:false,
 }) 
 Modelos.removeAttribute('id')
 
-////////GERENTE
+/* ////////GERENTE
 const GerenteGF = pa7gfConnection.define('gerentes', {
     Codigo: {
         type:DataTypes.STRING,
@@ -255,9 +255,9 @@ const ModelosGF = pa7gfConnection.define('modelos', {
 freezeTableName:true,
 timestamps:false,
 }) 
-ModelosGF.removeAttribute('id')
-
+ModelosGF.removeAttribute('id') 
+ */
 pa7Connection.authenticate()
-pa7gfConnection.authenticate()
+/* pa7gfConnection.authenticate() */
 
 
