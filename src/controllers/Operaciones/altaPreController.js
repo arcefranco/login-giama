@@ -5,7 +5,7 @@ require('dotenv').config()
 export const getModelos = async (req, res) => {
     const dbGiama = req.db
     try {
-        const allModelos = await dbGiama.query(`SELECT modelos.Codigo, modelos.Nombre, modelos.Marca, modelosvalorescuotas.TipoPlan, tipoplan.Descripcion, modelosvalorescuotas.CuotaTerminal 
+        const allModelos = await dbGiama.query(`SELECT modelos.Codigo, modelos.Activo, modelos.Nombre, modelos.Marca, modelosvalorescuotas.TipoPlan, tipoplan.Descripcion, modelosvalorescuotas.CuotaTerminal 
         FROM modelos LEFT JOIN modelosvalorescuotas ON modelosvalorescuotas.Codigo = modelos.Codigo
         LEFT JOIN tipoplan ON tipoplan.ID = modelosvalorescuotas.TipoPlan`, {
             type: QueryTypes.SELECT
