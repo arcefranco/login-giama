@@ -14,9 +14,6 @@ export const testConnection = (req, res, next) => {
             req.db = pa7Connection
 
 
-          }else if(db === 'pa7_gf_test_2'){
-            req.db = pa7gfConnection
-            
           }
          
          next(); 
