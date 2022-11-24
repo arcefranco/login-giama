@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { getFromasPago, getIntereses, getModeloPrecio, getModelos, getModeloValorCuota, getOficialCanje, getOrigenSuscripcion, 
+import { altaPre, getFromasPago, getIntereses, getModeloPrecio, getModelos, getModeloValorCuota, getOficialCanje, getOrigenSuscripcion, 
     getPuntosVenta, getSucursales, getSupervisores, getTarjetas, getTeamLeaders, getVendedores, verifyDoc, verifySolicitud, verifySolicitudStatus } from '../../controllers/Operaciones/altaPreController';
+import authentication from '../../middlewares/authentication';
 import { testConnection } from '../../middlewares/testConnection';
 
 require('dotenv').config()
@@ -25,5 +26,5 @@ altaPreRouter.route('/solicitudStatus').post(verifySolicitudStatus)
 altaPreRouter.route('/getValorCuota').post(getModeloValorCuota)
 altaPreRouter.route('/getModeloPrecio').post(getModeloPrecio)
 altaPreRouter.route('/verifyDoc').post(verifyDoc)
-
+altaPreRouter.post('/altaPre', authentication, altaPre)
 export default altaPreRouter
