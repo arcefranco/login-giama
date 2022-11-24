@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
-import { pa7Connection } from "../helpers/connections";
-import { pa7gfConnection } from "../helpers/connections";
+import { pa7_cgConnection } from "../helpers/connections";
+import { pa7_elyseesConnection } from "../helpers/connections";
+
 
 
 export const testConnection = (req, res, next) => {
@@ -10,10 +11,11 @@ export const testConnection = (req, res, next) => {
         return next({ status: 552, message: "db not found" });
      } 
      else {
-        if(db === 'pa7'){
-            req.db = pa7Connection
-
-
+        if(db === 'pa7' || db === 'pa7_cg'){
+            req.db = pa7_cgConnection
+          }
+          if(db === 'pa7_elysees'){
+            req.db = pa7_elyseesConnection
           }
          
          next(); 

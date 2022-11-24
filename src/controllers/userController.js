@@ -19,11 +19,19 @@ export const login = async (req, res) => {
     const {login, password, empresa, empresaReal, codigoMarca, marca, codigoEmpresa} = req.body
  
     let dbGiama = {};
-    if(empresa === 'pa7'){
+    if(empresa === 'pa7_cg' || empresa === 'pa7'){
       dbGiama.sequelize = new Sequelize('pa7_cg', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
         host: process.env.DB_HOST,
         dialect: process.env.DB_DIALECT
     })
+    
+    }
+    if(empresa === 'pa7_elysees'){
+      dbGiama.sequelize = new Sequelize('pa7_elysees', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+        host: process.env.DB_HOST,
+        dialect: process.env.DB_DIALECT
+    })
+    
     }/* else if(empresa === 'pa7_gf_test_2'){
       dbGiama.sequelize = new Sequelize('pa7_gf_test_2', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
         host: process.env.DB_HOST,
