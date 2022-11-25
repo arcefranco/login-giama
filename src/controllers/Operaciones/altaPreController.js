@@ -1,5 +1,6 @@
-import { QueryTypes } from "sequelize";
-import {queryGetTarjetasAltaPre} from '../../queries'
+import { HostNotFoundError, QueryTypes } from "sequelize";
+import { queryGetFormasPagoAltaPre } from '../../queries'
+import { abmPreSol, abmMovimientoContable, abmMovimientoContable2, abmSenia, addRecordObservacionPreSol, setObsPreSolByEmpresa, grabarObsByEmpresa } from '../../utils/Operaciones/solicitudesUtils'
 require('dotenv').config()
 
 
@@ -12,14 +13,14 @@ export const getModelos = async (req, res) => {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: allModelos})
-        
+
+        return res.send({ status: true, data: allModelos })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
 export const getSucursales = async (req, res) => {
@@ -29,31 +30,31 @@ export const getSucursales = async (req, res) => {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: allSucursales})
-        
+
+        return res.send({ status: true, data: allSucursales })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
-export const getFromasPago = async (req, res) => {
+export const getTarjetas = async (req, res) => {
     const dbGiama = req.db
     try {
-        const allFormasPago = await dbGiama.query(`SELECT * FROM pre_formaspago`, {
+        const tarjetas = await dbGiama.query(`SELECT * FROM tarjetas`, {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: allFormasPago})
-        
+
+        return res.send({ status: true, data: tarjetas })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
 export const getVendedores = async (req, res) => {
@@ -63,14 +64,14 @@ export const getVendedores = async (req, res) => {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: allVendedores})
-        
+
+        return res.send({ status: true, data: allVendedores })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
 export const getPuntosVenta = async (req, res) => {
@@ -80,14 +81,14 @@ export const getPuntosVenta = async (req, res) => {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: allPuntosVenta})
-        
+
+        return res.send({ status: true, data: allPuntosVenta })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
 export const getOficialCanje = async (req, res) => {
@@ -97,14 +98,14 @@ export const getOficialCanje = async (req, res) => {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: allOficialCanje})
-        
+
+        return res.send({ status: true, data: allOficialCanje })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
 export const getTeamLeaders = async (req, res) => {
@@ -114,14 +115,14 @@ export const getTeamLeaders = async (req, res) => {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: allTeamLeaders})
-        
+
+        return res.send({ status: true, data: allTeamLeaders })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
 export const getSupervisores = async (req, res) => {
@@ -131,14 +132,14 @@ export const getSupervisores = async (req, res) => {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: allSupervisores})
-        
+
+        return res.send({ status: true, data: allSupervisores })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
 export const getIntereses = async (req, res) => {
@@ -152,30 +153,30 @@ export const getIntereses = async (req, res) => {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: intereses})
-        
+
+        return res.send({ status: true, data: intereses })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
-export const getTarjetas = async (req, res) => {
+export const getFormasPago = async (req, res) => {
     const dbGiama = req.db
     try {
-        const tarjetas = await dbGiama.query(queryGetTarjetasAltaPre, {
+        const formasPago = await dbGiama.query(queryGetFormasPagoAltaPre, {
             type: QueryTypes.SELECT
         })
-        
-        return res.send({status: true, data: tarjetas})
-        
+
+        return res.send({ status: true, data: formasPago })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
 export const getOrigenSuscripcion = async (req, res) => {
@@ -185,43 +186,43 @@ export const getOrigenSuscripcion = async (req, res) => {
             type: QueryTypes.SELECT
         }
         )
-        
-        return res.send({status: true, data: origen})
-        
+
+        return res.send({ status: true, data: origen })
+
     } catch (error) {
         console.log(error)
-        return res.send({status: false, data: error})
+        return res.send({ status: false, data: error })
     }
-    
+
 }
 
 export const verifySolicitud = async (req, res) => {
     const dbGiama = req.db
-    const {solicitud} = req.body
+    const { solicitud } = req.body
 
 
     try {
         const preSol = await dbGiama.query('SELECT * FROM pre_solicitudes WHERE Solicitud = ?',
-        {
-            replacements: [solicitud],
-            type: QueryTypes.SELECT
-        })
+            {
+                replacements: [solicitud],
+                type: QueryTypes.SELECT
+            })
         const operacion = await dbGiama.query('SELECT * FROM operaciones WHERE Solicitud = ?',
-        {
-            replacements: [solicitud],
-            type: QueryTypes.SELECT
-        })
+            {
+                replacements: [solicitud],
+                type: QueryTypes.SELECT
+            })
         return res.send([...preSol, ...operacion])
-        
+
     } catch (error) {
         console.log(error)
         return res.send(error)
-    } 
+    }
 }
 
 export const verifySolicitudStatus = async (req, res) => {
     const dbGiama = req.db
-    const {solicitud, codMarca} = req.body
+    const { solicitud, codMarca } = req.body
 
     try {
 
@@ -229,13 +230,13 @@ export const verifySolicitudStatus = async (req, res) => {
             replacements: [solicitud, solicitud, null, null, codMarca, null],
         })
 
-        if(Object.keys(solicitudStatus[0]).length) return res.send(solicitudStatus[0][0])
+        if (Object.keys(solicitudStatus[0]).length) return res.send(solicitudStatus[0][0])
         else return res.send(solicitudStatus[0])
 
-        
+
 
     } catch (error) {
-        
+
         console.log(error)
         return res.send(error)
     }
@@ -243,7 +244,7 @@ export const verifySolicitudStatus = async (req, res) => {
 
 export const getModeloValorCuota = async (req, res) => {
     const dbGiama = req.db
-    const {codMarca, modelo, tipoPlan} = req.body
+    const { codMarca, modelo, tipoPlan } = req.body
 
     try {
 
@@ -252,11 +253,9 @@ export const getModeloValorCuota = async (req, res) => {
         })
 
         return res.send(valorCuota[0])
-
         
-
     } catch (error) {
-        
+
         console.log(error)
         return res.send(error)
     }
@@ -264,17 +263,17 @@ export const getModeloValorCuota = async (req, res) => {
 
 export const getModeloPrecio = async (req, res) => {
     const dbGiama = req.db
-    const {codMarca, modelo, tipoPlan} = req.body
+    const { codMarca, modelo, tipoPlan } = req.body
 
     try {
-        const precioA = await dbGiama.query('CALL net_getcuotaacobrar("A", ?, ?, ?)',{
-          replacements: [codMarca, modelo, tipoPlan],
+        const precioA = await dbGiama.query('CALL net_getcuotaacobrar("A", ?, ?, ?)', {
+            replacements: [codMarca, modelo, tipoPlan],
         })
-        const precioB = await dbGiama.query('CALL net_getcuotaacobrar("B", ?, ?, ?)',{
+        const precioB = await dbGiama.query('CALL net_getcuotaacobrar("B", ?, ?, ?)', {
             replacements: [codMarca, modelo, tipoPlan],
         })
 
-        return res.send({PrecioA: precioA[0], PrecioB: precioB[0]})
+        return res.send({ PrecioA: precioA[0], PrecioB: precioB[0] })
 
     } catch (error) {
         console.log(error)
@@ -284,27 +283,27 @@ export const getModeloPrecio = async (req, res) => {
 
 export const verifyDoc = async (req, res) => {
     const dbGiama = req.db
-    const {documento, documentoNro} = req.body
+    const { documento, documentoNro } = req.body
 
     try {
         const documentoStatus = await dbGiama.query('CALL net_verificadniempresas2(?, ?)', {
-          replacements: [documento, documentoNro],
+            replacements: [documento, documentoNro],
         })
         const suscriptorData = await dbGiama.query('CALL net_getDtoSuscriptor(?, ?)', {
             replacements: [documento, documentoNro],
-          })
+        })
 
-        return res.send({docStatus: documentoStatus, suscriptor: suscriptorData})
+        return res.send({ docStatus: documentoStatus, suscriptor: suscriptorData })
 
     } catch (error) {
         console.log(error)
-        return res.send(error) 
+        return res.send(error)
     }
 }
 
 export const altaPre = async (req, res) => {
     const dbGiama = req.db
-    const {user} = req.usuario
+    const { user } = req.usuario
     const hoy = new Date().toISOString().slice(0, 10).replace('T', ' ').split('-').reverse().join('/')
     const {
         codigoMarca,
@@ -362,624 +361,399 @@ export const altaPre = async (req, res) => {
         nroCupon,
         debAutom,
         DNI,
-        Mail, 
+        Mail,
         Anexos,
         promoEspecial,
         planSubite,
         lote,
         observaciones
-      } = req.body
+    } = req.body
     let cuentaSecundaria;
     let codigoCuentaSeña;
     let codigoCuentaSecundariaSeña
     let codigoCuentaEfvo;
     let importeDecimal;
+    let solicitudesDoc;
+    let dtoSuscriptor;
     const a = 0
     const t = await dbGiama.transaction()
 
-    try {//PRIMERO OBTENGO LA CUENTA SECUNDARIA DE LA FORMA DE PAGO(USANDO EL CODIGO CUENTA CONTABLE)
-        if(cuentaContable){
-            await dbGiama.query('SELECT * FROM c_plancuentas WHERE Codigo = ?', {
-                replacements: [cuentaContable]
-            }).then((data) => {
-                cuentaSecundaria = data[0][0].CuentaSecundaria
-            })
-
-        }
-
-    } catch (error) {
-        console.log(error)
+try {
+const documentoStatus = await dbGiama.query('CALL net_verificadniempresas2(?, ?)', { //BUSCO DENUEVO EL DNI PARA LAS OBSERVACIONES
+replacements: [Documento, DocumentoNro],
+    })
+solicitudesDoc = documentoStatus
+} catch (error) {
+console.log('verificaDNI', error)
     }
 
-   
-    try {//DESPUES EL CODIGO DE CUENTA SEÑA
-        if(cuentaContable){
-            await dbGiama.query(`SELECT * FROM c_plancuentas WHERE codigoespecial IN('SEÑA','EFVO')`, {
-                type: QueryTypes.SELECT
-            }).then((data) => {
-                codigoCuentaEfvo = data[0].Codigo
-                codigoCuentaSeña = data[1].Codigo
-                codigoCuentaSecundariaSeña = data[1].CuentaSecundaria
-            })
-
-        }
-        
-    } catch (error) {
-        console.log(error)
+try {
+const suscriptorData = await dbGiama.query('CALL net_getDtoSuscriptor(?, ?)', { //BUSCO DENUEVO EL DNI PARA LAS OBSERVACIONES
+replacements: [Documento, DocumentoNro],
+    })
+dtoSuscriptor = suscriptorData[0]
+} catch (error) {
+console.log('getDtoSuscriptor', error)
     }
 
-    try {
-        
-        dbGiama.query(`SET @a = 0; CALL net_getproxinumeropresol(@a); SELECT @a;`, {
-            multipleStatements: true,
-            type: QueryTypes.SELECT
-        }).then( async (data) =>{ 
-            const numeroPreSol = data[2][0]["@a"]
+try {//OBTENGO LA CUENTA SECUNDARIA DE LA FORMA DE PAGO(USANDO EL CODIGO CUENTA CONTABLE)
+if (cuentaContable) {
+    await dbGiama.query('SELECT * FROM c_plancuentas WHERE Codigo = ?', {
+        replacements: [cuentaContable]
+}).then((data) => {
+    cuentaSecundaria = data[0][0].CuentaSecundaria
+})
+}
+} catch (error) {
+console.log('cPlanCuentas', error)
+    }   
 
-            try {
-                
-                dbGiama.query(`CALL net_abmpresol(
-                :p_Accion,
-                :p_Marca,
-                :p_Numero,
-                :p_Fecha,
-                :p_Solicitud,
-                :p_Apellido,
-                :p_Nombres,
-                :p_Domicilio,
-                :p_Localidad,
-                :p_Telefonos,
-                :p_Vendedor,
-                :p_PuntoVenta,
-                :p_Modelo,
-                :p_ValorCuotaTerminal,
-                :p_ImpoCuota,
-                :p_FechaEstimCancel,
-                :p_DNI, 
-                :p_Servicio,
-                :p_Anexos,
-                :p_Suc,
-                :p_Oficial, 
-                :p_Origen,
-                :p_DebitoAutomatico,
-                :p_TipoDoc,
-                :p_NroDoc,
-                :p_tipoPrecio,
-                :p_tipoplan,
-                :p_Telefonos2,
-                :p_Telefonos3,
-                :p_PromoEspecial,
-                :p_SucReal,
-                :p_AnuladaCliente, 
-                :p_FechaPrescoring, 
-                :p_FechaIngresoExtraNet,  
-                :p_EstadoPrescoring, 
-                :p_Estadoscoring, 
-                :p_NroReciboX,
-                :p_ImporteReciboX, 
-                :p_DebitoAutomaticoscoring, 
-                :p_Empresa,
-                :p_NumeroCalle,
-                :p_Piso,
-                :p_Dto,
-                :p_CodPostal,
-                :p_Provincia,
-                :p_Telefonos4,
-                :p_EmailParticular,
-                :p_EmailLaboral,
-                :p_FechaNac,
-                :p_Ocupacion,
-                :p_DomicilioOcupacion,
-                :p_FechaIngresoTerminal,
-                :p_CuotaACobrarOriginal,
-                :p_Oficialscoring,
-                :p_OficialMora,
-                :p_PlanSubite,
-                :p_TipoResponsable,
-                :p_Bonificacion,
-                :p_Rec,
-                :p_Crucescoring,
-                :p_FechaCrucescoring,
-                :p_teamleader,
-                :p_UsuarioPrescoring,
-                :p_USUARIO, 
-                :p_LLXLL,
-                :p_LLXLLMODIF,
-                :p_NROCUIL)
-                `, {
-                    replacements: 
-                    {
-                p_Accion: 'A',
-                p_Marca: codigoMarca,
-                p_Numero: numeroPreSol,
-                p_Fecha: FechaAlta,
-                p_Solicitud: Solicitud,
-                p_Apellido: Apellido,
-                p_Nombres: Nombre,
-                p_Domicilio: Calle,
-                p_Localidad: Localidad,
-                p_Telefonos: TelefParticular ? TelefParticular : null,
-                p_Vendedor: Vendedor,
-                p_PuntoVenta: puntoVenta,
-                p_Modelo: Modelo,
-                p_ValorCuotaTerminal: ValorCuotaTerm,
-                p_ImpoCuota: TotalCuota,
-                p_FechaEstimCancel: FechaCancelacionSaldo,
-                p_DNI: DNI,
-                p_Servicio: Mail,
-                p_Anexos: Anexos,
-                p_Suc: Supervisor,
-                p_Oficial: OficialCanje ? OficialCanje : null,
-                p_Origen: origenSuscripcion,
-                p_DebitoAutomatico: debAutom,
-                p_TipoDoc: Documento, 
-                p_NroDoc: DocumentoNro,
-                p_tipoPrecio: Precio,
-                p_tipoplan: TipoPlan,
-                p_Telefonos2: TelefCelular ? TelefCelular : null,
-                p_Telefonos3: TelefLaboral ? TelefLaboral : null,
-                p_PromoEspecial: promoEspecial,
-                p_SucReal: Sucursal,
-                p_AnuladaCliente: null, 
-                p_FechaPrescoring:null, 
-                p_FechaIngresoExtraNet:null, 
-                p_EstadoPrescoring:null, 
-                p_Estadoscoring:null, 
-                p_NroReciboX: nroRecibo + nroRecibo2,
-                p_ImporteReciboX:null,  
-                p_DebitoAutomaticoscoring:null, 
-                p_Empresa: 1,
-                p_NumeroCalle: Numero,
-                p_Piso: Piso ? Piso : null,
-                p_Dto: Dto ? Dto : null,
-                p_CodPostal: CodPostal,
-                p_Provincia: Provincia,
-                p_Telefonos4: TelefFamiliar ? TelefFamiliar : null,
-                p_EmailParticular: EmailParticular ? EmailParticular : null,
-                p_EmailLaboral: EmailLaboral ? EmailLaboral : null,
-                p_FechaNac: Nacimiento,
-                p_Ocupacion: Ocupacion,
-                p_DomicilioOcupacion:null,
-                p_FechaIngresoTerminal:null,
-                p_CuotaACobrarOriginal: TotalCuota,
-                p_Oficialscoring:null,
-                p_OficialMora:null,
-                p_PlanSubite:null,
-                p_TipoResponsable: CondIva,
-                p_Bonificacion:null, 
-                p_Rec:null,
-                p_Crucescoring:null, 
-                p_FechaCrucescoring:null,
-                p_teamleader: TeamLeader,
-                p_UsuarioPrescoring:null,
-                p_USUARIO: user,
-                p_LLXLL:null,
-                p_LLXLLMODIF:null,
-                p_NROCUIL: CUIL ? CUIL : null
 
-                    },
-                transaction: t
-                }).then(async () => {
-                    if(
-                        (codEmpresa === 1 && codigoMarca === 2 && cuentaContable !== null ) || 
-                        (codEmpresa === 14 && codigoMarca === 10 && cuentaContable !== null) ||  
-                        (codEmpresa === 15 && codigoMarca === 12 && cuentaContable !== null )){ //SI CONTABILIZA
-                            try {
-                                await dbGiama.query(`SET @b = 0; CALL net_getnumeroasiento(@b); SELECT @b;`, {
-                                    multipleStatements: true,
-                                    type: QueryTypes.SELECT,
-                                    transaction: t
-                                }).then(async (data) =>{ 
-                                    const numeroAsiento = data[2][0]["@b"]
-                                    try {
-                                        await dbGiama.query(`SET @c = 0; CALL net_getnumeroasientosecundario(@c); SELECT @c;`, {
-                                            multipleStatements: true,
-                                            type: QueryTypes.SELECT,
-                                            transaction: t
-                                        }).then(async (data) => { 
-                                            const numeroAsientoSecundario = data[2][0]["@c"]
+try {//DESPUES EL CODIGO DE CUENTA SEÑA
+if (cuentaContable) {
+await dbGiama.query(`SELECT * FROM c_plancuentas WHERE codigoespecial IN('SEÑA','EFVO')`, {
+type: QueryTypes.SELECT
+}).then((data) => {
+    codigoCuentaEfvo = data[0].Codigo
+    codigoCuentaSeña = data[1].Codigo
+    codigoCuentaSecundariaSeña = data[1].CuentaSecundaria
+})
 
-                                            try {
-                                            await dbGiama.query(`SET @result1 = 0; CALL net_abm_movimientocontable(
-                                            :p_ACCION,
-                                            :p_ID,
-                                            :p_FECHA,
-                                            :p_NROASIENTO,
-                                            :p_CUENTA,
-                                            :p_DH,
-                                            :p_IMPORTE,
-                                            :p_CONCEPTO,
-                                            :p_MARCA,
-                                            :p_OPERACION,
-                                            :p_OPPRESOL,
-                                            :p_TIPOCOMP,
-                                            :p_NROCOMP,
-                                            :p_ASIENTOSEC,
-                                            :p_IDOPERACIONMP,
-                                            :p_USUARIO,
-                                            @result1); SELECT @result1;`, {
-                                                multipleStatements: true,
-                                                type: QueryTypes.SELECT,
-                                                transaction: t,
-                                                replacements: 
-                                                {
-                                                    p_ACCION: 'A',
-                                                    p_ID: null,
-                                                    p_FECHA: FechaAlta.split('-').join(''),
-                                                    p_NROASIENTO: numeroAsiento,
-                                                    p_CUENTA:cuentaContable,
-                                                    p_DH: 'D',
-                                                    p_IMPORTE: importeAbonado,
-                                                    p_CONCEPTO:`Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
-                                                    p_MARCA: codigoMarca,
-                                                    p_OPERACION: null,
-                                                    p_OPPRESOL: numeroPreSol,
-                                                    p_TIPOCOMP: 'RCP',
-                                                    p_NROCOMP: nroRecibo + nroRecibo2,
-                                                    p_ASIENTOSEC: numeroAsientoSecundario,
-                                                    p_IDOPERACIONMP: null,
-                                                    p_USUARIO: user,
-                                                    p_RET: null        
-                                                }
-                                            }).then(async (data) => { 
-                                                if(data[2][0]['@result1'] === 0){
-                                                
-                                                     t.rollback()
-                                                }else{
-                                                try {
-                                                await dbGiama.query(`SET @result2 = 0; CALL net_abm_movimientocontable(
-                                                    :p_ACCION,
-                                                    :p_ID,
-                                                    :p_FECHA,
-                                                    :p_NROASIENTO,
-                                                    :p_CUENTA,
-                                                    :p_DH,
-                                                    :p_IMPORTE,
-                                                    :p_CONCEPTO,
-                                                    :p_MARCA,
-                                                    :p_OPERACION,
-                                                    :p_OPPRESOL,
-                                                    :p_TIPOCOMP,
-                                                    :p_NROCOMP,
-                                                    :p_ASIENTOSEC,
-                                                    :p_IDOPERACIONMP,
-                                                    :p_USUARIO,
-                                                    @result2); SELECT @result2;`, {
-                                                        multipleStatements: true,
-                                                        type: QueryTypes.SELECT,
-                                                        transaction: t,
-                                                        replacements: 
-                                                        {
-                                                            p_ACCION: 'A',
-                                                            p_ID: null,
-                                                            p_FECHA: FechaAlta.split('-').join(''),
-                                                            p_NROASIENTO: numeroAsiento,
-                                                            p_CUENTA: codigoCuentaSeña,
-                                                            p_DH: 'H',
-                                                            p_IMPORTE: importeAbonado,
-                                                            p_CONCEPTO:`Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
-                                                            p_MARCA: codigoMarca,
-                                                            p_OPERACION: null,
-                                                            p_OPPRESOL: numeroPreSol,
-                                                            p_TIPOCOMP: 'RCP',
-                                                            p_NROCOMP: nroRecibo + nroRecibo2,
-                                                            p_ASIENTOSEC: numeroAsientoSecundario,
-                                                            p_IDOPERACIONMP: null,
-                                                            p_USUARIO: user,
-                                                            p_RET: null        
-                                                        }
-                                                    }).then(async (data) => {
-                                                        if(data[2][0]['@result2'] === 0){
-                                                            t.rollback()
-                                                        }else{
-                                                            try {
-                                                            await dbGiama.query(`SET @result3 = 0; CALL net_abm_movimientocontable2(
-                                                            :p_ACCION,
-                                                            :p_ID,
-                                                            :p_FECHA,
-                                                            :p_NROASIENTO,
-                                                            :p_CUENTA,
-                                                            :p_DH,
-                                                            :p_IMPORTE,
-                                                            :p_CONCEPTO,
-                                                            :p_MARCA,
-                                                            :p_OPERACION,
-                                                            :p_OPPRESOL,
-                                                            :p_TIPOCOMP,
-                                                            :p_NROCOMP,
-                                                            :p_NROASIENTORENUM,
-                                                            :p_IDOPERACIONMP,
-                                                            :p_USUARIO,
-                                                            @result3
-                                                            ); SELECT @result3;`,{
-                                                            multipleStatements: true,
-                                                            type: QueryTypes.SELECT,
-                                                            transaction: t,
-                                                            replacements:{
-                                                            p_ACCION: 'A',
-                                                            p_ID: null,
-                                                            p_FECHA: FechaAlta.split('-').join(''),
-                                                            p_NROASIENTO: numeroAsientoSecundario,
-                                                            p_CUENTA: cuentaSecundaria,
-                                                            p_DH: 'D',
-                                                            p_IMPORTE: cuentaContable === codigoCuentaEfvo ? ValorCuotaTerm : importeAbonado,
-                                                            p_CONCEPTO: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
-                                                            p_MARCA: codigoMarca,
-                                                            p_OPERACION: null,
-                                                            p_OPPRESOL: numeroPreSol,
-                                                            p_TIPOCOMP: 'RCP',
-                                                            p_NROCOMP: nroRecibo + nroRecibo2,
-                                                            p_NROASIENTORENUM: numeroAsientoSecundario,
-                                                            p_IDOPERACIONMP: null,
-                                                            p_USUARIO: user,
-                                                            p_RET: null 
-                                                            }
-                                                            }).then(async (data) => {
-                                                               if(data[2][0]['@result3'] === 0){
-                                                                   t.rollback()   
-                                                               }else{
-                                                                try {
-                                                            await dbGiama.query(`SET @result4 = 0; CALL net_abm_movimientocontable2(
-                                                            :p_ACCION,
-                                                            :p_ID,
-                                                            :p_FECHA,
-                                                            :p_NROASIENTO,
-                                                            :p_CUENTA,
-                                                            :p_DH,
-                                                            :p_IMPORTE,
-                                                            :p_CONCEPTO,
-                                                            :p_MARCA,
-                                                            :p_OPERACION,
-                                                            :p_OPPRESOL,
-                                                            :p_TIPOCOMP,
-                                                            :p_NROCOMP,
-                                                            :p_NROASIENTORENUM,
-                                                            :p_IDOPERACIONMP,
-                                                            :p_USUARIO,
-                                                            @result4
-                                                            ); SELECT @result4;`,{
-                                                            multipleStatements: true,
-                                                            type: QueryTypes.SELECT,
-                                                            transaction: t,
-                                                            replacements:{
-                                                            p_ACCION: 'A',
-                                                            p_ID: null,
-                                                            p_FECHA: FechaAlta.split('-').join(''),
-                                                            p_NROASIENTO: numeroAsientoSecundario,
-                                                            p_CUENTA: codigoCuentaSecundariaSeña,
-                                                            p_DH: 'H',
-                                                            p_IMPORTE: cuentaContable === codigoCuentaEfvo ? ValorCuotaTerm : importeAbonado,
-                                                            p_CONCEPTO: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
-                                                            p_MARCA: codigoMarca,
-                                                            p_OPERACION: null,
-                                                            p_OPPRESOL: numeroPreSol,
-                                                            p_TIPOCOMP: 'RCP',
-                                                            p_NROCOMP: nroRecibo + nroRecibo2,
-                                                            p_NROASIENTORENUM: numeroAsientoSecundario,
-                                                            p_IDOPERACIONMP: null,
-                                                            p_USUARIO: user,
-                                                            p_RET: null 
-                                                            }
-                                                            }).then(async (data) => {
-                                                                if(data[2][0]['@result4'] === 0){
-                                                                    t.rollback()
-                                                                }else{
-                                                                    try {
-                                                                        await dbGiama.query(`
-                                                                        SET @result5 = 0;
-                                                                        CALL net_abmsenias(
-                                                                        :p_ACCION,
-                                                                        :p_MARCA,
-                                                                        :p_NUMERO,
-                                                                        :p_IMPORTE,
-                                                                        :p_FECHA,
-                                                                        :p_FORMA,
-                                                                        :p_FECHACH,
-                                                                        :p_NRORECIBO,
-                                                                        :p_CODTARJETA,
-                                                                        :p_FECHACUPON,
-                                                                        :p_NROTARJETA,
-                                                                        :p_NROCUPON,
-                                                                        :p_LOTE,
-                                                                        :p_ID,
-                                                                        :p_CANTpagos,
-                                                                        :p_INTERES,
-                                                                        :p_NROASIENTO,
-                                                                        @result5);
-                                                                        SELECT @result5;
-                                                                        `,{
-                                                                        multipleStatements: true,
-                                                                        type: QueryTypes.SELECT,
-                                                                        transaction: t,
-                                                                        replacements:{
-                                                                            p_ACCION: 'A',
-                                                                            p_MARCA: codigoMarca,
-                                                                            p_NUMERO: numeroPreSol,
-                                                                            p_IMPORTE: importeAbonado,
-                                                                            p_FECHA: FechaAlta,
-                                                                            p_FORMA: FormaDePago,
-                                                                            p_FECHACH: FechaCheque ? FechaCheque : null,
-                                                                            p_NRORECIBO: nroRecibo + nroRecibo2,
-                                                                            p_CODTARJETA: Tarjeta ? Tarjeta : null,
-                                                                            p_FECHACUPON: fechaCupon ? fechaCupon : null,
-                                                                            p_NROTARJETA: nroTarjeta ? nroTarjeta.slice(nroTarjeta.length - 4) : null,
-                                                                            p_NROCUPON: nroCupon ? nroCupon : null,
-                                                                            p_LOTE: lote ? lote : null,
-                                                                            p_ID: null,
-                                                                            p_CANTpagos: CantPagos ? CantPagos : null,
-                                                                            p_INTERES: Interes ? Interes : null,
-                                                                            p_NROASIENTO: numeroAsiento,
-                                                                            p_RET: null 
-                                                                            
-                                                                            }
-                                                                        }).then(async (data) => {
-                                                                            if(data[2][0]['@result5'] === 0){
-                                                                                console.log(data)
-                                                                                t.rollback()
-                                                                            }else{
-                                                                                try {
-                                                                                   await dbGiama.query(`
-                                                                                    SET @result6 = 0;
-                                                                                    CALL pa5_addrecordobservacionespresol(
-                                                                                    :p_varCODIGOMARCA,
-                                                                                    :p_varOPERACION,
-                                                                                    :p_varFECHA,
-                                                                                    :p_varOBS,
-                                                                                    :p_USUARIO,
-                                                                                    @result6
-                                                                                    );
-                                                                                    SELECT @result6;`,{
-                                                                                    multipleStatements: true,
-                                                                                    type: QueryTypes.SELECT,
-                                                                                    transaction: t,
-                                                                                    replacements:{    
-                                                                                    p_varCODIGOMARCA: codigoMarca,
-                                                                                    p_varOPERACION: numeroPreSol,
-                                                                                    p_varFECHA: hoy,
-                                                                                    p_varOBS: "Pre-Solicitud dada de alta el día " + hoy + ".",
-                                                                                    p_USUARIO: user,
-                                                                                    p_RET: null   
-                                                                                    }
-                                                                                    }).then((data) => {
-                                                                                        console.log('DATA OBS: ', data)
-                                                                                        t.rollback()
-                                                                                    })
-                                                                                } catch (error) {
-                                                                                    t.rollback()
-                                                                                    console.log(error)
-                                                                                }
+}
 
-                                                                            }
-                                                                                
-                                                                            
-                                                                        })
-                                                                        
-                                                                    } catch (error) {
-                                                                        console.log(error)
-                                                                        t.rollback()
-                                                                    }
-                                                                }
-                                                            })
-                                                                } catch (error) {
-                                                                    console.log(error)
-                                                                    t.rollback()
-                                                                }
-                                                               }
-                                                            })
-                                                            } catch (error) {
-                                                                t.rollback()
-                                                                console.log(error)
-                                                            }
-                                                        }
-                                                    })
-                                                        
-                                                    } catch (error) {
-                                                        t.rollback()
-                                                        console.log(error)
-                                                    }
-                                                }
+} catch (error) {
+console.log('cPlanCuentas seña', error)
+}
 
-                                            })
-                                            } catch (error) {
-                                                console.log(error)
-                                                t.rollback()
-                                            }
-                                        
-                                         })
-                                    } catch (error) {
-                                        console.log(error)
-                                        t.rollback()
-                                    }
-                                    })
-                            } catch (error) {
-                                console.log(error)
-                                t.rollback()
-                                return res.send({status: false, message: 'Ha habido un error'})
-                            }
-                            
-                        }else{ //SI NO CONTABILIZA
-                            try {
-                                await dbGiama.query(`
-                                SET @result5 = 0;
-                                CALL net_abmsenias(
-                                :p_ACCION,
-                                :p_MARCA,
-                                :p_NUMERO,
-                                :p_IMPORTE,
-                                :p_FECHA,
-                                :p_FORMA,
-                                :p_FECHACH,
-                                :p_NRORECIBO,
-                                :p_CODTARJETA,
-                                :p_FECHACUPON,
-                                :p_NROTARJETA,
-                                :p_NROCUPON,
-                                :p_LOTE,
-                                :p_ID,
-                                :p_CANTpagos,
-                                :p_INTERES,
-                                :p_NROASIENTO,
-                                @result5);
-                                SELECT @result5;
-                                `,{
-                                multipleStatements: true,
-                                type: QueryTypes.SELECT,
-                                transaction: t,
-                                replacements:{
-                                    p_ACCION: 'A',
-                                    p_MARCA: codigoMarca,
-                                    p_NUMERO: numeroPreSol,
-                                    p_IMPORTE: importeAbonado,
-                                    p_FECHA: FechaAlta,
-                                    p_FORMA: FormaDePago,
-                                    p_FECHACH: FechaCheque ? FechaCheque : null,
-                                    p_NRORECIBO: nroRecibo + nroRecibo2,
-                                    p_CODTARJETA: Tarjeta ? Tarjeta : null,
-                                    p_FECHACUPON: fechaCupon ? fechaCupon : null,
-                                    p_NROTARJETA: nroTarjeta ? nroTarjeta.slice(nroTarjeta.length - 4) : null,
-                                    p_NROCUPON: nroCupon ? nroCupon : null,
-                                    p_LOTE: lote ? lote : null,
-                                    p_ID: null,
-                                    p_CANTpagos: CantPagos ? CantPagos : null,
-                                    p_INTERES: Interes ? Interes : null,
-                                    p_NROASIENTO: null,
-                                    p_RET: null 
-                                    
-                                    }
-                                }).then(async (data) => {
-                                    if(data[2][0]['@result5'] === 0){
-                                                                                
-                                       try {
-                                        
-                                       } catch (error) {
-                                        
-                                       }
-                                    }else{
-                                        t.rollback()
-                                    }
-                                })
-                                
-                            } catch (error) {
-                                t.rollback()
-                            }
-                        }
-                })
-                
-                return res.send({status: true, message: 'Pre-Solicitud añadida correctamente!'})
+try {
 
-            } catch (error) {
-                console.log(error)
-                t.rollback()
-                return res.send({status: false, message: 'Ha habido un error'})
-            }
-        })
-            
-       
+dbGiama.query(`SET @a = 0; CALL net_getproxinumeropresol(@a); SELECT @a;`, { //OBTENGO NUMERO DE PRESOLICITUD
+multipleStatements: true,
+type: QueryTypes.SELECT
+}).then(async (data) => {
+const numeroPreSol = data[2][0]["@a"]
 
-    } catch (error) {
-        console.log(error)
-        return res.send({status: false, messsage: 'Ha habido un error'})
-    }
+try {
+
+abmPreSol({
+    dbGiama: dbGiama, t: t, codigoMarca: codigoMarca, numeroPreSol: numeroPreSol, FechaAlta: FechaAlta,
+    Solicitud: Solicitud, Apellido: Apellido, Nombre: Nombre, Calle: Calle, Localidad: Localidad, TelefParticular: TelefParticular,
+    Vendedor: Vendedor, puntoVenta: puntoVenta, Modelo: Modelo, ValorCuotaTerm: ValorCuotaTerm, TotalCuota: TotalCuota,
+    FechaCancelacionSaldo: FechaCancelacionSaldo, DNI: DNI, Mail: Mail, Anexos: Anexos, Supervisor: Supervisor,
+    OficialCanje: OficialCanje, origenSuscripcion: origenSuscripcion, debAutom: debAutom, Documento: Documento, DocumentoNro: DocumentoNro,
+    Precio: Precio, TipoPlan: TipoPlan, TelefCelular: TelefCelular, TelefLaboral: TelefLaboral, promoEspecial: promoEspecial,
+    Sucursal: Sucursal, nroRecibo: nroRecibo, nroRecibo2: nroRecibo2, Numero: Numero, Piso: Piso, Dto: Dto, CodPostal: CodPostal,
+    Provincia: Provincia, TelefFamiliar: TelefFamiliar, EmailParticular: EmailParticular, EmailLaboral: EmailLaboral,
+    Nacimiento: Nacimiento, Ocupacion: Ocupacion, CondIva: CondIva, TeamLeader: TeamLeader, user: user, CUIL: CUIL
+})
+.then(async () => {
+if(
+(codEmpresa === 1 && codigoMarca === 2 && cuentaContable !== null) ||
+(codEmpresa === 14 && codigoMarca === 10 && cuentaContable !== null) ||
+(codEmpresa === 15 && codigoMarca === 12 && cuentaContable !== null)) { //SI CONTABILIZA
+
+try {
+
+await dbGiama.query(`SET @b = 0; CALL net_getnumeroasiento(@b); SELECT @b;`, {
+    multipleStatements: true,
+    type: QueryTypes.SELECT,
+    transaction: t
+}).then(async (data) => {
+
+const numeroAsiento = data[2][0]["@b"]
+
+try {
+await dbGiama.query(`SET @c = 0; CALL net_getnumeroasientosecundario(@c); SELECT @c;`, {
+multipleStatements: true,
+type: QueryTypes.SELECT,
+transaction: t
+}).then(async (data) => {
+const numeroAsientoSecundario = data[2][0]["@c"]
+
+try {
+abmMovimientoContable({
+    dbGiama: dbGiama, Accion: 'A', ID: null, FechaAlta: FechaAlta, numeroAsiento: numeroAsiento,
+    cuenta: cuentaContable, DH: 'D', importeAbonado: importeAbonado, Solicitud: Solicitud, numeroPreSol: numeroPreSol,
+    codigoMarca: codigoMarca, tipoComp: 'RCP', nroRecibo: nroRecibo, nroRecibo2: nroRecibo2,
+    numeroAsientoSecundario: numeroAsientoSecundario, user: user, IDOPERACIONMP: null, t: t
+})
+.then(async (data) => {
+if (data[2][0]['@result1'] === 0) {
+
+t.rollback()
+} else {
+try {
+abmMovimientoContable({
+    dbGiama: dbGiama, Accion: 'A', ID: null, FechaAlta: FechaAlta, numeroAsiento: numeroAsiento,
+    cuenta: codigoCuentaSeña, DH: 'H', importeAbonado: importeAbonado, Solicitud: Solicitud, numeroPreSol: numeroPreSol,
+    codigoMarca: codigoMarca, tipoComp: 'RCP', nroRecibo: nroRecibo, nroRecibo2: nroRecibo2,
+    numeroAsientoSecundario: numeroAsientoSecundario, user: user, IDOPERACIONMP: null, t: t
+})
+.then(async (data) => {
+if (data[2][0]['@result2'] === 0) {
+t.rollback()
+} else {
+try {
+abmMovimientoContable2({
+    dbGiama: dbGiama, t: t, Accion: 'A', ID: null, FechaAlta: FechaAlta,
+    numeroAsiento: numeroAsientoSecundario, cuenta: cuentaSecundaria, DH: 'D', cuentaContable: cuentaContable,
+    codigoCuentaEfvo: codigoCuentaEfvo, ValorCuotaTerm: ValorCuotaTerm, importeAbonado: importeAbonado,
+    Solicitud: Solicitud, numeroPreSol: numeroPreSol, codigoMarca: codigoMarca, Operacion: null,
+    OPPRESOL: numeroPreSol, tipoComp: 'RCP', nroRecibo: nroRecibo, nroRecibo2: nroRecibo2, IDOPERACIONMP: null,
+    user: user
+})
+
+.then(async (data) => {
+if (data[2][0]['@result3'] === 0) {
+t.rollback()
+} else {
+try {
+abmMovimientoContable2({
+    dbGiama: dbGiama, t: t, Accion: 'A', ID: null, FechaAlta: FechaAlta,
+    numeroAsiento: numeroAsientoSecundario, cuenta: codigoCuentaSecundariaSeña, DH: 'D', cuentaContable: cuentaContable,
+    codigoCuentaEfvo: codigoCuentaEfvo, ValorCuotaTerm: ValorCuotaTerm, importeAbonado: importeAbonado,
+    Solicitud: Solicitud, numeroPreSol: numeroPreSol, codigoMarca: codigoMarca, Operacion: null,
+    OPPRESOL: numeroPreSol, tipoComp: 'RCP', nroRecibo: nroRecibo, nroRecibo2: nroRecibo2, IDOPERACIONMP: null,
+    user: user
+})
+
+.then(async (data) => {
+if (data[2][0]['@result4'] === 0) {
+t.rollback()
+} else {
+
+try {
+abmSenia({
+    dbGiama: dbGiama, t: t, Accion: 'A', codigoMarca: codigoMarca, numero: numeroPreSol,
+    importe: importeAbonado, fecha: FechaAlta, forma: FormaDePago, codTarjeta: Tarjeta ? Tarjeta : null,
+    FechaCheque: FechaCheque ? FechaCheque : null, nroRecibo: nroRecibo + nroRecibo2,
+    nroTarjeta: nroTarjeta ? nroTarjeta : null, nroCupon: nroCupon ? nroCupon : null,
+    fechaCupon: fechaCupon ? fechaCupon : null,
+    lote: lote, ID: null, cantPagos: CantPagos ? CantPagos : null, interes: Interes ? Interes : null,
+    nroAsiento: numeroAsiento,
+})
+.then(async (data) => {
+if (data[2][0]['@result5'] === 0) {
+console.log(data)
+t.rollback()
+} else {  //OBSERVACIONES 
+try {
+addRecordObservacionPreSol({
+    dbGiama: dbGiama, t: t, codigoMarca: codigoMarca,
+    operacion: numeroPreSol, fecha: hoy, obs: "Pre-Solicitud dada de alta el día " + hoy + ".",
+    user: user
+})
+.then(async (data) => {
+if (data[2][0]['@result6'] === 0) {
+t.rollback()
+} else {
+if (solicitudesDoc.length) {
+try {
+addRecordObservacionPreSol({
+    dbGiama: dbGiama, t: t, codigoMarca: codigoMarca,
+    operacion: numeroPreSol, fecha: hoy, obs: `El cliente posee la(s) siguiente(s) Operaciones(es): 
+    ${solicitudesDoc.map(e => ` Solicitud: ${e.Solicitud} Empresa: ${e.Empresa}`)}`,
+    user: user})
+.then(async (data) => {
+if (data[2][0]['@result7'] === 0) {
+
+t.rollback()
+} else {
+
+if (dtoSuscriptor.PresoSN === 1) {
+setObsPreSolByEmpresa({
+    dbGiama: dbGiama, t: t, codigoMarca: dtoSuscriptor.Marca,
+    operacion: dtoSuscriptor.Codigo, fecha: hoy,
+    obs: `"El cliente ingreso una nueva solicitud en fecha: "  ${hoy}  " Nro. Solicitud: "  ${dtoSuscriptor.Solicitud}  " Empresa: "  ${solicitudesDoc.find(e => e.Solicitud === dtoSuscriptor.Solicitud).Empresa}`,
+    user: user, empresa: dtoSuscriptor.Empresa})
+.then((data) => {
+console.log(data)
+t.rollback()
+})
+} else {
+grabarObsByEmpresa({
+    dbGiama: dbGiama, t: t, codigoMarca: dtoSuscriptor.Marca,
+    operacion: dtoSuscriptor.Codigo, fecha: hoy,
+    obs: "El cliente ingreso una nueva solicitud en fecha: " + hoy + " Nro. Solicitud: " + dtoSuscriptor.Solicitud + " Empresa: " + solicitudesDoc.find(e => e.Solicitud === dtoSuscriptor.Solicitud).Empresa,
+    user: user, fechaLlamado: null, resaltado: null, automatica: 1, empresa: dtoSuscriptor.Empresa})
+.then((data) => {
+console.log(data)
+t.rollback()})
+}
+}
+
+})
+
+} catch (error) {
+console.log('observacion2', error)
+t.rollback()
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+}
+}
+})
+} catch (error) {
+t.rollback()
+console.log('observacion1', error)
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+}
+})
+
+} catch (error) {
+console.log('seña', error)
+t.rollback()
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+}
+})
+} catch (error) {
+console.log('movimientoContable2', error)
+t.rollback()
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+}
+})
+} catch (error) {
+t.rollback()
+console.log('movimientoContable2', error)
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+}
+})
+
+} catch (error) {
+t.rollback()
+console.log('movimientoContable1', error)
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+}
+
+})
+} catch (error) {
+console.log('movimientoContable1', error)
+t.rollback()
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+
+})
+} catch (error) {
+console.log('getNumeroAsientoSecundario', error)
+t.rollback()
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+})
+} catch (error) {
+console.log('getNumeroAsiento', error)
+t.rollback()
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+
+} else { //SI NO CONTABILIZA
+try {
+abmSenia({
+    dbGiama: dbGiama, t: t, Accion: 'A', codigoMarca: codigoMarca, numero: numeroPreSol,
+    importe: importeAbonado, fecha: FechaAlta, forma: FormaDePago, codTarjeta: Tarjeta ? Tarjeta : null,
+    FechaCheque: FechaCheque ? FechaCheque : null, nroRecibo: nroRecibo + nroRecibo2,
+    nroTarjeta: nroTarjeta ? nroTarjeta : null, nroCupon: nroCupon ? nroCupon : null,
+    fechaCupon: fechaCupon ? fechaCupon : null,
+    lote: lote, ID: null, cantPagos: CantPagos ? CantPagos : null, interes: Interes ? Interes : null,
+    nroAsiento: null,
+})
+.then(async (data) => {
+if (data[2][0]['@result5'] === 0) {
+t.rollback()
+
+} else {
+try {
+addRecordObservacionPreSol({
+    dbGiama: dbGiama, t: t, codigoMarca: codigoMarca,
+    operacion: numeroPreSol, fecha: hoy, obs: "Pre-Solicitud dada de alta el día " + hoy + ".",
+    user: user
+})
+.then(async (data) => {
+if (data[2][0]['@result6'] === 0) {
+t.rollback()
+} else {
+if (solicitudesDoc.length) {
+try {
+addRecordObservacionPreSol({
+    dbGiama: dbGiama, t: t, codigoMarca: codigoMarca,
+    operacion: numeroPreSol, fecha: hoy, obs: `El cliente posee la(s) siguiente(s) Operaciones(es): 
+    ${solicitudesDoc.map(e => ` Solicitud: ${e.Solicitud} Empresa: ${e.Empresa}`)}`,
+    user: user
+})
+.then(async (data) => {
+if (data[2][0]['@result7'] === 0) {
+
+t.rollback()
+} else {
+
+if (dtoSuscriptor.PresoSN === 1) {
+setObsPreSolByEmpresa({
+    dbGiama: dbGiama, t: t, codigoMarca: dtoSuscriptor.Marca,
+    operacion: dtoSuscriptor.Codigo, fecha: hoy,
+    obs: `El cliente ingreso una nueva solicitud en fecha: "  ${hoy}  " Nro. Solicitud: "  ${dtoSuscriptor.Solicitud}  " Empresa: "  ${solicitudesDoc.find(e => e.Solicitud === dtoSuscriptor.Solicitud).Empresa}`,
+    user: user, empresa: dtoSuscriptor.Empresa
+}).then((data) => {
+console.log(data)
+t.rollback()
+})
+} else {
+grabarObsByEmpresa({
+    dbGiama: dbGiama, t: t, codigoMarca: dtoSuscriptor.Marca,
+    operacion: dtoSuscriptor.Codigo, fecha: hoy,
+    obs: "El cliente ingreso una nueva solicitud en fecha: " + hoy + " Nro. Solicitud: " + dtoSuscriptor.Solicitud + " Empresa: " + solicitudesDoc.find(e => e.Solicitud === dtoSuscriptor.Solicitud).Empresa,
+    user: user, fechaLlamado: null, resaltado: null, automatica: 1, empresa: dtoSuscriptor.Empresa
+})
+.then((data) => {
+console.log(data)
+t.rollback()
+})
+}
+}
+})
+
+} catch (error) {
+console.log('observacion2', error)
+t.rollback()
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+}
+}
+})
+
+} catch (error) {
+t.rollback()
+console.log('observacion 1', error)
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+}
+})
+
+} catch (error) {
+t.rollback()
+console.log('seña', error)
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+}
+})
+
+return res.send({ status: true, message: 'Pre-Solicitud añadida correctamente!' })
+
+} catch (error) {
+console.log('abmPreSol', error)
+t.rollback()
+return res.send({ status: false, message: 'Ha habido un error' })
+}
+})
+
+
+
+} catch (error) {
+console.log('proxiNumeroPreSol', error)
+return res.send({ status: false, messsage: 'Ha habido un error' })
+}
 
 }
 

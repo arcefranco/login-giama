@@ -22,7 +22,7 @@ export var queryListasPrecios = 'SELECT listasprecios.`Codigo`,listasprecios.`De
 
 export var queryModelosOnLista = 'SELECT modelos.Nombre, modelos.Codigo AS CodigoModelo, precios.Precio FROM listasprecios LEFT JOIN precios ON precios.Codigo = listasprecios.Codigo LEFT JOIN modelos ON modelos.Codigo = precios.CodigoModelo AND modelos.Marca = precios.Marca WHERE listasprecios.Codigo = ? AND listasprecios.Marca = ?'
 
-export var queryGetTarjetasAltaPre = `SELECT pre_formaspago.Codigo, pre_formaspago.Nombre, pre_formaspago.SolicitaCtaBancaria, pre_formaspago.SolicitaNroCheque, 
+export var queryGetFormasPagoAltaPre = `SELECT pre_formaspago.Codigo, pre_formaspago.Nombre, pre_formaspago.SolicitaCtaBancaria, pre_formaspago.SolicitaNroCheque, 
 pre_formaspago.CuentaContable, pre_formaspago.UsarEnMesaPlanesCompra, pre_formaspago.UsarEnMesaPlanesVta, pre_formaspago.UsarEnCompraProv, 
 pre_formaspago.UsarEnMesaPlanesCostos, 
 (CASE pre_formaspago.CuentaContable WHEN '' THEN '' ELSE c_plancuentas.CuentaSecundaria END) AS CtaSecundaria, pre_formaspago.C2, pre_formaspago.CtaDefCompraMP_C2, pre_formaspago.UsarEnHaberesNetosPagoVoucher, pre_formaspago.EsTarjeta, pre_formaspago.EsEfvo, 
