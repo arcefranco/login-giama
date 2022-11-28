@@ -4,7 +4,7 @@ require('dotenv').config()
 
 export const abmPreSol = async (body) => {
 
-const {dbGiama, t, codigoMarca, numeroPreSol, FechaAlta, 
+const {dbGiama, t, accion, codigoMarca, numeroPreSol, FechaAlta, 
     Solicitud, Apellido, Nombre, Calle, Localidad, TelefParticular, Vendedor, puntoVenta, 
     Modelo, ValorCuotaTerm, TotalCuota, FechaCancelacionSaldo,
     DNI, Mail, Anexos, Supervisor, OficialCanje, origenSuscripcion, debAutom,
@@ -83,7 +83,7 @@ const {dbGiama, t, codigoMarca, numeroPreSol, FechaAlta,
         `, {
             replacements: 
             {
-        p_Accion: 'A',
+        p_Accion: accion,
         p_Marca: codigoMarca,
         p_Numero: numeroPreSol,
         p_Fecha: FechaAlta,
@@ -132,7 +132,7 @@ const {dbGiama, t, codigoMarca, numeroPreSol, FechaAlta,
         p_EmailParticular: EmailParticular ? EmailParticular : null,
         p_EmailLaboral: EmailLaboral ? EmailLaboral : null,
         p_FechaNac: Nacimiento,
-        p_Ocupacion: Ocupacion,
+        p_Ocupacion: Ocupacion ? Ocupacion : null,
         p_DomicilioOcupacion:null,
         p_FechaIngresoTerminal:null,
         p_CuotaACobrarOriginal: TotalCuota,
@@ -419,4 +419,28 @@ export const grabarObsByEmpresa = async (body) => {
 
         return obsResult
 
+}
+
+export const getObsTelefonos = async (body) => {//A CORREGIR POR EMPRESAS
+    const {dbGiama, arrayTelefonos} = body
+    let result;
+    for(let i = 0; i<arrayTelefonos.length; i++){
+        
+      await dbGiama.query('CALL net_getObservacion_telefonos(:p_TELEFONO)', {
+            replacements:{
+                p_TELEFONO: arrayTelefonos[i]
+            }
+        }).then((data) => {
+            if(data[0] && Object.keys(data[0]) && !result){ //solo pisa result la primera vez que encuentra algo
+                console.log(data[0])
+                
+                result = data[0]
+            }
+        })
+        
+        
+    }
+
+    return result
+ 
 }
