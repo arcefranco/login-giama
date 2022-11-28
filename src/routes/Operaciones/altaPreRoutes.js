@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { altaPre, getFormasPago, getIntereses, getModeloPrecio, getModelos, getModeloValorCuota, getOficialCanje, getOrigenSuscripcion, 
+import { altaPre, getFechaMinimaCont, getFormasPago, getIntereses, getModeloPrecio, getModelos, getModeloValorCuota, getOficialCanje, getOrigenSuscripcion, 
     getPuntosVenta, getSucursales, getSupervisores, getTarjetas, getTeamLeaders, getVendedores, verifyDoc, verifySolicitud, verifySolicitudStatus } from '../../controllers/Operaciones/altaPreController';
 import authentication from '../../middlewares/authentication';
 import { testConnection } from '../../middlewares/testConnection';
@@ -21,6 +21,7 @@ altaPreRouter.route('/supervisores').get(getSupervisores)
 altaPreRouter.route('/intereses').get(getIntereses)
 altaPreRouter.route('/formaspago').get(getFormasPago)
 altaPreRouter.route('/origen').get(getOrigenSuscripcion)
+altaPreRouter.route('/fechaCont').post(getFechaMinimaCont)
 altaPreRouter.route('/verify').post(verifySolicitud)
 altaPreRouter.route('/solicitudStatus').post(verifySolicitudStatus)
 altaPreRouter.route('/getValorCuota').post(getModeloValorCuota)
