@@ -1,4 +1,4 @@
-import { HostNotFoundError, QueryTypes } from "sequelize";
+import {  QueryTypes } from "sequelize";
 import { queryGetFormasPagoAltaPre } from '../../queries'
 import { abmPreSol, abmMovimientoContable, abmMovimientoContable2, abmSenia, addRecordObservacionPreSol, setObsPreSolByEmpresa, grabarObsByEmpresa, getObsTelefonos } from '../../utils/Operaciones/solicitudesUtils'
 require('dotenv').config()

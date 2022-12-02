@@ -20,7 +20,7 @@ export const getModelos = async (req, res) => {
                 modelosvalorescuotas.tipoplan AS Codtipoplan, tipoplan.Descripcion AS Nomtipoplan, 
                 modelosvalorescuotas.CuotaTerminal, modelosvalorescuotas.CuotaACobrar, modelosvalorescuotas.CuotaACobrarA, 
                 modelosvalorescuotas.Cuota2, modelosvalorescuotas.Cuota1 
-                FROM pa7.modelos 
+                FROM modelos 
                 LEFT JOIN modelosvalorescuotas ON modelos.Marca = modelosvalorescuotas.Marca 
                 AND modelos.Codigo = modelosvalorescuotas.Codigo 
                 LEFT JOIN tipoplan ON modelosvalorescuotas.tipoplan = tipoplan.ID
@@ -32,9 +32,9 @@ export const getModelos = async (req, res) => {
 
 
 export const getModelosById = async (req, res) => {
-    const Modelos = req.body
+    const Modelos = req.body 
     const dbGiama = req.db
-    const {user} = req.usuario
+    const {user} = req.usuario 
     try {
 
         const tryModelo = await dbGiama.query('SELECT inUpdate from modelos WHERE Codigo = ?', {
@@ -244,7 +244,7 @@ export const deleteModelos = async (req, res, error) => {
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.18.3')
         if(!finded){
             return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
-        }
+        } 
     } catch (error) {
         console.log(error)
         return res.status(400).send({status: false, data: error})
