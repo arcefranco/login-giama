@@ -12,13 +12,13 @@ export const forgotPassword = async (req, res) => {
  const {username, empresa} = req.body //Tomo el nombre de usuario y lo busco en la DB
  console.log(empresa)
  let dbGiama = {}; 
- if(empresa === 'pa7'){
-   dbGiama.sequelize = new Sequelize('pa7', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+ if(empresa === 'pa7_cg'){
+   dbGiama.sequelize = new Sequelize('pa7_cg', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
      host: process.env.DB_HOST,
      dialect: process.env.DB_DIALECT
  })
- }else if(empresa === 'pa7_gf_test_2'){
-   dbGiama.sequelize = new Sequelize('pa7_gf_test_2', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+ }else if(empresa === 'pa7_elysees'){
+   dbGiama.sequelize = new Sequelize('pa7_elysees', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
      host: process.env.DB_HOST,
      dialect: process.env.DB_DIALECT
  })
@@ -84,7 +84,7 @@ export const updatePass = async (req, res) => { //Recibo su nueva contraseña y 
   replacements: [id],
   type: QueryTypes.SELECT
 }
-);
+); 
 
 if(user.length) {
   
