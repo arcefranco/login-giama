@@ -1,4 +1,5 @@
 import { QueryTypes } from "sequelize";
+import { queryGetFormasPagoAltaPre } from '../../queries'
 require('dotenv').config()
 
 
@@ -137,6 +138,51 @@ export const getPuntosVenta = async (req, res) => {
         ) 
 
         return res.send(puntos)
+
+    } catch (error) {
+        console.log(error)
+        return res.send({ status: false, data: error })
+    }
+
+}
+
+export const getParametros = async (req, res) => {
+    const dbGiama = req.db
+    let soli;
+    let sanu;
+
+    try {
+        soli = await dbGiama.query(`SELECT Valor FROM parametros WHERE Codigo = 'SOLI'`,{
+            type: QueryTypes.SELECT
+        })
+        
+    } catch (error) {
+
+        console.log(error)
+        return res.send({status: false, data: error})
+        
+    }
+
+    try {
+        sanu = await dbGiama.query(`SELECT Valor FROM parametros WHERE Codigo = 'SANU'`,{
+            type: QueryTypes.SELECT
+        })
+    } catch (error) {
+        console.log(error)
+        return res.send({status: false, data: error})
+    }
+
+    return res.send({status: true, data: {soli: parseInt(soli[0].Valor), sanu: parseInt(sanu[0].Valor)}})
+}
+
+export const getFormasPago = async (req, res) => {
+    const dbGiama = req.db
+    try {
+        const formasPago = await dbGiama.query(queryGetFormasPagoAltaPre, {
+            type: QueryTypes.SELECT
+        })
+
+        return res.send({ status: true, data: formasPago })
 
     } catch (error) {
         console.log(error)
