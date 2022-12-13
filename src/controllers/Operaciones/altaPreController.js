@@ -493,7 +493,7 @@ return res.send({ status: false, message: 'Ha habido un error' })
 
 if(
 (codEmpresa === 1 && codigoMarca === 2 && cuentaContable.length) ||
-(codEmpresa === 14 && codigoMarca === 10 && cuentaContable.length) ||
+(codEmpresa === 13 && codigoMarca === 10 && cuentaContable.length) ||
 (codEmpresa === 15 && codigoMarca === 12 && cuentaContable.length)) { //SI CONTABILIZA
 console.log('SI CONTABILIZA')
 
@@ -518,6 +518,7 @@ const numeroAsientoSecundario = data[2][0]["@c"]
 await abmMovimientoContable({
     dbGiama: dbGiama, Accion: 'A', ID: null, FechaAlta: FechaAlta, numeroAsiento: numeroAsiento,
     cuenta: cuentaContable, DH: 'D', importeAbonado: importeAbonado, Solicitud: Solicitud, numeroPreSol: numeroPreSol,
+    concepto: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
     codigoMarca: codigoMarca, tipoComp: 'RCP', nroRecibo: nroRecibo, nroRecibo2: nroRecibo2,
     numeroAsientoSecundario: numeroAsientoSecundario, user: user, IDOPERACIONMP: null, t: t
 })
@@ -530,17 +531,19 @@ t.rollback()
 await abmMovimientoContable({
     dbGiama: dbGiama, Accion: 'A', ID: null, FechaAlta: FechaAlta, numeroAsiento: numeroAsiento,
     cuenta: codigoCuentaSeña, DH: 'H', importeAbonado: importeAbonado, Solicitud: Solicitud, numeroPreSol: numeroPreSol,
+    concepto: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
     codigoMarca: codigoMarca, tipoComp: 'RCP', nroRecibo: nroRecibo, nroRecibo2: nroRecibo2,
     numeroAsientoSecundario: numeroAsientoSecundario, user: user, IDOPERACIONMP: null, t: t
 })
 .then(async (data) => {
-if (data[2][0]['@result2'] === 0) {
+if (data[2][0]['@result1'] === 0) {
 t.rollback()
 } else {
 
 await abmMovimientoContable2({
     dbGiama: dbGiama, t: t, Accion: 'A', ID: null, FechaAlta: FechaAlta,
     numeroAsiento: numeroAsientoSecundario, cuenta: cuentaSecundaria, DH: 'D', cuentaContable: cuentaContable,
+    concepto: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
     codigoCuentaEfvo: codigoCuentaEfvo, ValorCuotaTerm: ValorCuotaTerm, importeAbonado: importeAbonado,
     Solicitud: Solicitud, numeroPreSol: numeroPreSol, codigoMarca: codigoMarca, Operacion: null,
     OPPRESOL: numeroPreSol, tipoComp: 'RCP', nroRecibo: nroRecibo, nroRecibo2: nroRecibo2, IDOPERACIONMP: null,
@@ -555,6 +558,7 @@ t.rollback()
 await abmMovimientoContable2({
     dbGiama: dbGiama, t: t, Accion: 'A', ID: null, FechaAlta: FechaAlta,
     numeroAsiento: numeroAsientoSecundario, cuenta: codigoCuentaSecundariaSeña, DH: 'H', cuentaContable: cuentaContable,
+    concepto: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
     codigoCuentaEfvo: codigoCuentaEfvo, ValorCuotaTerm: ValorCuotaTerm, importeAbonado: importeAbonado,
     Solicitud: Solicitud, numeroPreSol: numeroPreSol, codigoMarca: codigoMarca, Operacion: null,
     OPPRESOL: numeroPreSol, tipoComp: 'RCP', nroRecibo: nroRecibo, nroRecibo2: nroRecibo2, IDOPERACIONMP: null,
@@ -562,7 +566,7 @@ await abmMovimientoContable2({
 })
 
 .then(async (data) => {
-if (data[2][0]['@result4'] === 0) {
+if (data[2][0]['@result3'] === 0) {
 t.rollback()
 } else {
 
