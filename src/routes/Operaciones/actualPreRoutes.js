@@ -1,6 +1,9 @@
 import { Router } from 'express';
+import authentication from '../../middlewares/authentication';
 import { getDatosPreSol, getModelos, getPreOperaciones, getOficialesMora, 
-    getOficialesPC, getOficialesScoring, getOrigenSuscripcion, getPuntosVenta, getParametros, getFormasPago } from '../../controllers/Operaciones/actualPreController';
+    getOficialesPC, getOficialesScoring, getOrigenSuscripcion, getPuntosVenta, getParametros, getFormasPago, 
+    getIntereses, getTarjetas, pagoSenia } from '../../controllers/Operaciones/actualPreController';
+
 import { testConnection } from '../../middlewares/testConnection';
 
 require('dotenv').config()
@@ -19,6 +22,9 @@ actualPreRouter.route('/origen').get(getOrigenSuscripcion)
 actualPreRouter.route('/puntosventa').get(getPuntosVenta)
 actualPreRouter.route('/parametros').get(getParametros)
 actualPreRouter.route('/formasPago').get(getFormasPago)
+actualPreRouter.route('/tarjetas').get(getTarjetas)
+actualPreRouter.route('/intereses').get(getIntereses)
+actualPreRouter.post('/pagoSenia', authentication, pagoSenia)
 
 
 export default actualPreRouter

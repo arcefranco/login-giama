@@ -161,7 +161,7 @@ const {dbGiama, t, accion, codigoMarca, numeroPreSol, FechaAlta,
 
 export const abmMovimientoContable = async (body) => {
     const {dbGiama, Accion, ID, FechaAlta, numeroAsiento, cuenta, DH, importeAbonado, Solicitud, numeroPreSol, 
-    codigoMarca, tipoComp, nroRecibo, nroRecibo2, numeroAsientoSecundario, user, IDOPERACIONMP, t} = body
+    codigoMarca, tipoComp, nroRecibo, nroRecibo2, numeroAsientoSecundario, user, IDOPERACIONMP, t, concepto} = body
 
     const movimientoResult = await dbGiama.query(`SET @result1 = 0; CALL net_abm_movimientocontable(
         :p_ACCION,
@@ -193,7 +193,7 @@ export const abmMovimientoContable = async (body) => {
                 p_CUENTA: cuenta,
                 p_DH: DH,
                 p_IMPORTE: importeAbonado,
-                p_CONCEPTO:`Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
+                p_CONCEPTO: concepto, //`Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
                 p_MARCA: codigoMarca,
                 p_OPERACION: null,
                 p_OPPRESOL: numeroPreSol,
@@ -215,7 +215,7 @@ export const abmMovimientoContable2 = async (body) => {
     const {dbGiama, t, Accion, ID, FechaAlta, numeroAsiento, cuenta, DH,
     cuentaContable, codigoCuentaEfvo, ValorCuotaTerm, importeAbonado, 
     Solicitud, numeroPreSol, codigoMarca, Operacion, OPPRESOL, tipoComp,
-    nroRecibo, nroRecibo2, IDOPERACIONMP, user} = body
+    nroRecibo, nroRecibo2, IDOPERACIONMP, user, concepto} = body
     
     const movimientoResult = await dbGiama.query(`SET @result3 = 0; CALL net_abm_movimientocontable2(
         :p_ACCION,
@@ -247,7 +247,7 @@ export const abmMovimientoContable2 = async (body) => {
         p_CUENTA: cuenta,
         p_DH: DH,
         p_IMPORTE: cuentaContable === codigoCuentaEfvo ? ValorCuotaTerm : importeAbonado,
-        p_CONCEPTO: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
+        p_CONCEPTO: concepto,//`Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
         p_MARCA: codigoMarca,
         p_OPERACION: Operacion,
         p_OPPRESOL: OPPRESOL,

@@ -1,5 +1,6 @@
 import { QueryTypes } from "sequelize";
 import { queryGetFormasPagoAltaPre } from '../../queries'
+import {abmSenia, abmMovimientoContable, abmMovimientoContable2} from '../../utils/Operaciones/solicitudesUtils'
 require('dotenv').config()
 
 
@@ -190,3 +191,223 @@ export const getFormasPago = async (req, res) => {
     }
 
 }
+
+export const getTarjetas = async (req, res) => {
+    const dbGiama = req.db
+    try {
+        const tarjetas = await dbGiama.query(`SELECT * FROM tarjetas`, {
+            type: QueryTypes.SELECT
+        }
+        )
+
+        return res.send({ status: true, data: tarjetas })
+
+    } catch (error) {
+        console.log(error)
+        return res.send({ status: false, data: error })
+    }
+
+}
+export const getIntereses = async (req, res) => {
+    const dbGiama = req.db
+    try {
+        const intereses = await dbGiama.query(`SELECT * ,cob.Nombre, cob.CuentaContable, cob.CtaSecundaria
+        FROM intereses LEFT JOIN
+            net_view_getmediosdecobro AS cob ON intereses.MedioCobro = cob.Codigo
+         AND intereses.Activo = 1
+        ORDER BY intereses.Cantidad`, {
+            type: QueryTypes.SELECT
+        }
+        )
+
+        return res.send({ status: true, data: intereses })
+
+    } catch (error) {
+        console.log(error)
+        return res.send({ status: false, data: error })
+    }
+
+}
+
+ export const pagoSenia = async (req, res) => { //NUEVA SEÑA
+    const dbGiama = req.db
+    const {user} = req.usuario
+    const {
+        accion,
+        Numero,
+        Solicitud,
+        codEmpresa,
+        codigoMarca,
+        cuentaContable,
+        impTotalAbonado,
+        ValorCuota,
+        Fecha,
+        Importe,
+        Interes,
+        ImpAbonado,
+        FormaDePago,
+        NroRecibo,
+        FechaVto,
+        Tarjeta,
+        NroTarjeta,
+        NroCupon,
+        FechaCupon,
+        Lote,
+        CantPagos} = req.body
+        const t = await dbGiama.transaction() 
+        let codigoCuentaSeña;
+        let codigoCuentaSecundariaSeña;
+        let codigoCuentaEfvo;
+        let cuentaSecundaria;
+        if (cuentaContable) {
+            await dbGiama.query('SELECT * FROM c_plancuentas WHERE Codigo = ?', {
+                replacements: [cuentaContable]
+        }).then((data) => {
+            cuentaSecundaria = data[0][0].CuentaSecundaria
+        })  //A CORREGIR POR EMPRESAS
+        }
+        if (cuentaContable) {
+            await dbGiama.query(`SELECT * FROM c_plancuentas WHERE codigoespecial IN('SEÑA','EFVO')`, {
+            type: QueryTypes.SELECT
+            }).then((data) => {
+                codigoCuentaEfvo = data[0].Codigo
+                codigoCuentaSeña = data[1].Codigo
+                codigoCuentaSecundariaSeña = data[1].CuentaSecundaria
+            })
+            
+            }
+
+        if((impTotalAbonado + ImpAbonado) > ValorCuota){
+            return res.send({status: false, data: 'El importe abonado no puede ser superior al importe total de la cuota'})
+        }else{
+
+            try {
+                
+        if(
+            (codEmpresa === 1 && codigoMarca === 2 && cuentaContable.length) ||
+            (codEmpresa === 13 && codigoMarca === 10 && cuentaContable.length) ||
+            (codEmpresa === 15 && codigoMarca === 12 && cuentaContable.length)){ //SI CONTABILIZA
+
+                await dbGiama.query(`SET @b = 0; CALL net_getnumeroasiento(@b); SELECT @b;`, {
+                    multipleStatements: true,
+                    type: QueryTypes.SELECT,
+                    transaction: t
+                }).then(async (data) => {
+                
+                const numeroAsiento = data[2][0]["@b"]
+                
+                
+                await dbGiama.query(`SET @c = 0; CALL net_getnumeroasientosecundario(@c); SELECT @c;`, {
+                multipleStatements: true,
+                type: QueryTypes.SELECT,
+                transaction: t
+                }).then(async (data) => {
+                const numeroAsientoSecundario = data[2][0]["@c"]
+
+                await abmMovimientoContable({
+                    dbGiama: dbGiama, Accion: 'A', ID: null, FechaAlta: Fecha, numeroAsiento: numeroAsiento,
+                    cuenta: cuentaContable, DH: 'D', importeAbonado: ImpAbonado, Solicitud: Solicitud, numeroPreSol: Numero,
+                    concepto:  `Pago Pre Solicitud ${Solicitud} - PreOperacion ${Numero}`,
+                    codigoMarca: codigoMarca, tipoComp: 'RCP', nroRecibo: NroRecibo.slice(0,4), nroRecibo2: NroRecibo.slice(4,12),
+                    numeroAsientoSecundario: numeroAsientoSecundario, user: user, IDOPERACIONMP: null, t: t
+                })
+                .then(async (data) => {
+                    if (data[2][0]['@result1'] === 0) {
+                    t.rollback()
+                    } else {
+                await abmMovimientoContable({
+                    dbGiama: dbGiama, Accion: 'A', ID: null, FechaAlta: Fecha, numeroAsiento: numeroAsiento,
+                    cuenta: codigoCuentaSeña, DH: 'H', importeAbonado: ImpAbonado, Solicitud: Solicitud, numeroPreSol: Numero,
+                    concepto: `Pago Pre Solicitud ${Solicitud}  - PreOperacion ${Numero}`,      
+                    codigoMarca: codigoMarca, tipoComp: 'RCP', nroRecibo: NroRecibo.slice(0,4), nroRecibo2: NroRecibo.slice(4,12),
+                    numeroAsientoSecundario: numeroAsientoSecundario, user: user, IDOPERACIONMP: null, t: t
+                })
+                .then(async (data) => {
+                    if (data[2][0]['@result1'] === 0) {
+                    t.rollback()
+                    } else {
+                        await abmMovimientoContable2({
+                            dbGiama: dbGiama, t: t, Accion: 'A', ID: null, FechaAlta: Fecha,
+                            numeroAsiento: numeroAsientoSecundario, cuenta: cuentaSecundaria, DH: 'D', cuentaContable: cuentaContable,
+                            codigoCuentaEfvo: codigoCuentaEfvo, ValorCuotaTerm: ImpAbonado, importeAbonado: ImpAbonado,
+                            concepto: `Pago Pre Solicitud ${Solicitud}  - PreOperacion ${Numero}`,
+                            Solicitud: Solicitud, numeroPreSol: Numero, codigoMarca: codigoMarca, Operacion: null,
+                            OPPRESOL: Numero, tipoComp: 'RCP', nroRecibo: NroRecibo.slice(0,4), nroRecibo2: NroRecibo.slice(4,12), 
+                            IDOPERACIONMP: null,
+                            user: user
+                        })
+                        .then(async (data) => {
+                            if (data[2][0]['@result3'] === 0) {
+                            t.rollback()
+                            } else {
+                                await abmMovimientoContable2({
+                                    dbGiama: dbGiama, t: t, Accion: 'A', ID: null, FechaAlta: Fecha,
+                                    numeroAsiento: numeroAsientoSecundario, cuenta: codigoCuentaSecundariaSeña, DH: 'H', cuentaContable: cuentaContable,
+                                    codigoCuentaEfvo: codigoCuentaEfvo, ValorCuotaTerm: ImpAbonado, importeAbonado: ImpAbonado,
+                                    concepto: `Pago Pre Solicitud ${Solicitud}  - PreOperacion ${Numero}`,
+                                    Solicitud: Solicitud, numeroPreSol: Numero, codigoMarca: codigoMarca, Operacion: null,
+                                    OPPRESOL: Numero, tipoComp: 'RCP', nroRecibo: NroRecibo.slice(0,4), nroRecibo2: NroRecibo.slice(4,12), 
+                                    IDOPERACIONMP: null,
+                                    user: user
+                                })
+                                .then(async (data) => {
+                                    if (data[2][0]['@result3'] === 0) {
+                                    t.rollback()
+                                    } else {
+                                        
+                                    await abmSenia({dbGiama: dbGiama, t: t, Accion: accion, codigoMarca: codigoMarca, numero: Numero,
+                                    importe: ImpAbonado, fecha: Fecha, forma: FormaDePago, codTarjeta: Tarjeta ? Tarjeta : null,
+                                    FechaCheque: FechaVto ? FechaVto : null, nroRecibo: NroRecibo,
+                                    nroTarjeta: NroTarjeta ? NroTarjeta : null, nroCupon: NroCupon ? NroCupon : null,
+                                    fechaCupon: FechaCupon ? FechaCupon : null,
+                                    lote: Lote, ID: null, cantPagos: CantPagos ? CantPagos : null, interes: Interes ? Interes : null,
+                                    nroAsiento: numeroAsiento})
+                                           .then(async (data) => {
+                                            if (data[2][0]['@result5'] === 0) {
+                                            console.log(data)
+                                            t.rollback()
+                                            } else {
+                                                t.commit()
+                                                return res.send({status: true, data: 'Seña agregada correctamente'})
+                                            } 
+                                        })
+                                            
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+                
+                    }
+                })
+                
+
+                })
+            })
+            }else{
+                await abmSenia({dbGiama: dbGiama, t: t, Accion: accion, codigoMarca: codigoMarca, numero: Numero,
+                    importe: ImpAbonado, fecha: Fecha, forma: FormaDePago, codTarjeta: Tarjeta ? Tarjeta : null,
+                    FechaCheque: FechaVto ? FechaVto : null, nroRecibo: NroRecibo,
+                    nroTarjeta: NroTarjeta ? NroTarjeta : null, nroCupon: NroCupon ? NroCupon : null,
+                    fechaCupon: FechaCupon ? FechaCupon : null,
+                    lote: Lote, ID: null, cantPagos: CantPagos ? CantPagos : null, interes: Interes ? Interes : null,
+                    nroAsiento: null})
+                           .then(async (data) => {
+                            if (data[2][0]['@result5'] === 0) {
+                            console.log(data)
+                            t.rollback()
+                            } else {
+                                t.commit()
+                                return res.send({status: true, data: 'Seña agregada correctamente'})
+                            } 
+                        })
+            }
+                
+            } catch (error) {
+                console.log(error)
+                return res.send({status: false, data: 'Hubo un problema'})
+            }
+        }
+
+} 
