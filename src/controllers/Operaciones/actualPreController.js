@@ -375,7 +375,7 @@ export const getIntereses = async (req, res) => {
                                 .then(async (data) => {
                                     if (data[2][0]['@result3'] === 0) {
                                     t.rollback()
-
+                                    }
                                 })
                             }
                         })
