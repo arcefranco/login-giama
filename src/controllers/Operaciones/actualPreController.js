@@ -225,7 +225,7 @@ export const getIntereses = async (req, res) => {
     } catch (error) {
         console.log(error)
         return res.send({ status: false, data: error })
-    }
+    } 
 
 }
 
