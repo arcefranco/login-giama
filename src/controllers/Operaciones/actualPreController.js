@@ -259,6 +259,7 @@ export const getIntereses = async (req, res) => {
         let codigoCuentaSecundariaSeña;
         let codigoCuentaEfvo;
         let cuentaSecundaria;
+
         let numeroAsiento;
         let numeroAsientoSecundario;
 
@@ -304,13 +305,16 @@ export const getIntereses = async (req, res) => {
                     
 
 
+
                 await dbGiama.query(`SET @b = 0; CALL net_getnumeroasiento(@b); SELECT @b;`, {
                     multipleStatements: true,
                     type: QueryTypes.SELECT,
                     transaction: t
                 }).then(async (data) => {
                 
+
                 numeroAsiento = data[2][0]["@b"]
+
                 
                 
                 await dbGiama.query(`SET @c = 0; CALL net_getnumeroasientosecundario(@c); SELECT @c;`, {
@@ -318,7 +322,9 @@ export const getIntereses = async (req, res) => {
                 type: QueryTypes.SELECT,
                 transaction: t
                 }).then(async (data) => {
+
                 numeroAsientoSecundario = data[2][0]["@c"]
+
 
                 await abmMovimientoContable({
                     dbGiama: dbGiama, Accion: 'A', ID: null, FechaAlta: Fecha, numeroAsiento: numeroAsiento,
@@ -369,7 +375,7 @@ export const getIntereses = async (req, res) => {
                                 .then(async (data) => {
                                     if (data[2][0]['@result3'] === 0) {
                                     t.rollback()
-                                    } 
+
                                 })
                             }
                         })
@@ -379,17 +385,21 @@ export const getIntereses = async (req, res) => {
                     }
                 })
                 
+
                 })
             })
             }
 
             await abmSenia({dbGiama: dbGiama, t: t, Accion: accion, codigoMarca: codigoMarca, numero: Numero,
+
                     importe: ImpAbonado, fecha: Fecha, forma: FormaDePago, codTarjeta: Tarjeta ? Tarjeta : null,
                     FechaCheque: FechaVto ? FechaVto : null, nroRecibo: NroRecibo,
                     nroTarjeta: NroTarjeta ? NroTarjeta : null, nroCupon: NroCupon ? NroCupon : null,
                     fechaCupon: FechaCupon ? FechaCupon : null,
                     lote: Lote, ID: null, cantPagos: CantPagos ? CantPagos : null, interes: Interes ? Interes : null,
+
                     nroAsiento: numeroAsiento ? numeroAsiento : null})
+
                            .then(async (data) => {
                             if (data[2][0]['@result5'] === 0) {
                             console.log(data)
@@ -399,6 +409,8 @@ export const getIntereses = async (req, res) => {
                                 return res.send({status: true, data: 'Seña agregada correctamente'})
                             } 
                         })
+
+
 
                 
             } catch (error) {
