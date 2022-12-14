@@ -259,34 +259,50 @@ export const getIntereses = async (req, res) => {
         let codigoCuentaSecundariaSeña;
         let codigoCuentaEfvo;
         let cuentaSecundaria;
-        if (cuentaContable) {
-            await dbGiama.query('SELECT * FROM c_plancuentas WHERE Codigo = ?', {
-                replacements: [cuentaContable]
-        }).then((data) => {
-            cuentaSecundaria = data[0][0].CuentaSecundaria
-        })  //A CORREGIR POR EMPRESAS
-        }
-        if (cuentaContable) {
-            await dbGiama.query(`SELECT * FROM c_plancuentas WHERE codigoespecial IN('SEÑA','EFVO')`, {
-            type: QueryTypes.SELECT
-            }).then((data) => {
-                codigoCuentaEfvo = data[0].Codigo
-                codigoCuentaSeña = data[1].Codigo
-                codigoCuentaSecundariaSeña = data[1].CuentaSecundaria
-            })
-            
-            }
+        let numeroAsiento;
+        let numeroAsientoSecundario;
 
-        if((impTotalAbonado + ImpAbonado) > ValorCuota){
+
+        if((impTotalAbonado + parseFloat(ImpAbonado)) > ValorCuota){
+            console.log(impTotalAbonado + parseFloat(ImpAbonado), ValorCuota)
             return res.send({status: false, data: 'El importe abonado no puede ser superior al importe total de la cuota'})
         }else{
 
-            try {
+        try {
                 
-        if(
-            (codEmpresa === 1 && codigoMarca === 2 && cuentaContable.length) ||
-            (codEmpresa === 13 && codigoMarca === 10 && cuentaContable.length) ||
-            (codEmpresa === 15 && codigoMarca === 12 && cuentaContable.length)){ //SI CONTABILIZA
+            if(
+                (codEmpresa === 1 && codigoMarca === 2 && cuentaContable.length) ||
+                (codEmpresa === 13 && codigoMarca === 10 && cuentaContable.length) ||
+                (codEmpresa === 15 && codigoMarca === 12 && cuentaContable.length)){ //SI CONTABILIZA
+
+                try {
+                    await dbGiama.query('SELECT * FROM c_plancuentas WHERE Codigo = ?', {
+                        replacements: [cuentaContable]
+                }).then((data) => {
+                    cuentaSecundaria = data[0][0].CuentaSecundaria
+                })  //A CORREGIR POR EMPRESAS
+                    
+                } catch (error) {
+                    console.log(error)
+                    
+                }
+
+                try {
+                    await dbGiama.query(`SELECT * FROM c_plancuentas WHERE codigoespecial IN('SEÑA','EFVO')`, {
+                    type: QueryTypes.SELECT
+                    }).then((data) => {
+                        codigoCuentaEfvo = data[0].Codigo
+                        codigoCuentaSeña = data[1].Codigo
+                        codigoCuentaSecundariaSeña = data[1].CuentaSecundaria
+                    })
+                    
+                } catch (error) {
+                    console.log(error)
+                }
+
+  
+                    
+
 
                 await dbGiama.query(`SET @b = 0; CALL net_getnumeroasiento(@b); SELECT @b;`, {
                     multipleStatements: true,
@@ -294,7 +310,7 @@ export const getIntereses = async (req, res) => {
                     transaction: t
                 }).then(async (data) => {
                 
-                const numeroAsiento = data[2][0]["@b"]
+                numeroAsiento = data[2][0]["@b"]
                 
                 
                 await dbGiama.query(`SET @c = 0; CALL net_getnumeroasientosecundario(@c); SELECT @c;`, {
@@ -302,7 +318,7 @@ export const getIntereses = async (req, res) => {
                 type: QueryTypes.SELECT,
                 transaction: t
                 }).then(async (data) => {
-                const numeroAsientoSecundario = data[2][0]["@c"]
+                numeroAsientoSecundario = data[2][0]["@c"]
 
                 await abmMovimientoContable({
                     dbGiama: dbGiama, Accion: 'A', ID: null, FechaAlta: Fecha, numeroAsiento: numeroAsiento,
@@ -353,26 +369,7 @@ export const getIntereses = async (req, res) => {
                                 .then(async (data) => {
                                     if (data[2][0]['@result3'] === 0) {
                                     t.rollback()
-                                    } else {
-                                        
-                                    await abmSenia({dbGiama: dbGiama, t: t, Accion: accion, codigoMarca: codigoMarca, numero: Numero,
-                                    importe: ImpAbonado, fecha: Fecha, forma: FormaDePago, codTarjeta: Tarjeta ? Tarjeta : null,
-                                    FechaCheque: FechaVto ? FechaVto : null, nroRecibo: NroRecibo,
-                                    nroTarjeta: NroTarjeta ? NroTarjeta : null, nroCupon: NroCupon ? NroCupon : null,
-                                    fechaCupon: FechaCupon ? FechaCupon : null,
-                                    lote: Lote, ID: null, cantPagos: CantPagos ? CantPagos : null, interes: Interes ? Interes : null,
-                                    nroAsiento: numeroAsiento})
-                                           .then(async (data) => {
-                                            if (data[2][0]['@result5'] === 0) {
-                                            console.log(data)
-                                            t.rollback()
-                                            } else {
-                                                t.commit()
-                                                return res.send({status: true, data: 'Seña agregada correctamente'})
-                                            } 
-                                        })
-                                            
-                                    }
+                                    } 
                                 })
                             }
                         })
@@ -382,17 +379,17 @@ export const getIntereses = async (req, res) => {
                     }
                 })
                 
-
                 })
             })
-            }else{
-                await abmSenia({dbGiama: dbGiama, t: t, Accion: accion, codigoMarca: codigoMarca, numero: Numero,
+            }
+
+            await abmSenia({dbGiama: dbGiama, t: t, Accion: accion, codigoMarca: codigoMarca, numero: Numero,
                     importe: ImpAbonado, fecha: Fecha, forma: FormaDePago, codTarjeta: Tarjeta ? Tarjeta : null,
                     FechaCheque: FechaVto ? FechaVto : null, nroRecibo: NroRecibo,
                     nroTarjeta: NroTarjeta ? NroTarjeta : null, nroCupon: NroCupon ? NroCupon : null,
                     fechaCupon: FechaCupon ? FechaCupon : null,
                     lote: Lote, ID: null, cantPagos: CantPagos ? CantPagos : null, interes: Interes ? Interes : null,
-                    nroAsiento: null})
+                    nroAsiento: numeroAsiento ? numeroAsiento : null})
                            .then(async (data) => {
                             if (data[2][0]['@result5'] === 0) {
                             console.log(data)
@@ -402,7 +399,7 @@ export const getIntereses = async (req, res) => {
                                 return res.send({status: true, data: 'Seña agregada correctamente'})
                             } 
                         })
-            }
+
                 
             } catch (error) {
                 console.log(error)
