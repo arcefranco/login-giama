@@ -302,7 +302,7 @@ export const abmSenia = async (body) => {
         p_IMPORTE: importe,
         p_FECHA: fecha,
         p_FORMA: forma,
-        p_FECHACH: FechaCheque,
+        p_FECHACH: FechaCheque ? FechaCheque : null,
         p_NRORECIBO: nroRecibo,
         p_CODTARJETA: codTarjeta,
         p_FECHACUPON: fechaCupon,

@@ -262,10 +262,23 @@ export const getIntereses = async (req, res) => {
 
         let numeroAsiento;
         let numeroAsientoSecundario;
+        try {
+            const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+                replacements: [user],
+                type: QueryTypes.SELECT
+    
+            })
+            const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.2.2.1')
+            if(!finded){
+                return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(400).send({status: false, data: error})
+        }
 
 
         if((impTotalAbonado + parseFloat(ImpAbonado)) > ValorCuota){
-            console.log(impTotalAbonado + parseFloat(ImpAbonado), ValorCuota)
             return res.send({status: false, data: 'El importe abonado no puede ser superior al importe total de la cuota'})
         }else{
 
@@ -419,4 +432,109 @@ export const getIntereses = async (req, res) => {
             }
         }
 
-} 
+}
+
+export const deletePago = async (req, res) => {
+
+    const dbGiama = req.db
+    const {user} = req.usuario
+    const {codigoMarca, ID} = req.body
+
+    try {
+        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+            replacements: [user],
+            type: QueryTypes.SELECT
+
+        })
+        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.2.2.3')
+        if(!finded){
+            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({status: false, data: error})
+    }
+
+    try {
+        
+        await abmSenia({dbGiama: dbGiama, t: null, Accion: 'B', codigoMarca: codigoMarca, numero: null,
+            importe: null, fecha: null, forma: null, codTarjeta: null,
+            FechaCheque: null, nroRecibo: null,
+            nroTarjeta:  null, nroCupon: null,
+            fechaCupon:  null,
+            lote: null, ID: ID, cantPagos: null, interes:  null,
+            nroAsiento: null})
+
+            return res.send({status: true, data: 'Seña eliminada correctamente!'})
+
+    } catch (error) {
+        console.log(error)
+        return res.send({status: false, data: error})
+    }
+
+
+}
+
+export const updatePago = async (req, res) => {
+
+    const dbGiama = req.db
+    const {user} = req.usuario
+    const {
+        codigoMarca, 
+        seniasFiltered,
+        CuotaACobrar,
+        Importe, 
+        Fecha,
+        Interes,
+        ImpAbonado,
+        FormaDePago,
+        NroRecibo,
+        FechaVto,
+        Tarjeta,
+        NroTarjeta,
+        NroCupon,
+        FechaCupon,
+        Lote,
+        CantPagos,  
+        ID} = req.body
+
+    try {
+        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
+            replacements: [user],
+            type: QueryTypes.SELECT
+
+        })
+        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.2.2.2')
+        if(!finded){
+            return res.status(500).send({status: false, data: 'No tiene permitido realizar esta acción'})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({status: false, data: error})
+    }
+
+    if((CuotaACobrar - seniasFiltered) < ImpAbonado){
+        console.log((CuotaACobrar - seniasFiltered), ImpAbonado)
+        return res.send({status: false, data: 'El importe abonado no puede ser superior al importe total de la cuota'})
+    }
+
+
+    try {
+        
+        await abmSenia({dbGiama: dbGiama, t: null, Accion: 'M', codigoMarca: codigoMarca, numero: null,
+            importe: Importe, fecha: Fecha, forma: FormaDePago, codTarjeta: Tarjeta,
+            FechaCheque: FechaVto, nroRecibo: NroRecibo,
+            nroTarjeta:  NroTarjeta, nroCupon: NroCupon,
+            fechaCupon:  FechaCupon,
+            lote: Lote, ID: ID, cantPagos: CantPagos, interes:  Interes,
+            nroAsiento: null})
+
+            return res.send({status: true, data: 'Seña actualizada correctamente!'})
+
+    } catch (error) {
+        console.log(error)
+        return res.send({status: false, data: error})
+    }
+
+
+}
