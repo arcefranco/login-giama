@@ -2,7 +2,7 @@ import { Router } from 'express';
 import authentication from '../../middlewares/authentication';
 import { getDatosPreSol, getModelos, getPreOperaciones, getOficialesMora, 
     getOficialesPC, getOficialesScoring, getOrigenSuscripcion, getPuntosVenta, getParametros, getFormasPago, 
-    getIntereses, getTarjetas, pagoSenia } from '../../controllers/Operaciones/actualPreController';
+    getIntereses, getTarjetas, pagoSenia, deletePago, updatePago } from '../../controllers/Operaciones/actualPreController';
 
 import { testConnection } from '../../middlewares/testConnection';
 
@@ -25,6 +25,8 @@ actualPreRouter.route('/formasPago').get(getFormasPago)
 actualPreRouter.route('/tarjetas').get(getTarjetas)
 actualPreRouter.route('/intereses').get(getIntereses)
 actualPreRouter.post('/pagoSenia', authentication, pagoSenia)
+actualPreRouter.post('/deletePago', authentication, deletePago)
+actualPreRouter.post('/updatePago', authentication, updatePago)
 
 
 export default actualPreRouter
