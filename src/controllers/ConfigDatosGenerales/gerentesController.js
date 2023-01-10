@@ -136,7 +136,7 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
     
  
  export const updateGerentes = async (req, res) => {
-    const gerentes = req.body;
+    const {Nombre, Activo, Codigo} = req.body;
     const dbGiama = req.db
     const {user} = req.usuario
     try {
@@ -154,18 +154,13 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
         console.log(error)
         return res.status(400).send({status: false, message: error})
     }
-    const Gerente = dbGiama.models.gerentes;
-    try{ await Gerente?.update(
-    {
-        Nombre: gerentes.Nombre,
-        Activo: gerentes.Activo,
-        UsuarioAltaRegistro: user,
-        inUpdate: null
-    }
-    ,{
-        where: {Codigo: gerentes.Codigo}
-    });
-    return res.send({status: true, message: 'Gerente actualizado correctamente!', codigo: gerentes.Codigo})
+
+    try{ 
+    await dbGiama.query('UPDATE gerentes SET Nombre = ?, Activo = ? WHERE Codigo = ?', {
+        replacements: [Nombre, Activo, Codigo],
+        type: QueryTypes.UPDATE
+    })
+    return res.send({status: true, message: 'Gerente actualizado correctamente!', codigo: Codigo})
         
     }
     catch(err) {
@@ -174,14 +169,18 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
 }
  
 
- export const deleteGerentes = async (req, res, error) => {
+ export const deleteGerentes = async (req, res) => {
     const {Codigo} = req.body;
     const dbGiama = req.db
 
     const Gerente = dbGiama.models.gerentes
-    try{await Gerente?.destroy({
-        where: {Codigo: Codigo} 
-        });
+    try{
+
+        await dbGiama.query("DELETE FROM gerentes WHERE Codigo = ?", {
+            replacements: [Codigo],
+            types: QueryTypes.DELETE
+        })
+
         return res.send({status: true, message: 'Gerente Borrado!'})
         }catch(err){
             console.log(err)
