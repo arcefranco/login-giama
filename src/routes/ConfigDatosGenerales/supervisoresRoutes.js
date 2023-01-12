@@ -23,7 +23,6 @@ SupervisoresRouter.delete('/', authentication, deleteSupervisores)
 
 //get gerentes, zonas
 SupervisoresRouter.route('/gerentes').get(getGerentes)
-/* SupervisoresRouter.route('/gerentesActivos').get(getGerentesActivos) */
 SupervisoresRouter.route('/zonas').get(getAllZonas)
 
 export default SupervisoresRouter
