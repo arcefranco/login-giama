@@ -7,16 +7,36 @@ require('dotenv').config()
 
 export const getSupervisores = async (req, res) => {
 
-        const dbGiama = req.db
-        const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Codigo` AS 'Gerente', NOT Inactivo AS Activo, zonas.`codigo` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo`  ")
+    try {
+        
+    const dbGiama = req.db
+    const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Codigo` AS 'Gerente', NOT Inactivo AS Activo, zonas.`codigo` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo`  ", {
+        type: QueryTypes.SELECT
+    })
+    
+    if(Array.isArray(allSupervisores)){
         res.send(allSupervisores)
+    }else{
+        res.send({status: false, message: 'Error al cargar supervisores'})
+    }
+
+    } catch (error) {
+        if(error.hasOwnProperty('sqlMessage')){
+            
+            res.send({status: false, message: JSON.stringify(error.sqlMessage)})
+        }else{
+            res.send({status: false, message: JSON.stringify(error)})
+        }
+    }
 
 }
 
 export const getSupervisoresActivos = async (req, res) => {
 
     const dbGiama = req.db
-    const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo` WHERE Inactivo = 0 ")
+    const allSupervisores = await dbGiama.query("SELECT sucursales.`Codigo` AS 'Codigo', sucursales.`Nombre`, sucursales.`Email`, EsMiniEmprendedor, ValorPromedioMovil, gerentes.`Nombre` AS 'Gerente', NOT Inactivo AS Activo, zonas.`Nombre` AS 'Zona' FROM sucursales LEFT JOIN gerentes ON sucursales.`Gerente` = gerentes.`Codigo` LEFT JOIN zonas ON sucursales.`Zona` = zonas.`codigo` WHERE Inactivo = 0 ", {
+        type: QueryTypes.SELECT
+    })
     res.send(allSupervisores)
 
 }
@@ -88,7 +108,7 @@ export const postSupervisores = async (req, res, error) => {
         }
     } catch (error) {
         console.log(error)
-        return res.send({status: false, message: error})
+        return res.send({status: false, message: error.name})
     } 
      
     if(!Nombre || !Email ) {
@@ -126,7 +146,7 @@ export const updateSupervisores = async (req, res) => {
         }
     } catch (error) {
         console.log(error)
-        return res.send({status: false, message: error})
+        return res.send({status: false, message: error.name})
     } 
     if(!Nombre || !Email ) {
         return res.send({status: false, message: 'Faltan campos'})
@@ -141,6 +161,7 @@ export const updateSupervisores = async (req, res) => {
     }
     catch(err) {
         console.log(err)
+        return res.send({status: false, message: err.name})
     }
 }
 
@@ -163,7 +184,7 @@ export const deleteSupervisores = async (req, res, error) => {
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, message: error})
+        return res.status(400).send({status: false, message: error.name})
     } 
     const Supervisor =  dbGiama.models.sucursales
     try{await Supervisor.destroy({
@@ -172,14 +193,34 @@ export const deleteSupervisores = async (req, res, error) => {
         return res.send({status: true, message: 'Supervisor Borrado!'})
         }catch(err){
             console.log(err)
+            return res.status(400).send({status: false, message: err.name})
         }
 }
 
 
 export const getAllZonas = async (req, res) => {
     const dbGiama = req.db
-    const result = await dbGiama.query("SELECT * from zonas")
-    res.send(result)
+    try {
+        const result = await dbGiama.query("SELECT * from zonas", {
+            type: QueryTypes.SELECT
+        })
+        if(Array.isArray(result)){
+    
+            res.send(result)
+        }else{
+    
+            res.send({status: false, message: 'Error al cargar las zonas'})
+        }
+        
+    } catch (error) {
+        if(error.hasOwnProperty('sqlMessage')){
+            
+            res.send({status: false, message: JSON.stringify(error.sqlMessage)})
+        }else{
+            res.send({status: false, message: JSON.stringify(error)})
+        }
+    
+    }
 }
    
  
