@@ -10,17 +10,36 @@ require('dotenv').config()
 
 export const getTeamLeaders = async (req, res) => {
 
-        const dbGiama = req.db
-        // const allTeamLeaders = await dbGiama.query("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre' ,  sucursales.`Nombre` AS 'Supervisor', NOT Inactivo AS Activo,  FROM teamleader LEFT JOIN sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   ")
-        const allTeamLeaders = await dbGiama.query("SELECT teamleader. `Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Codigo` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`  ")
-        res.send(allTeamLeaders)
+        try {               
+            const dbGiama = req.db
+            const allTeamLeaders = await dbGiama
+            .query("SELECT teamleader. `Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Codigo` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`  ", {
+                type: QueryTypes.SELECT
+            })
+            if(Array.isArray(allTeamLeaders)){
+ 
+                return res.send(allTeamLeaders)
+            }else{
+                 throw Error(allTeamLeaders)
+            }
+        
+            } catch (error) {
+                if(error.hasOwnProperty('name')){
+                    return res.send(JSON.stringify(error.name))
+                }else{
+                    console.log(error)
+                    return res.send(error)
+                }
+            }
 
 }
 export const getTeamLeadersActivos = async (req, res) => {
 
     const dbGiama = req.db
     // const allTeamLeaders = await dbGiama.query("SELECT teamleader.`Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre' ,  sucursales.`Nombre` AS 'Supervisor', NOT Inactivo AS Activo,  FROM teamleader LEFT JOIN sucursales ON teamleader.`Sucursal` = sucursales.`Codigo`   ")
-    const allTeamLeaders = await dbGiama.query("SELECT teamleader. `Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo` WHERE CONVERT(teamleader.`Inactivo`, DECIMAL) = 0 ")
+    const allTeamLeaders = await dbGiama.query("SELECT teamleader. `Codigo` AS 'Codigo', teamleader.`Nombre` AS 'Nombre', sucursales.`Nombre` AS 'Supervisor', NOT CONVERT(teamleader.`Inactivo`,DECIMAL) AS 'Activo' FROM teamleader LEFT JOIN  sucursales ON teamleader.`Sucursal` = sucursales.`Codigo` WHERE CONVERT(teamleader.`Inactivo`, DECIMAL) = 0 ", {
+        type: QueryTypes.SELECT
+    })
     res.send(allTeamLeaders)
 
 }
@@ -86,7 +105,6 @@ export const postTeamLeaders = async (req, res, error) => {
             type: QueryTypes.SELECT
 
         })
-        console.log('roles: ', roles)
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.1')
         if(!finded){
             return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
@@ -104,7 +122,6 @@ try{
         replacements: [Nombre,  Supervisor  , Inactivo? Inactivo: 1, user  ],
         type: QueryTypes.INSERT
       });
-      console.log('roles')
 
     return res.send({status: true, message: 'Team Leader creado con exito!'})
     }catch(err){
@@ -131,7 +148,7 @@ export const updateTeamLeaders = async (req, res) => {
         }
     } catch (error) {
         console.log(error)
-        return res.status(400).send({status: false, message: error})
+        return res.status(400).send({status: false, message: error.name})
     } 
 
     try{  
@@ -143,7 +160,7 @@ export const updateTeamLeaders = async (req, res) => {
         
     }
     catch(err) {
-        console.log(err)
+        return res.send({status: false, message: err.name})
     }
 }
 
@@ -160,7 +177,7 @@ export const deleteTeamLeaders = async (req, res, error) => {
             type: QueryTypes.SELECT
 
         })
-        console.log('roles: ', roles)
+
         const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.3')
         if(!finded){
             return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
@@ -175,16 +192,11 @@ export const deleteTeamLeaders = async (req, res, error) => {
         });
         return res.send({status: true, message: 'Team Leader Borrado!'})
         }catch(err){
-            console.log(err)
+            return res.send({status: false, message: err.name})
         }
 }
 
 
-export const getAllZonas = async (req, res) => {
-    const dbGiama = req.db
-    const result = await dbGiama.query("SELECT * from zonas")
-    res.send(result)
-}
-   
+
  
  

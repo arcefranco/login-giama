@@ -15,17 +15,17 @@ export const getSupervisores = async (req, res) => {
     })
     
     if(Array.isArray(allSupervisores)){
-        res.send(allSupervisores)
+         res.send(allSupervisores) 
     }else{
-        res.send({status: false, message: 'Error al cargar supervisores'})
+        throw Error(allSupervisores)
     }
 
     } catch (error) {
-        if(error.hasOwnProperty('sqlMessage')){
-            
-            res.send({status: false, message: JSON.stringify(error.sqlMessage)})
+        if(error.hasOwnProperty('name')){
+
+            return res.send(JSON.stringify(error.name))
         }else{
-            res.send({status: false, message: JSON.stringify(error)})
+            return res.send({message: JSON.stringify(error)})
         }
     }
 
