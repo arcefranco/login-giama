@@ -1,7 +1,6 @@
 import { Router } from "express";
 import {  getTeamLeaders, beginUpdate, postTeamLeaders, updateTeamLeaders,
     deleteTeamLeaders, getTeamLeadersActivos, endUpdate } from "../../controllers/ConfigDatosGenerales/teamLeadersController";
-import {  getGerentes} from "../../controllers/ConfigDatosGenerales/gerentesController";
 import { testConnection } from "../../middlewares/testConnection";
 import authentication from "../../middlewares/authentication";
 
