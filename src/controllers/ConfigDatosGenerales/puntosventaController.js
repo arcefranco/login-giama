@@ -11,12 +11,19 @@ export const getAllPuntosDeVenta = async (req, res) => {
         {type: QueryTypes.SELECT}
         
         )
-        return res.send(allPuntosDeVenta)
-        
+        if(Array.isArray(allPuntosDeVenta)) {
+            return res.send(allPuntosDeVenta)
+        }else{
+            throw Error(allPuntosDeVenta)
+        }
     } catch (error) {
-        console.log(error)
-        return res.send(error)
+        if(error.hasOwnProperty('name')){
+            return res.send(JSON.stringify(error.name))
+        }else{
+            return res.send(error)
+        }
     }
+
 }
 
 export const beginUpdate = async (req, res) => {
@@ -49,7 +56,7 @@ export const endUpdate = async (req, res) => {
     const {Codigo} = req.body
     const dbGiama = req.db
     const {user} = req.usuario
-    if(!Codigo) return 'ID required'
+    if(!Codigo) return 
     try {
         const actualPunto = await dbGiama.query("SELECT inUpdate FROM pre_puntosventa WHERE Codigo = ?", 
         {
@@ -61,12 +68,13 @@ export const endUpdate = async (req, res) => {
                 replacements: [Codigo],
                 type: QueryTypes.UPDATE
             })
-            return res.send('endUpdate OK!')
+            return res.send({codigo: Codigo})
         }else{
-            return
+            return res.send({status: false})
         }
     } catch (error) {
-        return res.send(error)
+        console.log(error)
+        return res.send({status: false, message: JSON.stringify(error)})
     }
 }
 
@@ -87,8 +95,11 @@ export const deletePuntoDeVenta = async (req, res) => {
             return res.send({status: true, message: 'Eliminado correctamente!'})
             
         } catch (error) {
-            console.log(error)
-            return res.send({status: false, message: 'Error al borrar'})
+            if(error.hasOwnProperty('name')){
+                res.send({status: false, message: `Error al eliminar punto de venta (${error.name})`})
+            }else{
+                return res.send({message: JSON.stringify(error)})
+            }
         }
 }
 
@@ -96,6 +107,7 @@ export const createPuntoDeVenta = async (req, res) => {
     const dbGiama = req.db
     const {user} = req.usuario 
     const {Nombre} = req.body
+
     try {
 
          await dbGiama.query('INSERT INTO pre_puntosventa (Nombre, UsuarioAltaRegistro) VALUES (?, ?)',
@@ -106,13 +118,16 @@ export const createPuntoDeVenta = async (req, res) => {
         }
         
         )
-        return res.send({status: true, message: 'Creado correctamente!'})
-        
+        return res.send({status: true, message: 'Punto de venta creado correctamente!'})
     } catch (error) {
-        console.log(error)
-        return res.send({status: false, message: 'Error al crear'})
+        if(error.hasOwnProperty('name')){
+            res.send({status: false, message: `Error al crear punto de venta (${error.name})`})
+        }else{
+            return res.send({message: JSON.stringify(error)})
+        }
     }
 }
+
 
 export const updatePuntoDeVenta = async (req, res) => {
     const dbGiama = req.db
@@ -130,7 +145,10 @@ export const updatePuntoDeVenta = async (req, res) => {
         return res.send({status: true, message: 'Actualizado correctamente!'})
         
     } catch (error) {
-        console.log(error)
-        return res.send({status: false, message: 'Error al actualizar'})
+        if(error.hasOwnProperty('name')){
+            res.send({status: false, message: `Error al actualizar punto de venta (${error.name})`})
+        }else{
+            return res.send({message: JSON.stringify(error)})
+        }
     }
 }

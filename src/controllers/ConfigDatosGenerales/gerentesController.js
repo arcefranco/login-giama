@@ -65,7 +65,7 @@ export const endUpdate = async (req, res) => {
                 replacements: [Codigo],
                 type: QueryTypes.UPDATE
             })
-            return res.send('endUpdate OK!')
+            return res.send('{status: true}')
         }else{
             return
         }
@@ -160,7 +160,7 @@ try{    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRe
         replacements: [Nombre, Activo, Codigo],
         type: QueryTypes.UPDATE
     })
-    return res.send({status: true, message: 'Gerente actualizado correctamente!', codigo: Codigo})
+    return res.send({status: true, message: 'Gerente actualizado correctamente!'})
         
     }
     catch(err) {

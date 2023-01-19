@@ -82,7 +82,7 @@ export const endUpdate = async (req, res) => {
                 replacements: [Codigo],
                 type: QueryTypes.UPDATE
             })
-            return res.send('endUpdate OK!')
+            return res.send('{status: true}')
         }else{
             return
         }
