@@ -4,47 +4,30 @@ require('dotenv').config()
 
 export const getVendedores = async (req, res) => {
 
-        const dbGiama = req.db
-        const allVendedores = await dbGiama.query("SELECT vendedores.`Codigo`, vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Codigo` AS 'TeamLeader', Categoria, oficialesscoring.`Codigo` AS OficialScoring, oficialesmora.`Codigo` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%d/%m/%Y') AS 'FechaBaja', escalascomisionesvendedores.`Codigo` AS 'Escala' FROM vendedores LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` ")
-        res.send(allVendedores)
-
-}
-export const getVendedoresById = async (req, res) => {
-    const dbGiama = req.db
-    const vendedores = req.body
-    const {user} = req.usuario
     try {
-        const vendedor = await dbGiama
-        .query
-        ("SELECT vendedores.`inUpdate`, vendedores.`Codigo`, vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Nombre` AS 'TeamLeader', Categoria, oficialesscoring.`Nombre` AS OficialScoring, oficialesmora.`Nombre` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%Y-%m-%d') AS 'FechaBaja', escalascomisionesvendedores.`Nombre` AS 'Escala' FROM vendedores LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` WHERE vendedores.`Codigo` = ? ",
-        {
-          replacements: [vendedores.Codigo],
-          type: QueryTypes.SELECT
+        const dbGiama = req.db
+        const allVendedores = await dbGiama.query("SELECT vendedores.`Codigo`, vendedores.`Nombre`,  NOT vendedores.`Inactivo` AS Activo, teamleader.`Codigo` AS 'TeamLeader', Categoria, oficialesscoring.`Codigo` AS OficialScoring, oficialesmora.`Codigo` AS 'OficialMora', DATE_FORMAT(vendedores.`FechaBaja`, '%d/%m/%Y') AS 'FechaBaja', escalascomisionesvendedores.`Codigo` AS 'Escala' FROM vendedores LEFT JOIN teamleader ON vendedores.`TeamLeader` = teamleader.`Codigo` LEFT JOIN oficialesscoring ON vendedores.`OficialScoring` = oficialesscoring.`Codigo` LEFT JOIN oficialesmora ON vendedores.`OficialMora` = oficialesmora.`Codigo` LEFT JOIN escalascomisionesvendedores ON vendedores.`Escala` = escalascomisionesvendedores.`Codigo` ", {
+            type: QueryTypes.SELECT
+        })
+        if(Array.isArray(allVendedores)){
+ 
+            return res.send(allVendedores)
+        }else{
+             throw Error(allVendedores)
         }
-       );
-       
-         if(vendedor[0].inUpdate  && vendedor[0].inUpdate !== user) {
-            return res.send({status: false, message: `El registro esta siendo editado por ${vendedor[0].inUpdate} `})
-         }
     
-      
-        try {
-        await dbGiama.query("UPDATE vendedores SET inUpdate = ? WHERE Codigo = ?",  {
-            replacements: [user, vendedores.Codigo],
-            type: QueryTypes.UPDATE
-            })
-    
-            return res.send(vendedor[0])
-    }   catch (error) {
-            console.log('error:', error)
-            return res.send(error)
+        } catch (error) {
+            if(error.hasOwnProperty('name')){
+                return res.send(JSON.stringify(error.name))
+            }else{
+                return res.send(error)
             }
-        
-    }       catch (error) {
-            return res.send(error)
-    }
+        }
+
+
 
 }
+
 export const beginUpdate = async (req, res) => {
     const {Codigo} = req.body
     const dbGiama = req.db
@@ -125,7 +108,7 @@ try{
     return res.send({status: true, message: 'Vendedor creado con exito!'})
     }catch(err){
         console.log(err)
-        return res.send({status: false, message: err.name})
+        return res.send({status: false, message: err.name + " " + "Error al agregar vendedor"})
     } }
 
     
@@ -163,8 +146,12 @@ export const updateVendedores = async (req, res) => {
         
     }
     catch(err) {
-        console.log(err)
-        return res.send({status: false, message: 'Hubo un error'})
+        if(err.hasOwnProperty("name")){
+
+            return res.send({status: false, message: err.name + " " + "Error al actualizar vendedor"})
+        }else{
+             return res.send({status: false, message: "Hubo un error"})
+        }
     }
 }
 
@@ -194,33 +181,92 @@ export const deleteVendedores = async (req, res, error) => {
         });
         return res.send({status: true, message: 'Vendedor Borrado!'})
         }catch(err){
-            console.log(err)
+            if(err.hasOwnProperty("name")){
+
+                return res.send({status: false, message: err.name + " " + "Error al borrar vendedor"})
+            }else{
+                 return res.send({status: false, message: "Hubo un error"})
+            }
         }
 }
 
 
 export const getAllEscalas = async (req, res) => {
-   const dbGiama = req.db
-    const result = await dbGiama.query("SELECT * from escalascomisionesvendedores")
-    res.send(result)
+    try {
+        
+        const dbGiama = req.db
+         const result = await dbGiama.query("SELECT * from scalascomisionesvendedores",{
+             type: QueryTypes.SELECT
+         })
+         if(Array.isArray(result)){
+             res.send(result)
+
+         }else{
+            throw Error(result)
+         }
+        
+    } catch (error) {
+        if(error.hasOwnProperty('name')){
+            return res.send(JSON.stringify(error.name))
+        }else{
+            return res.send(error)
+        }
+        
+    }
 }
 export const getAllOficialesScoring = async (req, res) => {
-   const dbGiama = req.db
-    const result = await dbGiama.query("SELECT * from oficialesscoring")
-    res.send(result)
+    try {
+        const dbGiama = req.db
+         const result = await dbGiama.query("SELECT * from oficialesscoring",{
+             type: QueryTypes.SELECT
+         })
+         if(Array.isArray(result)){
+            res.send(result)
+         }else{
+            throw Error(result)
+         }
+        
+    } catch (error) {
+        if(error.hasOwnProperty('name')){
+            return res.send(JSON.stringify(error.name))
+        }else{
+            return res.send(error)
+        }
+    }
+    
 }
 export const getAllOficialesScoringActivos = async (req, res) => {
    const dbGiama = req.db
-    const result = await dbGiama.query("SELECT * from oficialesscoring WHERE Inactivo = 0")
+    const result = await dbGiama.query("SELECT * from oficialesscoring WHERE Inactivo = 0",{
+        type: QueryTypes.SELECT
+    })
     res.send(result)
 }   
 export const getAllOficialesMora = async (req, res) => {
-   const dbGiama = req.db
-    const result = await dbGiama.query("SELECT * from oficialesmora")
-    res.send(result)
+    try {
+        const dbGiama = req.db
+         const result = await dbGiama.query("SELECT * from oficialesmora",{
+             type: QueryTypes.SELECT
+         })
+
+        if(Array.isArray(result)){
+            res.send(result)
+         }else{
+            throw Error(result)
+         }
+        
+    } catch (error) {
+        if(error.hasOwnProperty('name')){
+            return res.send(JSON.stringify(error.name))
+        }else{
+            return res.send(error)
+        }
+    }
 } 
 export const getAllOficialesMoraActivos = async (req, res) => {
    const dbGiama = req.db
-    const result = await dbGiama.query("SELECT * from oficialesmora WHERE Activo = 1")
+    const result = await dbGiama.query("SELECT * from oficialesmora WHERE Activo = 1",{
+        type: QueryTypes.SELECT
+    })
     res.send(result)
 }  
