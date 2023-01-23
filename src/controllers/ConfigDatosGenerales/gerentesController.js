@@ -5,7 +5,9 @@ require('dotenv').config()
 export const getGerentes = async (req, res) => {
     const dbGiama = req.db
     
-    const allGerentes = await dbGiama.query("SELECT Codigo, Nombre, Activo FROM gerentes")
+    const allGerentes = await dbGiama.query("SELECT Codigo, Nombre, Activo FROM gerentes", {
+        type: QueryTypes.SELECT
+    })
     res.send(allGerentes)
 }
  export const getGerentesActivos = async (req, res) => {

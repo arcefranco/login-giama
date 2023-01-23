@@ -79,7 +79,10 @@ export const endUpdate = async (req, res) => {
     const {Codigo} = req.body
     const dbGiama = req.db
     const {user} = req.usuario
-    if(typeof Codigo !== 'number') return 'ID required'
+    if(typeof Codigo !== 'number'){
+        console.log('es esto: ', Codigo)
+         return res.send({status: false, message: 'ID required'})
+        }
     try {
         const actualUsuario = await dbGiama.query("SELECT inUpdate FROM sucursalreal WHERE Codigo = ?", 
         {
@@ -93,10 +96,15 @@ export const endUpdate = async (req, res) => {
             })
             return res.send({status: true})
         }else{
-            return
+            return 
         }
     } catch (error) {
-        return res.send({status: false, message: error})
+        if(error.hasOwnProperty("message")){
+
+            return res.send({status: false, message: error.message})
+        }else {
+            return res.send({status: false, message: JSON.stringify(error)})
+        }
     }
 }
 
