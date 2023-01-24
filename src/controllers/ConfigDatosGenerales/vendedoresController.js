@@ -1,4 +1,7 @@
 import {  QueryTypes } from "sequelize";
+import { beginUpdateQuery } from "../queries/beginUpdateQuery";
+import { endUpdateQuery } from "../queries/endUpdateQuery";
+import { findRolOrMaster } from "../queries/findRoles";
 import { selectQuery } from "../queries/selectQuery";
 require('dotenv').config()
 
@@ -10,56 +13,28 @@ try {
 } catch (error) {
    return res.send(error)    
 }
-
-
 }
 
 export const beginUpdate = async (req, res) => {
-    const {Codigo} = req.body
-    const dbGiama = req.db
+    const Codigo = /* req.body */ null
     const {user} = req.usuario
-    if(!Codigo) return res.send('ID required')
     try {
-        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM vendedores WHERE Codigo = ?", 
-        {
-            replacements: [Codigo],
-            type: QueryTypes.SELECT
-        })
-        if(actualUsuario[0].inUpdate === null  || actualUsuario[0].inUpdate === user){
-            await dbGiama.query("UPDATE vendedores SET inUpdate = ? WHERE Codigo = ?", {
-                replacements: [user, Codigo],
-                type: QueryTypes.UPDATE
-            })
-            return res.send({codigo: Codigo})
-        }else{
-            return res.send(`El registro está siendo editado por ${actualUsuario[0].inUpdate}`)
-        }
+        if(!Codigo) throw {status: false, message: 'ID required'}
+        const result = beginUpdateQuery(req.db, user, Codigo, "vendedores")
+        return res.send(result)
     } catch (error) {
-        res.send(error.hasOwnProperty("name") ? error.name : JSON.stringify(error))
+        return res.send(error)
     }
 }
-export const endUpdate = async (req, res) => { //MANDA MAL EL ERROR
+export const endUpdate = async (req, res) => { 
     const {Codigo} = req.body
-    const dbGiama = req.db
     const {user} = req.usuario
-    if(!Codigo) return 
     try {
-        const actualUsuario = await dbGiama.query("SELECT inUpdate FROM vendedores WHERE Codigo = ?", 
-        {
-            replacements: [Codigo],
-            type: QueryTypes.SELECT
-        })
-        if(actualUsuario[0].inUpdate === user){
-            await dbGiama.query("UPDATE vendedores SET inUpdate = NULL WHERE Codigo = ?", {
-                replacements: [Codigo],
-                type: QueryTypes.UPDATE
-            })
-            return res.send({status: true})
-        }else{
-            return res.send('No está autorizado')
-        }
+        if(!Codigo) throw {status: false, message: 'ID required'}
+        const result = endUpdateQuery(req.db, user, Codigo, "vendedores")
+        return res.send(result)
     } catch (error) {
-        res.send(error.hasOwnProperty("name") ? error.name : JSON.stringify(error))
+        res.send(error)
     }
 }
 
@@ -68,17 +43,9 @@ export const postVendedores = async (req, res) => {
     let {Nombre,   Activo:Inactivo, TeamLeader, Categoria, OficialS, OficialM, FechaBaja, Escala} = req.body;
     const {user} = req.usuario
     try {
-        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
-            replacements: [user],
-            type: QueryTypes.SELECT
-
-        })
-        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.1')
-        if(!finded){
-            return res.send({status: false, message: 'No tiene permitido realizar esta acción'})
-        }
+        await findRolOrMaster(req.db, user, '1.7.2.1')
     } catch (error) {
-        return res.send({status: false, message: error.name})
+        return res.send(error)
     } 
      
     if(!Nombre) {
@@ -104,18 +71,10 @@ export const updateVendedores = async (req, res) => {
     let {Codigo, Nombre,   Activo:Inactivo, TeamLeader, Categoria, OficialS, OficialM, Escala, FechaBaja} = req.body;
     const {user} = req.usuario
     try {
-        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
-            replacements: [user],
-            type: QueryTypes.SELECT
-
-        })
-    
-        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.2')
-        if(!finded){
-            return res.status(500).send({status: false, message: 'No tiene permitido realizar esta acción'})
-        }
+        await findRolOrMaster(req.db, '1.7.2.2')
+        
     } catch (error) {
-        return res.send({status: false, message: error.hasOwnProperty("name") ? error.name : JSON.stringify(error)})
+        return res.send(error)
     } 
     if(!Nombre ) {
         return res.send({status: false, message: 'Faltan campos'})
@@ -140,17 +99,11 @@ export const deleteVendedores = async (req, res) => {
     const {Codigo} = req.body;
     const {user} = req.usuario
     try {
-        const roles = await dbGiama.query('SELECT usuarios_has_roles.`rl_codigo` FROM usuarios_has_roles WHERE us_login = ?', {
-            replacements: [user],
-            type: QueryTypes.SELECT
 
-        })
-        const finded = roles.find(e => e.rl_codigo === '1' || e.rl_codigo === '1.7.2.3')
-        if(!finded){
-            return res.send({status: false, message: 'No tiene permitido realizar esta acción'})
-        }
+        await findRolOrMaster(req.db, user, '1.7.2.3')
+
     } catch (error) {
-        return res.send({status: false, message: error.hasOwnProperty("name") ? error.name : JSON.stringify(error)})
+        return res.send(error)
     } 
     const Vendedor = dbGiama.models.vendedores
     try{await Vendedor.destroy({
