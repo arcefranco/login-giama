@@ -1,4 +1,5 @@
 import { QueryTypes } from "sequelize"
+import { returnErrorMessage } from "../../helpers/errors/returnErrorMessage"
 
 export const selectQuery = async (db, query) => {
     try {
@@ -6,16 +7,14 @@ export const selectQuery = async (db, query) => {
         const result = await dbGiama.query(query, {
             type: QueryTypes.SELECT
         })
-
          if(Array.isArray(result)){
  
             return result
         }else{
-            console.log('this is result: ', result)
             throw Error(result)
         }
     
         } catch (error) {
-            throw error.hasOwnProperty("name") ? error.name : JSON.stringify(error) 
+            throw {status: false, message: returnErrorMessage(error)}
         }
 }
