@@ -21,7 +21,7 @@ export const beginUpdate = async (req, res) => {
     const {user} = req.usuario
     try {
         ifNoCode(Codigo)
-        const result = beginUpdateQuery(req.db, user, Codigo, "vendedores")
+        const result = await beginUpdateQuery(req.db, user, Codigo, "vendedores")
         return res.send(result)
     } catch (error) {
         return res.send(error)
@@ -31,7 +31,7 @@ export const endUpdate = async (req, res) => {
     const {Codigo} = req.body
     const {user} = req.usuario
     try {
-        if(!Codigo) throw {status: false, message: 'ID required'}
+        ifNoCode(Codigo)
         const result = endUpdateQuery(req.db, user, Codigo, "vendedores")
         return res.send(result)
     } catch (error) {
