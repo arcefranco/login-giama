@@ -1,4 +1,5 @@
 import {  QueryTypes } from "sequelize";
+import { ifNoCode } from "../../helpers/errors/ifNoCode";
 import { beginUpdateQuery } from "../queries/beginUpdateQuery";
 import { endUpdateQuery } from "../queries/endUpdateQuery";
 import { findRolOrMaster } from "../queries/findRoles";
@@ -16,10 +17,10 @@ try {
 }
 
 export const beginUpdate = async (req, res) => {
-    const Codigo = /* req.body */ null
+    const Codigo =  req.body 
     const {user} = req.usuario
     try {
-        if(!Codigo) throw {status: false, message: 'ID required'}
+        ifNoCode(Codigo)
         const result = beginUpdateQuery(req.db, user, Codigo, "vendedores")
         return res.send(result)
     } catch (error) {

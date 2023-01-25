@@ -2,7 +2,7 @@ import {  QueryTypes } from "sequelize";
 import { selectQuery } from "../queries/selectQuery";
 import {beginUpdateQuery} from "../queries/beginUpdateQuery"
 import {findRolOrMaster} from '../queries/findRoles'
-import { returnErrorMessage, returnErrorName } from "../../helpers/errors/returnErrorMessage";
+import { returnErrorMessage } from "../../helpers/errors/returnErrorMessage";
 import { endUpdateQuery } from "../queries/endUpdateQuery";
 require('dotenv').config()
 
