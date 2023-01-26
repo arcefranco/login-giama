@@ -10,8 +10,6 @@ require('dotenv').config()
 
 
 export const getAllPuntosDeVenta = async (req, res) => {
-    const dbGiama = req.db
-
     try {
         const result = await selectQuery(req.db, 'SELECT * FROM pre_puntosventa')
         return res.send(result)
@@ -37,7 +35,6 @@ export const beginUpdate = async (req, res) => {
 
 export const endUpdate = async (req, res) => {
     const {Codigo} = req.body
-    const dbGiama = req.db
     const {user} = req.usuario
     try {
         ifNoCode(Codigo)

@@ -297,8 +297,6 @@ export const updateOficiales = async (req, res) => {
 
         case 'Subite':
             try {
-/*                 const HNtoNumber = parseInt(HN)
-                const SupervisorToNumber = parseInt(Supervisor) */
                 if(!login)   return res.send({status: false, message: 'Faltan campos'})
                 await dbGiama.query("UPDATE subite_oficiales SET Nombre = ?, login = ?, HNMayor40 = ?, Supervisor = ?, Activo = ?, inUpdate = NULL WHERE Codigo = ?", {
                      replacements: [Nombre, login, HNMayor40, Supervisor? Supervisor : null, Activo, Codigo],
