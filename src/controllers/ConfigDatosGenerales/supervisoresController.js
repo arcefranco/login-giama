@@ -7,6 +7,7 @@ import { endUpdateQuery } from "../queries/endUpdateQuery";
 import { findRolOrMaster } from "../queries/findRoles";
 import { insertQuery } from "../queries/insertQuery";
 import { returnErrorMessage } from "../../helpers/errors/returnErrorMessage";
+import { updateQuery } from "../queries/updateQuery";
 require('dotenv').config()
 
 export const getSupervisores = async (req, res) => {
@@ -60,24 +61,19 @@ export const endUpdate = async (req, res) => {
 export const postSupervisores = async (req, res) => {
     let {Nombre, Email, Gerente, Activo:Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona} = req.body;
     const {user} = req.usuario;
-    try {
-        await findRolOrMaster(req.db, user, '1.7.2.1')
-    } catch (error) {
-        return res.send(error)
-    } 
-     
     if(!Nombre || !Email ) {
         return res.send({status: false, message: 'Faltan campos'})
     }
-try{  
-    const result = await insertQuery(req.db, "INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona, UsuarioAltaRegistro ) VALUES (?,?,?,NOT ?,?,?,?,?) ",
-    [Nombre, Email, Gerente? Gerente : null  , Inactivo? Inactivo : 0, EsMiniEmprendedor? EsMiniEmprendedor :0, ValorPromedioMovil? ValorPromedioMovil: 0, Zona? Zona : null, user ], "Supervisor")
-
-    return res.send(result)
-
-    }catch(error){
+    try {
+        await findRolOrMaster(req.db, user, '1.7.2.1')
+        const result = await insertQuery(req.db, "INSERT INTO sucursales (Nombre, Email, Gerente, Inactivo, EsMiniEmprendedor, ValorPromedioMovil, Zona, UsuarioAltaRegistro ) VALUES (?,?,?,NOT ?,?,?,?,?) ",
+        [Nombre, Email, Gerente? Gerente : null  , Inactivo? Inactivo : 0, EsMiniEmprendedor? EsMiniEmprendedor :0, ValorPromedioMovil? ValorPromedioMovil: 0, Zona? Zona : null, user ], "Supervisor")
+    
+        return res.send(result)
+    } catch (error) {
         return res.send(error)
-    } }
+    } 
+}
 
     
  
@@ -85,25 +81,19 @@ export const updateSupervisores = async (req, res) => {
     const dbGiama = req.db
     let {Codigo, Nombre, Email, Gerente, Activo:Inactivo, EsMicro, VPM, Zona} = req.body;
     const {user} = req.usuario;
-    try {
-        await findRolOrMaster(req.db, user, '1.7.2.2')
-    } catch (error) {
-        return res.send(error)
-    } 
     if(!Nombre || !Email ) {
         return res.send({status: false, message: 'Faltan campos'})
     }
-    try{  
-    await dbGiama.query("UPDATE sucursales SET Nombre = ?, Email = ?, Gerente = ?, Inactivo = NOT ?, EsMiniEmprendedor = ?, ValorPromedioMovil = ?, Zona = ?, inUpdate = NULL, UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
-        replacements: [Nombre, Email, Gerente? Gerente : null, Inactivo, EsMicro? EsMicro : null, VPM? VPM : null, Zona? Zona: null, user, Codigo ],
-        type: QueryTypes.UPDATE
-      });
-      return res.send({status: true, message: 'Supervisor modificado con exito!'})
-        
-    }
-    catch(error) {
-        return res.send({status: false, message: returnErrorMessage(error)})
-    }
+    try {
+        await findRolOrMaster(req.db, user, '1.7.2.2')
+        const result = await updateQuery(req.db, "UPDATE sucursales SET Nombre = ?, Email = ?, Gerente = ?, Inactivo = NOT ?, EsMiniEmprendedor = ?, ValorPromedioMovil = ?, Zona = ?, inUpdate = NULL, UsuarioAltaRegistro = ? WHERE Codigo = ? ",
+        [Nombre, Email, Gerente? Gerente : null, Inactivo, EsMicro? EsMicro : null, VPM? VPM : null, Zona? Zona: null, user, Codigo ], "Supervisor")
+
+        return res.send(result)
+    } catch (error) {
+        return res.send(error)
+    } 
+
 }
 
 

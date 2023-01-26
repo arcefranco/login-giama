@@ -6,6 +6,7 @@ import { endUpdateQuery } from "../queries/endUpdateQuery";
 import { findRolOrMaster } from "../queries/findRoles";
 import {returnErrorMessage} from '../../helpers/errors/returnErrorMessage'
 import { insertQuery } from "../queries/insertQuery";
+import { updateQuery } from "../queries/updateQuery";
 require('dotenv').config()
 
 export const getTeamLeaders = async (req, res) => {
@@ -84,21 +85,15 @@ export const updateTeamLeaders = async (req, res) => {
     const {user} = req.usuario;
     try {
     await findRolOrMaster(req.db, user, '1.7.2.2')
+    
+    const result = await updateQuery(req.db, "UPDATE teamleader SET inUpdate = NULL, Nombre = ?,  Sucursal = ?, Inactivo = NOT CONVERT(?,BINARY), UsuarioAltaRegistro = ? WHERE Codigo = ? ",
+    [Nombre,  Supervisor? Supervisor:null, Inactivo, user , Codigo ], "Team Leader")
+    
+    return res.send(result)
     } catch (error) {
         return res.send(error)
     } 
 
-    try{  
-    await dbGiama.query("UPDATE teamleader SET inUpdate = NULL, Nombre = ?,  Sucursal = ?, Inactivo = NOT CONVERT(?,BINARY), UsuarioAltaRegistro = ? WHERE Codigo = ? ", {
-        replacements: [Nombre,  Supervisor? Supervisor:null, Inactivo, user , Codigo ],
-        type: QueryTypes.UPDATE
-      });
-      return res.send({status: true, message: 'Team Leader modificado con exito!'})
-        
-    }
-    catch(error) {
-        return res.send({status: false, message: returnErrorMessage(error)})
-    }
 }
 
 

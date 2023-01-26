@@ -3,15 +3,14 @@ import { returnErrorMessage } from "../../helpers/errors/returnErrorMessage"
 
 export const selectQuery = async (db, query) => {
     try {
-        const dbGiama = db
-        const result = await dbGiama.query(query, {
+        const result = await db.query(query, {
             type: QueryTypes.SELECT
         })
          if(Array.isArray(result)){
  
             return result
         }else{
-            throw Error(result)
+            throw result
         }
     
         } catch (error) {

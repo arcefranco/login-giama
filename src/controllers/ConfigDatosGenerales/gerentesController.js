@@ -4,6 +4,9 @@ import {beginUpdateQuery} from "../queries/beginUpdateQuery"
 import {findRolOrMaster} from '../queries/findRoles'
 import { returnErrorMessage } from "../../helpers/errors/returnErrorMessage";
 import { endUpdateQuery } from "../queries/endUpdateQuery";
+import { insertQuery } from "../queries/insertQuery";
+import { updateQuery } from "../queries/updateQuery";
+import {deleteQuery} from "../queries/deleteQuery"
 require('dotenv').config()
 
 
@@ -56,24 +59,20 @@ try {
      let {Nombre, Activo} = req.body;
      const dbGiama = req.db;
      const {user} = req.usuario
-     try {
-        await findRolOrMaster(req.db, user, '1.7.18.1')
-     } catch (error) {
-         return res.send(error)
-     }
      if(!Nombre) {
         return res.send({status: false, message: 'Faltan campos'})
     }
-     
-try{   
-    await dbGiama.query("INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRegistro) VALUES (?,?,?)",{
-        replacements: [Nombre, Activo? Activo : 0, user],
-        type: QueryTypes.INSERT,    
-    });
-    return res.send({status: true, message: 'Gerente creado!'})
-    }catch(error){
-        return res.send({status: false, message: returnErrorMessage(error)})
-    } }
+     try {
+        await findRolOrMaster(req.db, user, '1.7.18.1')
+        const result = await insertQuery(req.db, "INSERT INTO gerentes (Nombre, Activo, UsuarioAltaRegistro) VALUES (?,?,?)", 
+        [Nombre, Activo? Activo : 0, user], "Gerente")
+
+        return res.send(result)
+     } catch (error) {
+         return res.send(error)
+     }
+
+}
  
     
  
@@ -83,36 +82,22 @@ try{
     const {user} = req.usuario
     try {
         await findRolOrMaster(req.db, user, '1.7.18.2')
+        const result = await updateQuery(req.db, 'UPDATE gerentes SET Nombre = ?, Activo = ? WHERE Codigo = ?',
+        [Nombre, Activo, Codigo], "Gerente")
+        return res.send(result)
      } catch (error) {
          return res.send(error)
      }
-
-    try{ 
-    await dbGiama.query('UPDATE gerentes SET Nombre = ?, Activo = ? WHERE Codigo = ?', {
-        replacements: [Nombre, Activo, Codigo],
-        type: QueryTypes.UPDATE
-    })
-    return res.send({status: true, message: 'Gerente actualizado correctamente!'})
-        
-    }
-    catch(error) {
-        return res.send({status: false, message: returnErrorMessage(error)})
-    }
 }
  
 
  export const deleteGerentes = async (req, res) => {
     const {Codigo} = req.body;
-    const dbGiama = req.db
     try{
+        const result = await deleteQuery(req.db, "DELETE FROM gerentes WHERE Codigo = ?", [Codigo], "Gerente")
+        return res.send(result)
 
-        await dbGiama.query("DELETE FROM gerentes WHERE Codigo = ?", {
-            replacements: [Codigo],
-            types: QueryTypes.DELETE
-        })
-
-        return res.send({status: true, message: 'Gerente Borrado!'})
         }catch(error){
-            return res.send({status: false, message: returnErrorMessage(error)})
+            return res.send(error)
         }
 } 

@@ -1,9 +1,12 @@
 import {  QueryTypes } from "sequelize";
 import { ifNoCode } from "../../helpers/errors/ifNoCode";
 import { beginUpdateQuery } from "../queries/beginUpdateQuery";
+import { deleteQuery } from "../queries/deleteQuery";
 import { endUpdateQuery } from "../queries/endUpdateQuery";
 import { findRolOrMaster } from "../queries/findRoles";
+import { insertQuery } from "../queries/insertQuery";
 import { selectQuery } from "../queries/selectQuery";
+import { updateQuery } from "../queries/updateQuery";
 require('dotenv').config()
 
 
@@ -32,7 +35,7 @@ export const endUpdate = async (req, res) => {
     const {user} = req.usuario
     try {
         ifNoCode(Codigo)
-        const result = endUpdateQuery(req.db, user, Codigo, "vendedores")
+        const result = await endUpdateQuery(req.db, user, Codigo, "vendedores")
         return res.send(result)
     } catch (error) {
         res.send(error)
@@ -40,57 +43,41 @@ export const endUpdate = async (req, res) => {
 }
 
 export const postVendedores = async (req, res) => {
-   const dbGiama = req.db
     let {Nombre,   Activo:Inactivo, TeamLeader, Categoria, OficialS, OficialM, FechaBaja, Escala} = req.body;
     const {user} = req.usuario
+    if(!Nombre) {
+        return res.send({status: false, message: 'Faltan campos'})
+    }
     try {
         await findRolOrMaster(req.db, user, '1.7.2.1')
+        const result = await insertQuery(req.db, "INSERT INTO vendedores (Nombre,  Inactivo, TeamLeader, Categoria, OficialScoring, OficialMora, FechaBaja, Escala, UsuarioAltaRegistro ) VALUES (?,NOT ?,?,?,?,?,?,?,?) ",
+        [Nombre,  Inactivo? Inactivo : 0, TeamLeader? TeamLeader : null, Categoria? Categoria : null, OficialS? OficialS : null, OficialM? OficialM : null, FechaBaja? FechaBaja : null, Escala? Escala:null, user ], "Vendedor")
+        return res.send(result)
     } catch (error) {
         return res.send(error)
     } 
      
-    if(!Nombre) {
-        return res.send({status: false, message: 'Faltan campos'})
-    }
-try{  
-    await dbGiama.query("INSERT INTO vendedores (Nombre,  Inactivo, TeamLeader, Categoria, OficialScoring, OficialMora, FechaBaja, Escala, UsuarioAltaRegistro ) VALUES (?,NOT ?,?,?,?,?,?,?,?) ", {
-        replacements: [Nombre,  Inactivo? Inactivo : 0, TeamLeader? TeamLeader : null, Categoria? Categoria : null, OficialS? OficialS : null, OficialM? OficialM : null, FechaBaja? FechaBaja : null, Escala? Escala:null, user ],
-        type: QueryTypes.INSERT
-      });
-
-    return res.send({status: true, message: 'Vendedor creado con exito!'})
-    }catch(err){
-
-        return res.send({status: false, message: err.hasOwnProperty("name") ? err.name : JSON.stringify(error)})
-    } }
+}
 
     
  
 export const updateVendedores = async (req, res) => {
    const dbGiama = req.db
-    console.log(req.body) 
     let {Codigo, Nombre,   Activo:Inactivo, TeamLeader, Categoria, OficialS, OficialM, Escala, FechaBaja} = req.body;
     const {user} = req.usuario
-    try {
-        await findRolOrMaster(req.db, '1.7.2.2')
-        
-    } catch (error) {
-        return res.send(error)
-    } 
     if(!Nombre ) {
         return res.send({status: false, message: 'Faltan campos'})
     }
-    try{  
-    await dbGiama.query("UPDATE vendedores SET Nombre = ?,  Inactivo = NOT ?, TeamLeader = ?, Categoria = ?, OficialScoring = ?, OficialMora = ?, Escala = ?, FechaBaja = ?, inUpdate = NULL WHERE Codigo = ? ", {
-        replacements: [Nombre,  Inactivo, TeamLeader ? TeamLeader : null, Categoria ? Categoria : null, OficialS ? OficialS : null, OficialM ? OficialM : null, Escala ? Escala : null, FechaBaja ? FechaBaja : null, Codigo ],
-        type: QueryTypes.UPDATE
-      });
-      return res.send({status: true, message: 'Vendedor modificado con exito!'})
+    try {
+        await findRolOrMaster(req.db, '1.7.2.2')
+        const result = await updateQuery(req.db, "UPDATE vendedores SET Nombre = ?,  Inactivo = NOT ?, TeamLeader = ?, Categoria = ?, OficialScoring = ?, OficialMora = ?, Escala = ?, FechaBaja = ?, inUpdate = NULL WHERE Codigo = ? ",
+        [Nombre,  Inactivo, TeamLeader ? TeamLeader : null, Categoria ? Categoria : null, OficialS ? OficialS : null, OficialM ? OficialM : null, Escala ? Escala : null, FechaBaja ? FechaBaja : null, Codigo ], "Vendedor" )
         
-    }
-    catch(error) {
-        res.send({status: false, message: error.hasOwnProperty("name") ? error.name : JSON.stringify(error)})
-    }
+        return res.send(result)
+    } catch (error) {
+        return res.send(error)
+    } 
+
 }
 
 
@@ -102,7 +89,6 @@ export const deleteVendedores = async (req, res) => {
     try {
 
         await findRolOrMaster(req.db, user, '1.7.2.3')
-
     } catch (error) {
         return res.send(error)
     } 
