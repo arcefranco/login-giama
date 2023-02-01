@@ -9,7 +9,7 @@ const usuariosRoutes = Router()
 
 usuariosRoutes.use(testConnection)
 
-usuariosRoutes.post('/id', authentication, getUsuarioById) 
+
 usuariosRoutes.route('/todos').get(getAllUsuarios)
 usuariosRoutes.post('/', authentication, createUsuario) 
 usuariosRoutes.put('/', authentication, updateUsuario)
