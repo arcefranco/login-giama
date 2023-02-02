@@ -3,6 +3,7 @@ import { queryMora, queryOperaciones, queryReportes} from "../../queries";
 import { insertQuery } from '../queries/insertQuery';
 import { deleteQuery } from '../queries/deleteQuery';
 import { selectQuery } from '../queries/selectQuery';
+import { returnErrorMessage } from "../../helpers/errors/returnErrorMessage";
 
 
 export const getRoles = async (req, res) => {
@@ -215,12 +216,21 @@ export const getRoles = async (req, res) => {
     
     else{
         try {
-            const roles = await selectQuery(req.db, 'SELECT rl_codigo, rl_descripcion FROM roles WHERE rl_codigo LIKE ?')  
-            return res.send(roles)
-    
-        } catch (error) {
-            return res.send(error)
-        }
+            const roles = await await req.db.query('SELECT rl_codigo, rl_descripcion FROM roles WHERE rl_codigo LIKE ?', {
+                type: QueryTypes.SELECT,
+                replacements: [rol]
+            })  
+            
+            if(Array.isArray(roles)){
+ 
+                return res.send(roles)
+            }else{
+                throw roles
+            }
+        
+            } catch (error) {
+                throw {status: false, message: returnErrorMessage(error)}
+            }
     }
 }
 
@@ -343,25 +353,29 @@ export const giveMaster = async (req, res) => {
         return res.send({status: false, message: 'Faltan datos'})
     }
     try {
-        const userHasRoles = await selectQuery(req.db, `SELECT * FROM usuarios_has_roles WHERE 
-        us_login = ? AND rl_codigo = "1"`) 
         
+        const userHasRoles = await req.db.query(`SELECT * FROM usuarios_has_roles WHERE 
+        us_login = ? AND rl_codigo = 1`, {
+            type: QueryTypes.SELECT,
+            replacements: [Usuario, '1']
+        }) 
     
         if(!userHasRoles.length){
             try {
-                await insertQuery(req.db, 'INSERT INTO usuarios_has_roles (us_login, rl_codigo) VALUES (?, "1")', 
-                [Usuario], 'usuarios_has_roles')
+                await req.db.query("INSERT INTO usuarios_has_roles (us_login, rl_codigo) VALUES (?, ?)", {
+                    type: QueryTypes.INSERT,
+                    replacements: ['1', Usuario]
+                })
                 return res.send({status: true, message: `Se le ha agregado el rol master correctamente a ${Usuario}`})
                 
             } catch (error) {
-                console.log(error)
-                return res.send(error)
+                return res.send({status: false, message: returnErrorMessage(error)})
             }
         }else{
             return res.send({status: false, message: `El usuario ${Usuario} ya posee el rol master`})
         }
     } catch (error) {
-        return res.send(error)
+        return res.send({status: false, message: returnErrorMessage(error)})
     }
 
 
