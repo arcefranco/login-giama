@@ -1,10 +1,4 @@
 import { QueryTypes } from "sequelize";
-import Sequelize from "sequelize";
-
-
- 
- 
-
 export const getOficialesByName = async (req, res) => {
 
     const {oficialName} = req.body
