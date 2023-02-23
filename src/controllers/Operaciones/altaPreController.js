@@ -282,7 +282,7 @@ export const altaPre = async (req, res) => {
     .join("/");
   const {
     Marca,
-    codEmpresa,
+    Empresa,
     empresaNombre,
     Solicitud,
     FechaAlta,
@@ -305,10 +305,10 @@ export const altaPre = async (req, res) => {
     CodPostal,
     Localidad,
     Provincia,
-    TelefParticular,
-    TelefCelular,
-    TelefLaboral,
-    TelefFamiliar,
+    Telefonos,
+    Telefonos2,
+    Telefonos3,
+    Telefonos4,
     Ocupacion,
     CodTipoResponsable,
     ContactoAD,
@@ -318,7 +318,7 @@ export const altaPre = async (req, res) => {
     nroRecibo2,
     CodSucReal,
     CodFormaPago,
-    cuentaContable,
+    CuentaContable,
     Cantpagos,
     Vendedor,
     FechaCheque,
@@ -354,10 +354,10 @@ export const altaPre = async (req, res) => {
   let resultVerifyTelef;
   const a = 0;
   const t = await dbGiama.transaction();
-  if (TelefParticular) arrayTelefonos.push(TelefParticular);
-  if (TelefCelular) arrayTelefonos.push(TelefCelular);
-  if (TelefFamiliar) arrayTelefonos.push(TelefFamiliar);
-  if (TelefLaboral) arrayTelefonos.push(TelefLaboral);
+  if (Telefonos) arrayTelefonos.push(Telefonos);
+  if (Telefonos2) arrayTelefonos.push(Telefonos2);
+  if (Telefonos3) arrayTelefonos.push(Telefonos3);
+  if (Telefonos4) arrayTelefonos.push(Telefonos4);
 
   //VERIFICACIONES//
 
@@ -391,13 +391,13 @@ export const altaPre = async (req, res) => {
 
   try {
     //OBTENGO LA CUENTA SECUNDARIA DE LA FORMA DE PAGO(USANDO EL CODIGO CUENTA CONTABLE)
-    if (cuentaContable) {
+    if (CuentaContable) {
       await dbGiama
         .query("SELECT * FROM c_plancuentas WHERE Codigo = ?", {
-          replacements: [cuentaContable],
+          replacements: [CuentaContable],
         })
         .then((data) => {
-          cuentaSecundaria = data[0][0].CuentaSecundaria;
+          cuentaSecundaria = Array.isArray(data) && data[0][0].CuentaSecundaria;
         }); //A CORREGIR POR EMPRESAS
     }
   } catch (error) {
@@ -407,7 +407,7 @@ export const altaPre = async (req, res) => {
 
   try {
     //DESPUES EL CODIGO DE CUENTA SEÑA
-    if (cuentaContable) {
+    if (CuentaContable) {
       await dbGiama
         .query(
           `SELECT * FROM c_plancuentas WHERE codigoespecial IN('SEÑA','EFVO')`,
@@ -416,13 +416,14 @@ export const altaPre = async (req, res) => {
           }
         )
         .then((data) => {
-          codigoCuentaEfvo = data[0].Codigo;
-          codigoCuentaSeña = data[1].Codigo;
-          codigoCuentaSecundariaSeña = data[1].CuentaSecundaria;
+          codigoCuentaEfvo = Array.isArray(data) && data[0].Codigo;
+          codigoCuentaSeña = Array.isArray(data) && data[1].Codigo;
+          codigoCuentaSecundariaSeña =
+            Array.isArray(data) && data[1].CuentaSecundaria;
         });
     }
   } catch (error) {
-    console.log("cPlanCuentas seña", error);
+    return res.send({ status: false, messsage: returnErrorMessage(error) });
   }
 
   try {
@@ -432,7 +433,7 @@ export const altaPre = async (req, res) => {
     });
     resultVerifyTelef = result;
   } catch (error) {
-    console.log("error con verificacion telefonos: ", error);
+    return res.send({ status: false, messsage: returnErrorMessage(error) });
   }
 
   try {
@@ -443,7 +444,7 @@ export const altaPre = async (req, res) => {
         type: QueryTypes.SELECT,
       })
       .then(async (data) => {
-        numeroPreSol = data[2][0]["@a"];
+        numeroPreSol = Array.isArray(data) && data[2][0]["@a"];
       });
   } catch (error) {
     console.log("proxiNumeroPreSol", error);
@@ -463,7 +464,7 @@ export const altaPre = async (req, res) => {
       Nombre: Nombres,
       Calle: Domicilio,
       Localidad: Localidad,
-      TelefParticular: TelefParticular,
+      TelefParticular: Telefonos,
       Vendedor: Vendedor,
       puntoVenta: CodPuntoVenta,
       Modelo: CodModelo,
@@ -481,8 +482,8 @@ export const altaPre = async (req, res) => {
       DocumentoNro: NroDocumento,
       Precio: tipoPrecio,
       TipoPlan: tipoplan,
-      TelefCelular: TelefCelular,
-      TelefLaboral: TelefLaboral,
+      TelefCelular: Telefonos2,
+      TelefLaboral: Telefonos3,
       promoEspecial: PromoEspecial,
       Sucursal: CodSucReal,
       nroRecibo: nroRecibo,
@@ -492,7 +493,7 @@ export const altaPre = async (req, res) => {
       Dto: Dto,
       CodPostal: CodPostal,
       Provincia: Provincia,
-      TelefFamiliar: TelefFamiliar,
+      TelefFamiliar: Telefonos4,
       EmailParticular: EmailParticular,
       EmailLaboral: EmailLaboral,
       Nacimiento: FechaNac,
@@ -509,12 +510,13 @@ export const altaPre = async (req, res) => {
   }
 
   if (
-    (codEmpresa === 1 && codigoMarca === 2 && cuentaContable.length) ||
-    (codEmpresa === 13 && codigoMarca === 10 && cuentaContable.length) ||
-    (codEmpresa === 15 && codigoMarca === 12 && cuentaContable.length)
+    (Empresa === 1 && Marca === 2 && CuentaContable.length) ||
+    (Empresa === 13 && Marca === 10 && CuentaContable.length) ||
+    (Empresa === 15 && Marca === 12 && CuentaContable.length)
   ) {
     //SI CONTABILIZA
     console.log("SI CONTABILIZA");
+
     try {
       await dbGiama
         .query(`SET @b = 0; CALL net_getnumeroasiento(@b); SELECT @b;`, {
@@ -523,7 +525,7 @@ export const altaPre = async (req, res) => {
           transaction: t,
         })
         .then(async (data) => {
-          const numeroAsiento = data[2][0]["@b"];
+          const numeroAsiento = Array.isArray(data) && data[2][0]["@b"];
 
           await dbGiama
             .query(
@@ -535,7 +537,8 @@ export const altaPre = async (req, res) => {
               }
             )
             .then(async (data) => {
-              const numeroAsientoSecundario = data[2][0]["@c"];
+              const numeroAsientoSecundario =
+                Array.isArray(data) && data[2][0]["@c"];
 
               await abmMovimientoContable({
                 dbGiama: dbGiama,
@@ -543,13 +546,13 @@ export const altaPre = async (req, res) => {
                 ID: null,
                 FechaAlta: FechaAlta,
                 numeroAsiento: numeroAsiento,
-                cuenta: cuentaContable,
+                cuenta: CuentaContable,
                 DH: "D",
                 importeAbonado: importeAbonado,
                 Solicitud: Solicitud,
                 numeroPreSol: numeroPreSol,
                 concepto: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
-                codigoMarca: codigoMarca,
+                codigoMarca: Marca,
                 tipoComp: "RCP",
                 nroRecibo: nroRecibo,
                 nroRecibo2: nroRecibo2,
@@ -558,8 +561,12 @@ export const altaPre = async (req, res) => {
                 IDOPERACIONMP: null,
                 t: t,
               }).then(async (data) => {
-                if (data[2][0]["@result1"] === 0) {
+                if (
+                  (data.hasOwnProperty("status") && data.status === false) ||
+                  (Array.isArray(data) && data[2][0]["@result1"] === 0)
+                ) {
                   t.rollback();
+                  throw data;
                 } else {
                   await abmMovimientoContable({
                     dbGiama: dbGiama,
@@ -582,8 +589,13 @@ export const altaPre = async (req, res) => {
                     IDOPERACIONMP: null,
                     t: t,
                   }).then(async (data) => {
-                    if (data[2][0]["@result1"] === 0) {
+                    if (
+                      (data.hasOwnProperty("status") &&
+                        data.status === false) ||
+                      (Array.isArray(data) && data[2][0]["@result1"] === 0)
+                    ) {
                       t.rollback();
+                      throw data;
                     } else {
                       await abmMovimientoContable2({
                         dbGiama: dbGiama,
@@ -594,10 +606,10 @@ export const altaPre = async (req, res) => {
                         numeroAsiento: numeroAsientoSecundario,
                         cuenta: cuentaSecundaria,
                         DH: "D",
-                        cuentaContable: cuentaContable,
+                        CuentaContable: CuentaContable,
                         concepto: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
                         codigoCuentaEfvo: codigoCuentaEfvo,
-                        ValorCuotaTerm: ValorCuotaTerm,
+                        ValorCuotaTerm: CuotaTerminal,
                         importeAbonado: importeAbonado,
                         Solicitud: Solicitud,
                         numeroPreSol: numeroPreSol,
@@ -610,8 +622,13 @@ export const altaPre = async (req, res) => {
                         IDOPERACIONMP: null,
                         user: user,
                       }).then(async (data) => {
-                        if (data[2][0]["@result3"] === 0) {
+                        if (
+                          (data.hasOwnProperty("status") &&
+                            data.status === false) ||
+                          (Array.isArray(data) && data[2][0]["@result3"] === 0)
+                        ) {
                           t.rollback();
+                          throw data;
                         } else {
                           await abmMovimientoContable2({
                             dbGiama: dbGiama,
@@ -622,10 +639,10 @@ export const altaPre = async (req, res) => {
                             numeroAsiento: numeroAsientoSecundario,
                             cuenta: codigoCuentaSecundariaSeña,
                             DH: "H",
-                            cuentaContable: cuentaContable,
+                            CuentaContable: CuentaContable,
                             concepto: `Alta Pre Solicitud ${Solicitud} - PreOperacion ${numeroPreSol}`,
                             codigoCuentaEfvo: codigoCuentaEfvo,
-                            ValorCuotaTerm: ValorCuotaTerm,
+                            ValorCuotaTerm: CuotaTerminal,
                             importeAbonado: importeAbonado,
                             Solicitud: Solicitud,
                             numeroPreSol: numeroPreSol,
@@ -638,8 +655,14 @@ export const altaPre = async (req, res) => {
                             IDOPERACIONMP: null,
                             user: user,
                           }).then(async (data) => {
-                            if (data[2][0]["@result3"] === 0) {
+                            if (
+                              (data.hasOwnProperty("status") &&
+                                data.status === false) ||
+                              (Array.isArray(data) &&
+                                data[2][0]["@result3"] === 0)
+                            ) {
                               t.rollback();
+                              throw data;
                             } else {
                               await abmSenia({
                                 dbGiama: dbGiama,
@@ -662,9 +685,14 @@ export const altaPre = async (req, res) => {
                                 interes: Interes ? Interes : null,
                                 nroAsiento: null,
                               }).then(async (data) => {
-                                if (data[2][0]["@result5"] === 0) {
-                                  console.log(data);
+                                if (
+                                  (data.hasOwnProperty("status") &&
+                                    data.status === false) ||
+                                  (Array.isArray(data) &&
+                                    data[2][0]["@result5"] === 0)
+                                ) {
                                   t.rollback();
+                                  throw data;
                                 } else {
                                   //OBSERVACIONES
 
@@ -680,8 +708,14 @@ export const altaPre = async (req, res) => {
                                       ".",
                                     user: user,
                                   }).then(async (data) => {
-                                    if (data[2][0]["@result6"] === 0) {
+                                    if (
+                                      (data.hasOwnProperty("status") &&
+                                        data.status === false) ||
+                                      (Array.isArray(data) &&
+                                        data[2][0]["@result6"] === 0)
+                                    ) {
                                       t.rollback();
+                                      throw data;
                                     } else {
                                       if (solicitudesDoc.length) {
                                         console.log("encontro solicitudes");
@@ -693,14 +727,20 @@ export const altaPre = async (req, res) => {
                                           operacion: numeroPreSol,
                                           fecha: hoy,
                                           obs: `El cliente posee la(s) siguiente(s) Operaciones(es): 
-                                          ${solicitudesDoc.map(
-                                            (e) =>
-                                              ` Solicitud: ${e.Solicitud} Empresa: ${e.Empresa}`
-                                          )}`,
+                                            ${solicitudesDoc.map(
+                                              (e) =>
+                                                ` Solicitud: ${e.Solicitud} Empresa: ${e.Empresa}`
+                                            )}`,
                                           user: user,
                                         }).then(async (data) => {
-                                          if (data[2][0]["@result6"] === 0) {
+                                          if (
+                                            (data.hasOwnProperty("status") &&
+                                              data.status === false) ||
+                                            (Array.isArray(data) &&
+                                              data[2][0]["@result6"] === 0)
+                                          ) {
                                             t.rollback();
+                                            throw data;
                                           } else {
                                             if (dtoSuscriptor.PresoSN === 1) {
                                               console.log(
@@ -715,11 +755,19 @@ export const altaPre = async (req, res) => {
                                                 operacion: dtoSuscriptor.Codigo,
                                                 fecha: hoy,
                                                 obs: `El cliente ingreso una nueva solicitud en fecha:   ${hoy}   
-                                                Nro. Solicitud:   ${Solicitud}   Empresa:   ${empresaNombre}`,
+                                                  Nro. Solicitud:   ${Solicitud}   Empresa:   ${empresaNombre}`,
                                                 user: user,
                                                 empresa: dtoSuscriptor.Empresa,
                                               }).then((data) => {
-                                                console.log(data);
+                                                if (
+                                                  data.hasOwnProperty(
+                                                    "status"
+                                                  ) &&
+                                                  data.status === false
+                                                ) {
+                                                  t.rollback();
+                                                  throw data;
+                                                }
                                               });
                                             } else {
                                               await grabarObsByEmpresa({
@@ -742,7 +790,15 @@ export const altaPre = async (req, res) => {
                                                 automatica: 1,
                                                 empresa: dtoSuscriptor.Empresa,
                                               }).then((data) => {
-                                                console.log(data);
+                                                if (
+                                                  data.hasOwnProperty(
+                                                    "status"
+                                                  ) &&
+                                                  data.status === false
+                                                ) {
+                                                  t.rollback();
+                                                  throw data;
+                                                }
                                               });
                                             }
                                           }
@@ -757,8 +813,16 @@ export const altaPre = async (req, res) => {
                                           operacion: numeroPreSol,
                                           fecha: hoy,
                                           obs: `${resultVerifyTelef.Codigo}/${resultVerifyTelef.Empresa}/
-                                                ${resultVerifyTelef.Solicitud}/${resultVerifyTelef.Marca}`,
+                                                  ${resultVerifyTelef.Solicitud}/${resultVerifyTelef.Marca}`,
                                           user: user,
+                                        }).then((data) => {
+                                          if (
+                                            data.hasOwnProperty("status") &&
+                                            data.status === false
+                                          ) {
+                                            t.rollback();
+                                            throw data;
+                                          }
                                         });
                                       }
                                     }
@@ -775,13 +839,16 @@ export const altaPre = async (req, res) => {
               });
             });
         });
+      t.commit();
+      return res.send({
+        status: true,
+        message: "Pre-Solicitud añadida correctamente!",
+      });
     } catch (error) {
       return res.send({ status: false, message: returnErrorMessage(error) });
     }
   } else {
     //SI NO CONTABILIZA
-    console.log("NO CONTABILIZA");
-
     try {
       await abmSenia({
         dbGiama: dbGiama,
@@ -804,8 +871,12 @@ export const altaPre = async (req, res) => {
         interes: Interes ? Interes : null,
         nroAsiento: null,
       }).then(async (data) => {
-        if (data[2][0]["@result5"] === 0) {
+        if (
+          (data.hasOwnProperty("status") && data.status === false) ||
+          (Array.isArray(data) && data[2][0]["@result5"] === 0)
+        ) {
           t.rollback();
+          throw data;
         } else {
           await addRecordObservacionPreSol({
             dbGiama: dbGiama,
@@ -816,84 +887,91 @@ export const altaPre = async (req, res) => {
             obs: "Pre-Solicitud dada de alta el día " + hoy + ".",
             user: user,
           }).then(async (data) => {
-            if (data[2][0]["@result6"] === 0) {
+            if (
+              (data.hasOwnProperty("status") && data.status === false) ||
+              (Array.isArray(data) && data[2][0]["@result6"] === 0)
+            ) {
               t.rollback();
+              throw data;
             } else {
               if (solicitudesDoc.length) {
-                try {
-                  await addRecordObservacionPreSol({
-                    dbGiama: dbGiama,
-                    t: t,
-                    codigoMarca: Marca,
-                    operacion: numeroPreSol,
-                    fecha: hoy,
-                    obs: `El cliente posee la(s) siguiente(s) Operaciones(es): 
-      ${solicitudesDoc.map(
-        (e) => ` Solicitud: ${e.Solicitud} Empresa: ${e.Empresa}`
-      )}`,
-                    user: user,
-                  }).then(async (data) => {
-                    if (data[2][0]["@result6"] === 0) {
-                      t.rollback();
+                await addRecordObservacionPreSol({
+                  dbGiama: dbGiama,
+                  t: t,
+                  codigoMarca: Marca,
+                  operacion: numeroPreSol,
+                  fecha: hoy,
+                  obs: `El cliente posee la(s) siguiente(s) Operaciones(es): 
+                    ${solicitudesDoc.map(
+                      (e) => ` Solicitud: ${e.Solicitud} Empresa: ${e.Empresa}`
+                    )}`,
+                  user: user,
+                }).then(async (data) => {
+                  if (
+                    (data.hasOwnProperty("status") && data.status === false) ||
+                    (Array.isArray(data) && data[2][0]["@result6"] === 0)
+                  ) {
+                    t.rollback();
+                    throw data;
+                  } else {
+                    if (dtoSuscriptor.PresoSN === 1) {
+                      await setObsPreSolByEmpresa({
+                        dbGiama: dbGiama,
+                        t: t,
+                        codigoMarca: dtoSuscriptor.Marca,
+                        operacion: dtoSuscriptor.Codigo,
+                        fecha: hoy,
+                        obs: `El cliente ingreso una nueva solicitud en fecha: "  ${hoy}  " Nro. Solicitud: "  ${
+                          dtoSuscriptor.Solicitud
+                        }  " Empresa: "  ${
+                          solicitudesDoc.find(
+                            (e) => e.Solicitud === dtoSuscriptor.Solicitud
+                          ).Empresa
+                        }`,
+                        user: user,
+                        empresa: dtoSuscriptor.Empresa,
+                      }).then((data) => {
+                        if (
+                          data.hasOwnProperty("status") &&
+                          data.status === false
+                        )
+                          t.rollback();
+                        throw data;
+                      });
                     } else {
-                      if (dtoSuscriptor.PresoSN === 1) {
-                        await setObsPreSolByEmpresa({
-                          dbGiama: dbGiama,
-                          t: t,
-                          codigoMarca: dtoSuscriptor.Marca,
-                          operacion: dtoSuscriptor.Codigo,
-                          fecha: hoy,
-                          obs: `El cliente ingreso una nueva solicitud en fecha: "  ${hoy}  " Nro. Solicitud: "  ${
-                            dtoSuscriptor.Solicitud
-                          }  " Empresa: "  ${
-                            solicitudesDoc.find(
-                              (e) => e.Solicitud === dtoSuscriptor.Solicitud
-                            ).Empresa
-                          }`,
-                          user: user,
-                          empresa: dtoSuscriptor.Empresa,
-                        }).then((data) => {
-                          console.log(data);
-                        });
-                      } else {
-                        await grabarObsByEmpresa({
-                          dbGiama: dbGiama,
-                          t: t,
-                          codigoMarca: dtoSuscriptor.Marca,
-                          operacion: dtoSuscriptor.Codigo,
-                          fecha: hoy,
-                          obs:
-                            "El cliente ingreso una nueva solicitud en fecha: " +
-                            hoy +
-                            " Nro. Solicitud: " +
-                            dtoSuscriptor.Solicitud +
-                            " Empresa: " +
-                            solicitudesDoc.find(
-                              (e) => e.Solicitud === dtoSuscriptor.Solicitud
-                            ).Empresa,
-                          user: user,
-                          fechaLlamado: null,
-                          resaltado: null,
-                          automatica: 1,
-                          empresa: dtoSuscriptor.Empresa,
-                        }).then((data) => {
-                          console.log(data);
-                        });
-                      }
+                      await grabarObsByEmpresa({
+                        dbGiama: dbGiama,
+                        t: t,
+                        codigoMarca: dtoSuscriptor.Marca,
+                        operacion: dtoSuscriptor.Codigo,
+                        fecha: hoy,
+                        obs:
+                          "El cliente ingreso una nueva solicitud en fecha: " +
+                          hoy +
+                          " Nro. Solicitud: " +
+                          dtoSuscriptor.Solicitud +
+                          " Empresa: " +
+                          solicitudesDoc.find(
+                            (e) => e.Solicitud === dtoSuscriptor.Solicitud
+                          ).Empresa,
+                        user: user,
+                        fechaLlamado: null,
+                        resaltado: null,
+                        automatica: 1,
+                        empresa: dtoSuscriptor.Empresa,
+                      }).then((data) => {
+                        if (
+                          data.hasOwnProperty("status") &&
+                          data.status === false
+                        )
+                          t.rollback();
+                        throw data;
+                      });
                     }
-                  });
-                } catch (error) {
-                  console.log("observacion2", error);
-                  t.rollback();
-                  return res.send({
-                    status: false,
-                    message: returnErrorMessage(error),
-                  });
-                }
+                  }
+                });
               }
               if (resultVerifyTelef) {
-                //Comiteamos en la última observacion
-
                 await addRecordObservacionPreSol({
                   dbGiama: dbGiama,
                   t: t,
@@ -901,22 +979,27 @@ export const altaPre = async (req, res) => {
                   operacion: numeroPreSol,
                   fecha: hoy,
                   obs: `${resultVerifyTelef.Codigo}/${resultVerifyTelef.Empresa}/
-          ${resultVerifyTelef.Solicitud}/${resultVerifyTelef.Marca}`,
+            ${resultVerifyTelef.Solicitud}/${resultVerifyTelef.Marca}`,
                   user: user,
+                }).then((data) => {
+                  if (data.hasOwnProperty("status") && data.status === false) {
+                    t.rollback();
+                    throw data;
+                  }
                 });
               }
             }
           });
         }
       });
+
+      t.commit();
+      return res.send({
+        status: true,
+        message: "Pre-Solicitud añadida correctamente!",
+      });
     } catch (error) {
       return res.send({ status: false, message: returnErrorMessage(error) });
     }
   }
-
-  t.commit();
-  return res.send({
-    status: true,
-    message: "Pre-Solicitud añadida correctamente!",
-  });
 };
