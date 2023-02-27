@@ -1,10 +1,12 @@
 import { QueryTypes } from "sequelize";
 import { queryGetFormasPagoAltaPre } from "../../queries";
+import { returnErrorMessage } from "../../helpers/errors/returnErrorMessage";
 import {
   abmSenia,
   abmMovimientoContable,
   abmMovimientoContable2,
 } from "../../utils/Operaciones/solicitudesUtils";
+
 require("dotenv").config();
 
 export const getPreOperaciones = async (req, res) => {
@@ -31,7 +33,7 @@ export const getPreOperaciones = async (req, res) => {
     return res.send(solicitudes);
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -59,7 +61,7 @@ export const getDatosPreSol = async (req, res) => {
     return res.send(dataConverted);
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -94,7 +96,7 @@ export const getSenias = async (req, res) => {
     return res.send(dataConverted);
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -106,7 +108,7 @@ export const getModelos = async (req, res) => {
     return res.send(data[0]);
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -120,7 +122,7 @@ export const getOficialesMora = async (req, res) => {
     return res.send(data[0]);
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -134,7 +136,7 @@ export const getOficialesPC = async (req, res) => {
     return res.send(data[0]);
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 export const getOficialesScoring = async (req, res) => {
@@ -147,7 +149,7 @@ export const getOficialesScoring = async (req, res) => {
     return res.send(data[0]);
   } catch (error) {
     console.log(error);
-    return res.send(error);
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -161,7 +163,7 @@ export const getOrigenSuscripcion = async (req, res) => {
     return res.send(origen);
   } catch (error) {
     console.log(error);
-    return res.send({ status: false, data: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -178,7 +180,7 @@ export const getPuntosVenta = async (req, res) => {
     return res.send(puntos);
   } catch (error) {
     console.log(error);
-    return res.send({ status: false, data: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -196,7 +198,7 @@ export const getParametros = async (req, res) => {
     );
   } catch (error) {
     console.log(error);
-    return res.send({ status: false, data: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 
   try {
@@ -208,7 +210,7 @@ export const getParametros = async (req, res) => {
     );
   } catch (error) {
     console.log(error);
-    return res.send({ status: false, data: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 
   return res.send({
@@ -227,7 +229,7 @@ export const getFormasPago = async (req, res) => {
     return res.send(formasPago);
   } catch (error) {
     console.log(error);
-    return res.send({ status: false, data: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -241,7 +243,7 @@ export const getTarjetas = async (req, res) => {
     return res.send(tarjetas);
   } catch (error) {
     console.log(error);
-    return res.send({ status: false, data: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 export const getIntereses = async (req, res) => {
@@ -261,7 +263,7 @@ export const getIntereses = async (req, res) => {
     return res.send(intereses);
   } catch (error) {
     console.log(error);
-    return res.send({ status: false, data: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -319,7 +321,7 @@ export const pagoSenia = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    return res.status(400).send({ status: false, data: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 
   if (impTotalAbonado + parseFloat(ImpAbonado) > ValorCuota) {
@@ -565,7 +567,7 @@ export const deletePago = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    return res.status(400).send({ status: false, message: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 
   try {
@@ -594,7 +596,7 @@ export const deletePago = async (req, res) => {
     return res.send({ status: true, message: "Seña eliminada correctamente!" });
   } catch (error) {
     console.log(error);
-    return res.send({ status: false, message: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
 
@@ -640,7 +642,7 @@ export const updatePago = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    return res.status(400).send({ status: false, message: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 
   if (CuotaACobrar - seniasFiltered < ImpAbonado) {
@@ -681,6 +683,6 @@ export const updatePago = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.send({ status: false, message: error });
+    return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
