@@ -504,7 +504,6 @@ export const altaPre = async (req, res) => {
       CUIL: CUIL,
     });
   } catch (error) {
-    console.log("abmPreSol", error);
     t.rollback();
     return res.send({ status: false, message: returnErrorMessage(error) });
   }
