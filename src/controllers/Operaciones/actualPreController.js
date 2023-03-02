@@ -560,7 +560,7 @@ export const deletePago = async (req, res) => {
       (e) => e.rl_codigo === "1" || e.rl_codigo === "1.2.2.3"
     );
     if (!finded) {
-      return res.status(500).send({
+      return res.send({
         status: false,
         message: "No tiene permitido realizar esta acción",
       });
