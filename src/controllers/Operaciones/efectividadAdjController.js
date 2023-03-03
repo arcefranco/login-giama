@@ -21,6 +21,14 @@ export const getEfectividadAdj = async (req, res) => {
       (tag, index, array) =>
         array.findIndex((t) => t.CodOficial == tag.CodOficial) == index
     );
+    cantidadOficiales.push({
+      Marca: cantidadOficiales[0].Marca,
+      NomOficial: "AAA TODOS LOS OFICIALES",
+      CodOficial: 999999,
+      Cantidad: 0,
+      Pedidos: 0,
+      PedidosDelMes: 0,
+    });
 
     for (let i = 0; i < cantidadOficiales.length; i++) {
       /* lleno el array con las categorias * la cantidad de oficiales */
@@ -200,7 +208,6 @@ export const getEfectividadAdj = async (req, res) => {
           );
         }
         if (
-          /*  result[i].Tipo === "E" && */
           result[i].CodOficial === array[j].CodOficial &&
           array[j].Categoria === "PEAC"
         ) {
@@ -211,7 +218,155 @@ export const getEfectividadAdj = async (req, res) => {
         }
       }
     }
+    let vueltas = 1;
+    let posArray = 0;
+    while (vueltas <= 10) {
+      let categorias = {
+        1: "GS",
+        2: "GL",
+        3: "GE",
+        4: "PS",
+        5: "PL",
+        6: "PE",
+        7: "PORS",
+        8: "PORL",
+        9: "PORE",
+        10: "PEAC",
+      };
+      let meses = {
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 0,
+        9: 0,
+        10: 0,
+        11: 0,
+        12: 0,
+        13: 0,
+        14: 0,
+        15: 0,
+        16: 0,
+      };
 
+      if (Object.values(categorias)[posArray] === "PORS") {
+        for (let i = 5; i <= 16; i++) {
+          meses[i] = Math.round(
+            (array
+              .filter((e) => e.Categoria === "PS")
+              .filter((e) => {
+                return e[Object.keys(e)[i]];
+              })
+              .reduce((accumulator, value) => {
+                return accumulator + value[Object.keys(value)[i]];
+              }, 0) /
+              array
+                .filter((e) => e.Categoria === "GS")
+                .filter((e) => {
+                  return e[Object.keys(e)[i]];
+                })
+                .reduce((accumulator, value) => {
+                  return accumulator + value[Object.keys(value)[i]];
+                }, 0)) *
+              100
+          );
+        }
+      } else if (Object.values(categorias)[posArray] === "PORL") {
+        for (let i = 5; i <= 16; i++) {
+          meses[i] = Math.round(
+            (array
+              .filter((e) => e.Categoria === "PL")
+              .filter((e) => {
+                return e[Object.keys(e)[i]];
+              })
+              .reduce((accumulator, value) => {
+                return accumulator + value[Object.keys(value)[i]];
+              }, 0) /
+              array
+                .filter((e) => e.Categoria === "GL")
+                .filter((e) => {
+                  return e[Object.keys(e)[i]];
+                })
+                .reduce((accumulator, value) => {
+                  return accumulator + value[Object.keys(value)[i]];
+                }, 0)) *
+              100
+          );
+        }
+      } else if (Object.values(categorias)[posArray] === "PORE") {
+        for (let i = 5; i <= 16; i++) {
+          meses[i] = Math.round(
+            (array
+              .filter((e) => e.Categoria === "PE")
+              .filter((e) => {
+                return e[Object.keys(e)[i]];
+              })
+              .reduce((accumulator, value) => {
+                return accumulator + value[Object.keys(value)[i]];
+              }, 0) /
+              array
+                .filter((e) => e.Categoria === "GE")
+                .filter((e) => {
+                  return e[Object.keys(e)[i]];
+                })
+                .reduce((accumulator, value) => {
+                  return accumulator + value[Object.keys(value)[i]];
+                }, 0)) *
+              100
+          );
+        }
+      } else {
+        for (let i = 5; i <= 16; i++) {
+          meses[i] = array
+            .filter((e) => e.Categoria === Object.values(categorias)[posArray])
+            .filter((e) => {
+              return e[Object.keys(e)[i]];
+            })
+            .reduce((accumulator, value) => {
+              return accumulator + value[Object.keys(value)[i]];
+            }, 0);
+        }
+      }
+
+      let mesAnio = Object.keys(
+        array[0]
+      ); /* random agarro el primer registro del array solo para sacarle el key de los meses */
+
+      for (let i = 1; i < Object.keys(meses).length + 1; i++) {
+        array[array.length - (10 - posArray)][mesAnio[4 + i]] = meses[4 + i];
+      }
+      vueltas++;
+      posArray++;
+    }
+    /* FILTRO DE OFICIALES CON DATA VACÍA */
+    let oficialesCodigos = [
+      /* TODOS LOS CODIGOS DE LOS OFICIALES EN EL ARRAY HASTA EL MOMENTO */
+      ...new Set(
+        array.map((e) => {
+          return e.CodOficial;
+        })
+      ),
+    ];
+
+    for (let i = 0; i < oficialesCodigos.length - 1; i++) {
+      if (
+        array
+          .filter((e) => e.CodOficial === oficialesCodigos[i])
+          .map((e) => {
+            return Object.values(e).slice(5, 16);
+          })
+          .map((e) =>
+            e.reduce((accumulator, value) => {
+              return accumulator + value;
+            }, 0)
+          )
+          .reduce((accumulator, value) => {
+            return accumulator + value;
+          }, 0) === 0
+      );
+      {
+        array = array.filter((e) => e.CodOficial !== oficialesCodigos[i]);
+      }
+    }
     return res.send(array);
   } catch (error) {
     return res.send({ status: false, message: returnErrorMessage(error) });
