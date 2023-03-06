@@ -23,7 +23,7 @@ export const getEfectividadAdj = async (req, res) => {
     );
     cantidadOficiales.push({
       Marca: cantidadOficiales[0].Marca,
-      NomOficial: "AAA TODOS LOS OFICIALES",
+      NomOficial: ".TODOS LOS OFICIALES",
       CodOficial: 999999,
       Cantidad: 0,
       Pedidos: 0,
@@ -211,10 +211,14 @@ export const getEfectividadAdj = async (req, res) => {
           result[i].CodOficial === array[j].CodOficial &&
           array[j].Categoria === "PEAC"
         ) {
-          array[j][result[i].Mes + "_" + result[i].Anio] =
-            result[i].PedidosDelMes && !isNaN(result[i].Pedidos)
-              ? result[i].PedidosDelMes
-              : 0;
+          array[j][result[i].Mes + "_" + result[i].Anio] = result
+            .filter(
+              (e) =>
+                e.CodOficial === result[i].CodOficial && e.Mes === result[i].Mes
+            )
+            .reduce((accumulator, value) => {
+              return accumulator + value.PedidosDelMes;
+            }, 0);
         }
       }
     }
@@ -347,23 +351,24 @@ export const getEfectividadAdj = async (req, res) => {
       ),
     ];
 
-    for (let i = 0; i < oficialesCodigos.length - 1; i++) {
-      if (
-        array
-          .filter((e) => e.CodOficial === oficialesCodigos[i])
-          .map((e) => {
-            return Object.values(e).slice(5, 16);
-          })
-          .map((e) =>
-            e.reduce((accumulator, value) => {
-              return accumulator + value;
-            }, 0)
-          )
-          .reduce((accumulator, value) => {
+    for (let i = 0; i < oficialesCodigos.length; i++) {
+      let value;
+      value = array
+        .filter((e) => e.CodOficial === oficialesCodigos[i])
+        .map((e) => {
+          return Object.values(e).slice(5, 16);
+        })
+        .map((e) =>
+          e.reduce((accumulator, value) => {
             return accumulator + value;
-          }, 0) === 0
-      );
-      {
+          }, 0)
+        )
+        .reduce((accumulator, value) => {
+          return accumulator + value;
+        }, 0);
+      if (value === 0) {
+        console.log("pasó", value, oficialesCodigos[i]);
+
         array = array.filter((e) => e.CodOficial !== oficialesCodigos[i]);
       }
     }
