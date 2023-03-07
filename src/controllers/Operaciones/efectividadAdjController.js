@@ -54,6 +54,13 @@ export const getEfectividadAdj = async (req, res) => {
         NombreOficial: cantidadOficiales[i].NomOficial,
       });
       array.push({
+        Categoria: "GT",
+        Tipo: "G",
+        NombreCategoria: "Ganadas TOTALES",
+        CodOficial: cantidadOficiales[i].CodOficial,
+        NombreOficial: cantidadOficiales[i].NomOficial,
+      });
+      array.push({
         Categoria: "PS",
         Tipo: "P",
         NombreCategoria: "Pedidos Aceptados por Sorteo de Acto",
@@ -71,6 +78,13 @@ export const getEfectividadAdj = async (req, res) => {
         Categoria: "PE",
         Tipo: "P",
         NombreCategoria: "Pedidos Aceptados por Entrega Programada",
+        CodOficial: cantidadOficiales[i].CodOficial,
+        NombreOficial: cantidadOficiales[i].NomOficial,
+      });
+      array.push({
+        Categoria: "PT",
+        Tipo: "P",
+        NombreCategoria: "Pedidos TOTALES",
         CodOficial: cantidadOficiales[i].CodOficial,
         NombreOficial: cantidadOficiales[i].NomOficial,
       });
@@ -95,7 +109,13 @@ export const getEfectividadAdj = async (req, res) => {
         CodOficial: cantidadOficiales[i].CodOficial,
         NombreOficial: cantidadOficiales[i].NomOficial,
       });
-
+      array.push({
+        Categoria: "PORT",
+        Tipo: "POR",
+        NombreCategoria: "Porcentajes TOTALES",
+        CodOficial: cantidadOficiales[i].CodOficial,
+        NombreOficial: cantidadOficiales[i].NomOficial,
+      });
       array.push({
         Categoria: "PEAC",
         Tipo: "",
@@ -139,6 +159,20 @@ export const getEfectividadAdj = async (req, res) => {
               : 0;
         }
         if (
+          result[i].CodOficial === array[j].CodOficial &&
+          array[j].Categoria === "GT"
+        ) {
+          array[j][result[i].Mes + "_" + result[i].Anio] = result
+            .filter((e) => {
+              return (
+                e.Mes === result[i].Mes && e.CodOficial === result[i].CodOficial
+              );
+            })
+            .reduce((accumulator, value) => {
+              return accumulator + value.Cantidad;
+            }, 0);
+        }
+        if (
           result[i].Tipo === "S" &&
           result[i].CodOficial === array[j].CodOficial &&
           array[j].Categoria === "PS"
@@ -169,6 +203,20 @@ export const getEfectividadAdj = async (req, res) => {
               : 0;
         }
         if (
+          result[i].CodOficial === array[j].CodOficial &&
+          array[j].Categoria === "PT"
+        ) {
+          array[j][result[i].Mes + "_" + result[i].Anio] = result
+            .filter((e) => {
+              return (
+                e.Mes === result[i].Mes && e.CodOficial === result[i].CodOficial
+              );
+            })
+            .reduce((accumulator, value) => {
+              return accumulator + value.Pedidos;
+            }, 0);
+        }
+        if (
           result[i].Tipo === "S" &&
           result[i].CodOficial === array[j].CodOficial &&
           array[j].Categoria === "PORS"
@@ -178,7 +226,7 @@ export const getEfectividadAdj = async (req, res) => {
               (result[i].Cantidad !== null && result[i].Cantidad !== 0
                 ? result[i].Cantidad
                 : 1)) *
-              100
+              140
           );
         }
         if (
@@ -209,6 +257,33 @@ export const getEfectividadAdj = async (req, res) => {
         }
         if (
           result[i].CodOficial === array[j].CodOficial &&
+          array[j].Categoria === "PORT"
+        ) {
+          let pedidos = result
+            .filter((e) => {
+              return (
+                e.Mes === result[i].Mes && e.CodOficial === result[i].CodOficial
+              );
+            })
+            .reduce((accumulator, value) => {
+              return accumulator + value.Pedidos;
+            }, 0);
+          let cantidad = result
+            .filter((e) => {
+              return (
+                e.Mes === result[i].Mes && e.CodOficial === result[i].CodOficial
+              );
+            })
+            .reduce((accumulator, value) => {
+              return accumulator + value.Cantidad;
+            }, 0);
+
+          array[j][result[i].Mes + "_" + result[i].Anio] = Math.round(
+            (pedidos / cantidad) * 100
+          );
+        }
+        if (
+          result[i].CodOficial === array[j].CodOficial &&
           array[j].Categoria === "PEAC"
         ) {
           array[j][result[i].Mes + "_" + result[i].Anio] = result
@@ -224,18 +299,21 @@ export const getEfectividadAdj = async (req, res) => {
     }
     let vueltas = 1;
     let posArray = 0;
-    while (vueltas <= 10) {
+    while (vueltas <= 13) {
       let categorias = {
         1: "GS",
         2: "GL",
         3: "GE",
-        4: "PS",
-        5: "PL",
-        6: "PE",
-        7: "PORS",
-        8: "PORL",
-        9: "PORE",
-        10: "PEAC",
+        4: "GT",
+        5: "PS",
+        6: "PL",
+        7: "PE",
+        8: "PT",
+        9: "PORS",
+        10: "PORL",
+        11: "PORE",
+        12: "PORT",
+        13: "PEAC",
       };
       let meses = {
         5: 0,
@@ -296,6 +374,28 @@ export const getEfectividadAdj = async (req, res) => {
               100
           );
         }
+      } else if (Object.values(categorias)[posArray] === "PORT") {
+        for (let i = 5; i <= 16; i++) {
+          meses[i] = Math.round(
+            (array
+              .filter((e) => e.Categoria === "PT")
+              .filter((e) => {
+                return e[Object.keys(e)[i]];
+              })
+              .reduce((accumulator, value) => {
+                return accumulator + value[Object.keys(value)[i]];
+              }, 0) /
+              array
+                .filter((e) => e.Categoria === "GT")
+                .filter((e) => {
+                  return e[Object.keys(e)[i]];
+                })
+                .reduce((accumulator, value) => {
+                  return accumulator + value[Object.keys(value)[i]];
+                }, 0)) *
+              100
+          );
+        }
       } else if (Object.values(categorias)[posArray] === "PORE") {
         for (let i = 5; i <= 16; i++) {
           meses[i] = Math.round(
@@ -330,13 +430,12 @@ export const getEfectividadAdj = async (req, res) => {
             }, 0);
         }
       }
-
       let mesAnio = Object.keys(
         array[0]
       ); /* random agarro el primer registro del array solo para sacarle el key de los meses */
 
       for (let i = 1; i < Object.keys(meses).length + 1; i++) {
-        array[array.length - (10 - posArray)][mesAnio[4 + i]] = meses[4 + i];
+        array[array.length - (13 - posArray)][mesAnio[4 + i]] = meses[4 + i];
       }
       vueltas++;
       posArray++;
@@ -350,25 +449,30 @@ export const getEfectividadAdj = async (req, res) => {
         })
       ),
     ];
-
     for (let i = 0; i < oficialesCodigos.length; i++) {
       let value;
       value = array
-        .filter((e) => e.CodOficial === oficialesCodigos[i])
+        .filter(
+          (e) =>
+            e.CodOficial === oficialesCodigos[i] &&
+            e.Categoria !== "PORT" &&
+            e.Categoria !== "PORS" &&
+            e.Categoria !== "PORE" &&
+            e.Categoria !== "PORL"
+        )
         .map((e) => {
           return Object.values(e).slice(5, 16);
         })
-        .map((e) =>
-          e.reduce((accumulator, value) => {
+        .map((e) => {
+          return e.reduce((accumulator, value) => {
             return accumulator + value;
-          }, 0)
-        )
+          }, 0);
+        })
         .reduce((accumulator, value) => {
           return accumulator + value;
         }, 0);
-      if (value === 0) {
-        console.log("pasó", value, oficialesCodigos[i]);
 
+      if (value === 0) {
         array = array.filter((e) => e.CodOficial !== oficialesCodigos[i]);
       }
     }
