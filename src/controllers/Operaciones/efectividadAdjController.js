@@ -10,25 +10,32 @@ export const getEfectividadAdj = async (req, res) => {
     return res.send({ status: false, message: "Faltan campos" });
 
   try {
-    const result = await dbGiama.query(
+    let result = await dbGiama.query(
       "CALL net_getadjudicaciones_2(?, ?, ?, ?)",
       {
         replacements: [codigoMarca, mes, anio, oficial ? oficial : 0],
       }
     );
+    if (oficial) {
+      result = result.filter((e) => {
+        return e.CodOficial === oficial;
+      });
+    }
     /** cuento la cantidad de oficiales */
     cantidadOficiales = result.filter(
       (tag, index, array) =>
         array.findIndex((t) => t.CodOficial == tag.CodOficial) == index
     );
-    cantidadOficiales.push({
-      Marca: cantidadOficiales[0].Marca,
-      NomOficial: ".TODOS LOS OFICIALES",
-      CodOficial: 999999,
-      Cantidad: 0,
-      Pedidos: 0,
-      PedidosDelMes: 0,
-    });
+    if (!oficial) {
+      cantidadOficiales.push({
+        Marca: cantidadOficiales[0].Marca,
+        NomOficial: ".TODOS LOS OFICIALES",
+        CodOficial: 999999,
+        Cantidad: 0,
+        Pedidos: 0,
+        PedidosDelMes: 0,
+      });
+    }
 
     for (let i = 0; i < cantidadOficiales.length; i++) {
       /* lleno el array con las categorias * la cantidad de oficiales */
@@ -56,7 +63,7 @@ export const getEfectividadAdj = async (req, res) => {
       array.push({
         Categoria: "GT",
         Tipo: "G",
-        NombreCategoria: "Ganadas TOTALES",
+        NombreCategoria: "TOTALES",
         CodOficial: cantidadOficiales[i].CodOficial,
         NombreOficial: cantidadOficiales[i].NomOficial,
       });
@@ -84,7 +91,7 @@ export const getEfectividadAdj = async (req, res) => {
       array.push({
         Categoria: "PT",
         Tipo: "P",
-        NombreCategoria: "Pedidos TOTALES",
+        NombreCategoria: "TOTALES",
         CodOficial: cantidadOficiales[i].CodOficial,
         NombreOficial: cantidadOficiales[i].NomOficial,
       });
@@ -112,13 +119,13 @@ export const getEfectividadAdj = async (req, res) => {
       array.push({
         Categoria: "PORT",
         Tipo: "POR",
-        NombreCategoria: "Porcentajes TOTALES",
+        NombreCategoria: "TOTALES",
         CodOficial: cantidadOficiales[i].CodOficial,
         NombreOficial: cantidadOficiales[i].NomOficial,
       });
       array.push({
         Categoria: "PEAC",
-        Tipo: "",
+        Tipo: "Z",
         NombreCategoria: "Pedidos Aceptados del Mes",
         CodOficial: cantidadOficiales[i].CodOficial,
         NombreOficial: cantidadOficiales[i].NomOficial,
