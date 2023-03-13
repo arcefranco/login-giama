@@ -51,6 +51,58 @@ export const pa7_alizzeConnection = new Sequelize(
   }
 );
 
+export const pa7_chConnection = new Sequelize(
+  "pa7_ch",
+  process.env.DB_USERNAME,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
+    dialectOptions: {
+      multipleStatements: true,
+    },
+  }
+);
+
+export const pa7_detConnection = new Sequelize(
+  "pa7_det",
+  process.env.DB_USERNAME,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
+    dialectOptions: {
+      multipleStatements: true,
+    },
+  }
+);
+
+export const pa7_gfConnection = new Sequelize(
+  "pa7_gf",
+  process.env.DB_USERNAME,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
+    dialectOptions: {
+      multipleStatements: true,
+    },
+  }
+);
+
+export const pa7_gfLuxcarConnection = new Sequelize(
+  "pa7_gf_luxcar",
+  process.env.DB_USERNAME,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
+    dialectOptions: {
+      multipleStatements: true,
+    },
+  }
+);
+
 ////MODELS PA7//////
 
 ////////GERENTE
