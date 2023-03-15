@@ -549,3 +549,20 @@ export const getOficialAdj = async (req, res) => {
     return res.send({ status: false, message: returnErrorMessage(error) });
   }
 };
+
+export const getDetalleEfectividad = async (req, res) => {
+  const { marca, tipo, mes, anio, oficial, periodoCompleto } = req.body;
+  const dbGiama = req.db;
+  try {
+    const detallesEfectividad = await dbGiama.query(
+      "CALL net_getadjudicacionesdetalle_v2(?, ?, ?, ?, ?, ?)",
+      {
+        replacements: [marca, tipo, mes, anio, oficial, periodoCompleto],
+      }
+    );
+
+    return res.send(detallesEfectividad);
+  } catch (error) {
+    return res.send({ status: false, message: returnErrorMessage(error) });
+  }
+};
