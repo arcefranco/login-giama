@@ -1,5 +1,5 @@
-import { returnErrorMessage } from "../../helpers/errors/returnErrorMessage";
-import { selectQuery } from "../queries/selectQuery";
+import { returnErrorMessage } from "../../../helpers/errors/returnErrorMessage";
+import { selectQuery } from "../../queries/selectQuery";
 export const getEfectividadAdj = async (req, res) => {
   const { codigoMarca, mes, anio, oficial } = req.body;
   const dbGiama = req.db;
