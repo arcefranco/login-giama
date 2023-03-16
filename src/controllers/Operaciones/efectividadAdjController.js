@@ -557,7 +557,14 @@ export const getDetalleEfectividad = async (req, res) => {
     const detallesEfectividad = await dbGiama.query(
       "CALL net_getadjudicacionesdetalle_v2(?, ?, ?, ?, ?, ?)",
       {
-        replacements: [marca, tipo, mes, anio, oficial, periodoCompleto],
+        replacements: [
+          parseInt(marca),
+          parseInt(tipo),
+          parseInt(mes),
+          parseInt(anio),
+          parseInt(oficial),
+          parseInt(periodoCompleto),
+        ],
       }
     );
 
