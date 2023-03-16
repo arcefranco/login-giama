@@ -3,9 +3,9 @@ import {
   getEfectividadAdj,
   getOficialAdj,
   getDetalleEfectividad,
-} from "../../controllers/Operaciones/efectividadAdjController";
-import { testConnection } from "../../middlewares/testConnection";
-import { testConnectionAll } from "../../middlewares/testConnectionAll";
+} from "../../../controllers/Reportes/AdmPlanes/efectividadAdjController";
+import { testConnection } from "../../../middlewares/testConnection";
+import { testConnectionAll } from "../../../middlewares/testConnectionAll";
 
 require("dotenv").config();
 
