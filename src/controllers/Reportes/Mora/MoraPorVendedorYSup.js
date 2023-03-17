@@ -34,6 +34,8 @@ export const getMoraXVendedor = async (req, res) => {
         Vendedor: cantidadVendedores[i].Oficial,
         FechaBaja: cantidadVendedores[i].FechaBaja,
         Supervisor: cantidadVendedores[i].SucNombre,
+        Mes: mes,
+        Anio: anio,
         V2: 0,
         M2: 0,
         PER2: "0%",
