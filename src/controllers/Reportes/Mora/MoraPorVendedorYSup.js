@@ -100,9 +100,10 @@ export const getMoraXVendedor = async (req, res) => {
 };
 
 export const getMoraXSupervisor = async (req, res) => {
-  const { mes, anio, restaCuotas, oficial } = req.body;
+  const { mes, anio, restaCuotas, oficial, SC } = req.body;
   let array = [];
   let cantidadSupervisores;
+  let result;
   const dbGiama = req.db;
   console.log(req.body);
   if (!mes || !anio) {
@@ -110,14 +111,28 @@ export const getMoraXSupervisor = async (req, res) => {
   }
 
   try {
-    const result = await dbGiama.query("CALL net_getmoraxvendedor(?,?,?,?)", {
-      replacements: [
-        mes,
-        anio,
-        restaCuotas ? restaCuotas : 0,
-        oficial ? oficial : null,
-      ],
-    });
+    if (SC === 1) {
+      result = await dbGiama.query(
+        "CALL net_getmoraxvendedor_SinCruce(?,?,?,?)",
+        {
+          replacements: [
+            mes,
+            anio,
+            restaCuotas ? restaCuotas : 0,
+            oficial ? oficial : null,
+          ],
+        }
+      );
+    } else {
+      result = await dbGiama.query("CALL net_getmoraxvendedor(?,?,?,?)", {
+        replacements: [
+          mes,
+          anio,
+          restaCuotas ? restaCuotas : 0,
+          oficial ? oficial : null,
+        ],
+      });
+    }
     /* cuento la cantidad de vendedores */
 
     cantidadSupervisores = result.filter(
