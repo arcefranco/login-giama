@@ -34,6 +34,7 @@ export const getMoraXVendedor = async (req, res) => {
         Vendedor: cantidadVendedores[i].Oficial,
         FechaBaja: cantidadVendedores[i].FechaBaja,
         Supervisor: cantidadVendedores[i].SucNombre,
+        SucCodigo: cantidadVendedores[i].SucCodigo,
         Mes: mes,
         Anio: anio,
         V2: 0,
@@ -105,7 +106,7 @@ export const getMoraXSupervisor = async (req, res) => {
   let cantidadSupervisores;
   let result;
   const dbGiama = req.db;
-  console.log(req.body);
+
   if (!mes || !anio) {
     return res.send({ status: false, message: "Faltan datos" });
   }
@@ -217,4 +218,38 @@ export const getMoraXSupervisor = async (req, res) => {
   } catch (error) {
     return res.send({ status: false, message: returnErrorMessage(error) });
   }
+};
+
+export const getMoraDetalle = async (req, res) => {
+  const { mes, anio, restaCuotas, oficial, SC } = req.body;
+  const dbGiama = req.db;
+  let result;
+  if (!mes || !anio) {
+    return res.send({ status: false, message: "Faltan datos" });
+  }
+
+  if (SC === 1) {
+    result = await dbGiama.query(
+      "CALL net_getmoraxoficial_detalle_SinCruce(?,?,?,?)",
+      {
+        replacements: [
+          mes,
+          anio,
+          restaCuotas ? restaCuotas : 0,
+          oficial ? oficial : null,
+        ],
+      }
+    );
+  } else {
+    result = await dbGiama.query("CALL net_getmoraxoficial_detalle(?,?,?,?)", {
+      replacements: [
+        mes,
+        anio,
+        restaCuotas ? restaCuotas : 0,
+        oficial ? oficial : null,
+      ],
+    });
+  }
+
+  return res.send(result);
 };
