@@ -3,9 +3,10 @@ import { returnErrorMessage } from "../../../helpers/errors/returnErrorMessage";
 require("dotenv").config();
 
 export const getMoraXVendedor = async (req, res) => {
-  const { mes, anio, restaCuotas, oficial } = req.body;
+  const { mes, anio, restaCuotas, oficial, SC } = req.body;
   let array = [];
   let cantidadVendedores;
+  let resultDetalle;
   const dbGiama = req.db;
   console.log(req.body);
   if (!mes || !anio) {
@@ -25,7 +26,9 @@ export const getMoraXVendedor = async (req, res) => {
 
     cantidadVendedores = result.filter(
       (tag, index, array) =>
-        array.findIndex((t) => t.Oficial == tag.Oficial) == index
+        array.findIndex(
+          (t) => t.Oficial == tag.Oficial && t.SucCodigo == tag.SucCodigo
+        ) == index
     );
 
     /* por cada vendedor pusheo un objeto de la tabla al array final */
@@ -78,7 +81,10 @@ export const getMoraXVendedor = async (req, res) => {
     let capaPER;
     for (let j = 0; j < result.length; j++) {
       for (let x = 0; x < array.length; x++) {
-        if (result[j].Oficial === array[x].Vendedor) {
+        if (
+          result[j].Oficial === array[x].Vendedor &&
+          result[j].SucCodigo === array[x].SucCodigo
+        ) {
           capaV = `V${result[j].Capa}`;
           capaM = `M${result[j].Capa}`;
           capaPER = `PER${result[j].Capa}`;
@@ -86,15 +92,36 @@ export const getMoraXVendedor = async (req, res) => {
           array[x][capaM] = result[j].M;
           array[x][capaPER] =
             Math.round((result[j].M / result[j].V) * 100).toString() + "%";
-          /* = {
-            V: result[j].V,
-            M: result[j].M,
-            PER: Math.round((result[j].M / result[j].V) * 100).toString() + "%",
-          }; */
         }
       }
     }
-    return res.send(array);
+
+    if (SC === 1) {
+      resultDetalle = await dbGiama.query(
+        "CALL net_getmoraxoficial_detalle_SinCruce(?,?,?,?)",
+        {
+          replacements: [
+            mes,
+            anio,
+            restaCuotas ? restaCuotas : 0,
+            oficial ? oficial : null,
+          ],
+        }
+      );
+    } else {
+      resultDetalle = await dbGiama.query(
+        "CALL net_getmoraxoficial_detalle(?,?,?,?)",
+        {
+          replacements: [
+            mes,
+            anio,
+            restaCuotas ? restaCuotas : 0,
+            oficial ? oficial : null,
+          ],
+        }
+      );
+    }
+    return res.send({ resumen: array, detalle: resultDetalle });
   } catch (error) {
     return res.send({ status: false, message: returnErrorMessage(error) });
   }
@@ -104,6 +131,7 @@ export const getMoraXSupervisor = async (req, res) => {
   const { mes, anio, restaCuotas, oficial, SC } = req.body;
   let array = [];
   let cantidadSupervisores;
+  let resultDetalle;
   let result;
   const dbGiama = req.db;
 
@@ -214,42 +242,34 @@ export const getMoraXSupervisor = async (req, res) => {
       }
     }
 
-    return res.send(array);
+    if (SC === 1) {
+      resultDetalle = await dbGiama.query(
+        "CALL net_getmoraxoficial_detalle_SinCruce(?,?,?,?)",
+        {
+          replacements: [
+            mes,
+            anio,
+            restaCuotas ? restaCuotas : 0,
+            oficial ? oficial : null,
+          ],
+        }
+      );
+    } else {
+      resultDetalle = await dbGiama.query(
+        "CALL net_getmoraxoficial_detalle(?,?,?,?)",
+        {
+          replacements: [
+            mes,
+            anio,
+            restaCuotas ? restaCuotas : 0,
+            oficial ? oficial : null,
+          ],
+        }
+      );
+    }
+
+    return res.send({ resumen: array, detalle: resultDetalle });
   } catch (error) {
     return res.send({ status: false, message: returnErrorMessage(error) });
   }
-};
-
-export const getMoraDetalle = async (req, res) => {
-  const { mes, anio, restaCuotas, oficial, SC } = req.body;
-  const dbGiama = req.db;
-  let result;
-  if (!mes || !anio) {
-    return res.send({ status: false, message: "Faltan datos" });
-  }
-
-  if (SC === 1) {
-    result = await dbGiama.query(
-      "CALL net_getmoraxoficial_detalle_SinCruce(?,?,?,?)",
-      {
-        replacements: [
-          mes,
-          anio,
-          restaCuotas ? restaCuotas : 0,
-          oficial ? oficial : null,
-        ],
-      }
-    );
-  } else {
-    result = await dbGiama.query("CALL net_getmoraxoficial_detalle(?,?,?,?)", {
-      replacements: [
-        mes,
-        anio,
-        restaCuotas ? restaCuotas : 0,
-        oficial ? oficial : null,
-      ],
-    });
-  }
-
-  return res.send(result);
 };
