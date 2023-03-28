@@ -13,5 +13,4 @@ moraXVendedorYSupRouter.use(testConnection);
 
 moraXVendedorYSupRouter.route("/").post(getMoraXVendedor);
 moraXVendedorYSupRouter.route("/sup").post(getMoraXSupervisor);
-moraXVendedorYSupRouter.route("/detalle").post(getMoraDetalle);
 export default moraXVendedorYSupRouter;
