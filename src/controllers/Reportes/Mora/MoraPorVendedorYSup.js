@@ -8,7 +8,6 @@ export const getMoraXVendedor = async (req, res) => {
   let cantidadVendedores;
   let resultDetalle;
   const dbGiama = req.db;
-  console.log(req.body);
   if (!mes || !anio) {
     return res.send({ status: false, message: "Faltan datos" });
   }

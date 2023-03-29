@@ -21,6 +21,7 @@ import altaPreRouter from "./routes/Operaciones/altaPreRoutes";
 import actualPreRouter from "./routes/Operaciones/actualPreRoutes";
 import efectividadAdjRouter from "./routes/Reportes/AdmPlanes/efectividadAdjRoutes";
 import moraXVendedorYSupRouter from "./routes/Reportes/Mora/MoraPorVendedorYSup";
+import moraXOficial from "./routes/Reportes/Mora/MoraXOficial";
 require("dotenv").config();
 
 const passport = require("passport");
@@ -62,6 +63,7 @@ app.use("/Operaciones/AltaPre", altaPreRouter);
 app.use("/Operaciones/ActualPre", actualPreRouter);
 app.use("/Reportes/efectividadAdj", efectividadAdjRouter);
 app.use("/Reportes/MoraXVendedorYSup", moraXVendedorYSupRouter);
+app.use("/Reportes/MoraXOficial", moraXOficial);
 app.listen(process.env.PORT, () => {
   console.log(`App is running on port`, process.env.PORT);
 });
