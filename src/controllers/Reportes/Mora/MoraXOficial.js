@@ -95,7 +95,12 @@ export const getMoraXOficial = async (req, res) => {
       }
     );
 
-    return res.send({ resumen: array, detalle: resultDetalle });
+    return res.send({
+      resumen: array,
+      detalle: resultDetalle,
+      mes: mes,
+      anio: anio,
+    });
   } catch {
     return res.send({ status: false, message: returnErrorMessage(error) });
   }
