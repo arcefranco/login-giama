@@ -2,6 +2,18 @@ import { QueryTypes } from "sequelize";
 import { returnErrorMessage } from "../../../helpers/errors/returnErrorMessage";
 require("dotenv").config();
 
+export const getOficialAdj = async (req, res) => {
+  try {
+    const oficialAdjudicaciones = await selectQuery(
+      req.db,
+      "SELECT * FROM oficialesadjudicacion"
+    );
+    return res.send(oficialAdjudicaciones);
+  } catch (error) {
+    return res.send({ status: false, message: returnErrorMessage(error) });
+  }
+};
+
 export const getMoraXVendedor = async (req, res) => {
   const { mes, anio, restaCuotas, oficial, SC } = req.body;
   let array = [];
