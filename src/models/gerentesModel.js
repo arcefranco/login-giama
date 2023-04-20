@@ -1,5 +1,3 @@
-
-
 /* import {Sequelize,DataTypes} from 'sequelize'
 require('dotenv').config()
 
@@ -10,7 +8,7 @@ const sequelize = new Sequelize(process.env.DB_NAME_CG, process.env.DB_USERNAME,
 /*  const sequelize = new Sequelize(.Sequelize.config.database, process.env.DB_USERNAME, process.env.DB_PASSWORD,{
 
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT
+    dialect: "mysql"
 })  */
 /*      const Gerente = app?.get('db').define('gerentes', {
            Codigo: {
@@ -31,6 +29,3 @@ const sequelize = new Sequelize(process.env.DB_NAME_CG, process.env.DB_USERNAME,
      Gerente.removeAttribute('id')  
     
       module.exports = Gerente */
-
-   
-   

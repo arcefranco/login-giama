@@ -231,7 +231,7 @@ Vendedores.removeAttribute("id");
 
 /* export const pa7gfConnection = new Sequelize('pa7_gf_test_2', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT    
+    dialect: "mysql"    
 }) */
 
 //MODELOS

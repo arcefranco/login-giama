@@ -3,16 +3,12 @@
 // import {app} from "./index"
 // require('dotenv').config()
 
-
-
 // /* const sequelize = new Sequelize('pa7', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
 //     host: process.env.DB_HOST,
-//     dialect: process.env.DB_DIALECT
+//     dialect: "mysql"
 // }) */
 
-
-
-// /* sequelize.authenticate().then(() => { 
+// /* sequelize.authenticate().then(() => {
 //     console.log(`DB pa7 connected`)
 // })
 // .catch(err => {
@@ -40,7 +36,7 @@
 // },{
 // freezeTableName:true,
 // timestamps:false,
-// }) 
+// })
 // Gerente.removeAttribute('id')   */
 
 // //SUPERVISOR
@@ -107,7 +103,7 @@
 // },{
 // freezeTableName:true,
 // timestamps:false,
-// }) 
+// })
 // TeamLeader.removeAttribute('id')   */
 
 // //VENDEDORES
@@ -118,9 +114,8 @@
 // },{
 // freezeTableName:true,
 // timestamps:false,
-// }) 
+// })
 // Vendedores.removeAttribute('id') */
-
 
 // //MODELOS
 // const Modelos = sequelize.define('modelos', {
@@ -130,15 +125,12 @@
 // },{
 // freezeTableName:true,
 // timestamps:false,
-// }) 
+// })
 // Modelos.removeAttribute('id')
-
-
 
 // const db = {}
 
 // db.Sequelize = Sequelize
 // db.sequelize = sequelize
 
-
-// export default db 
+// export default db
