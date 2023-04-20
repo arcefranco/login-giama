@@ -6,7 +6,7 @@ export const pa7_cgConnection = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    dialect: "mysql",
     dialectOptions: {
       multipleStatements: true,
     },
@@ -18,7 +18,7 @@ export const pa7_elyseesConnection = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    dialect: "mysql",
     dialectOptions: {
       multipleStatements: true,
     },
@@ -31,7 +31,7 @@ export const pa7_autConnection = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    dialect: "mysql",
     dialectOptions: {
       multipleStatements: true,
     },
@@ -44,7 +44,7 @@ export const pa7_alizzeConnection = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    dialect: "mysql",
     dialectOptions: {
       multipleStatements: true,
     },
@@ -57,7 +57,7 @@ export const pa7_chConnection = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    dialect: "mysql",
     dialectOptions: {
       multipleStatements: true,
     },
@@ -70,7 +70,7 @@ export const pa7_detConnection = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    dialect: "mysql",
     dialectOptions: {
       multipleStatements: true,
     },
@@ -83,7 +83,7 @@ export const pa7_gfConnection = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    dialect: "mysql",
     dialectOptions: {
       multipleStatements: true,
     },
@@ -96,7 +96,7 @@ export const pa7_gfLuxcarConnection = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    dialect: "mysql",
     dialectOptions: {
       multipleStatements: true,
     },
