@@ -48,7 +48,7 @@ app.use((req, res, next) => {
 });
 app.use(passport.initialize());
 
-app.listen(3002, () => {
+app.listen(3001, () => {
   console.log(`Our app is running on port 3001`);
 });
 
