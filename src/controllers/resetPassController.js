@@ -1,28 +1,45 @@
-import db from "../database";
+import {app} from '../index'
 const jwt = require('jsonwebtoken')
 import { sendEmail } from "../helpers/email/sendEmail";
-import { createPass } from "../helpers/createPass";
-import { QueryTypes } from "sequelize";
+import { createPass } from "../helpers/passwords/createPass";
+import { QueryTypes, Sequelize } from "sequelize";
+require('dotenv').config()
 
 
-const dbGiama = db.sequelize
-const JWT_SECRET = 'MY_SECRET'
+
 
 export const forgotPassword = async (req, res) => {
- const {login} = req.body //Tomo el nombre de usuario y lo busco en la DB
+ const {username, empresa} = req.body //Tomo el nombre de usuario y lo busco en la DB
+ console.log(empresa)
+ let dbGiama = {}; 
+ if(empresa === 'pa7_cg'){
+   dbGiama.sequelize = new Sequelize('pa7_cg', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+     host: process.env.DB_HOST,
+     dialect: process.env.DB_DIALECT
+ })
+ }else if(empresa === 'pa7_elysees'){
+   dbGiama.sequelize = new Sequelize('pa7_elysees', process.env.DB_USERNAME, process.env.DB_PASSWORD,{
+     host: process.env.DB_HOST,
+     dialect: process.env.DB_DIALECT
+ })
+   
+ }
+
+
+ dbGiama = dbGiama.sequelize
  const user = await dbGiama.query('SELECT * FROM usuarios WHERE login = ?',
  {
-   replacements: [login],
+   replacements: [username],
    type: QueryTypes.SELECT
  }
 ); 
 if(user.length === 0){
-    res.send({message: 'Usuario no registrado!'})
+    return res.send({message: 'Usuario no registrado!'})
 }
 const userDb = user[0]
 const {emailtest, ID} = userDb
 
-const secret = JWT_SECRET + user[0].password_hash
+const secret = process.env.RESET_SECRET + user[0].password_hash
 const payload = {
     email: user[0].emailtest,
     id: user[0].ID
@@ -31,7 +48,7 @@ const token = jwt.sign(payload, secret, {expiresIn: '3h'}) //Una vez que lo encu
 
 sendEmail(emailtest, ID, token)
 
-res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contraseña!`, username: userDb.login})
+return res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contraseña!`, username: userDb.login, db: empresa})
 }
 
 
@@ -40,19 +57,19 @@ res.send({message: `Te enviamos un correo a ${emailtest} para recuperar tu contr
 export const tokenStatus = async (req, res) => { //Para enviar el estado del token de recupero de contraseña al front
 
    try {
-    res.send({
+    return res.send({
       status: true
     })
    } catch (error) {
     console.log(error)
-    res.send(error.message)
+    return res.send(error.message)
    }
 
 
 }
 
 export const updatePass = async (req, res) => { //Recibo su nueva contraseña y segun su id lo encuentro la DB 
-
+  const dbGiama = req.db
   const {newPass, confirmPass, id} = req.body
   if(newPass !== confirmPass) {
    return res.json({message: 'Las contraseñas no coinciden', status: false})
@@ -60,23 +77,20 @@ export const updatePass = async (req, res) => { //Recibo su nueva contraseña y 
   if(!id) {
    return res.json({message: 'Not user provided', status: false})  
   }
-  const newPassResult = await createPass(id, newPass)
-
-  const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?', //Es necesario preguntar dos veces si existe el usuario?
+  const newPassResult = createPass(newPass)
+  const {passHashed, newSalt} = newPassResult
+  const user = await dbGiama.query('SELECT * FROM usuarios WHERE ID = ?', 
 {
   replacements: [id],
   type: QueryTypes.SELECT
 }
-);
+); 
 
 if(user.length) {
   
- await dbGiama.query('UPDATE usuarios SET password_hash = ? WHERE ID = ?', 
-  {
-    replacements: [newPassResult, id],
-    type: QueryTypes.UPDATE
-  }
- ); 
+ dbGiama
+  .query('CALL pa7_update_pass (:p_LOGIN, :p_SALT, :p_PASSWORD)', 
+        {replacements: { p_LOGIN: user[0].login, p_SALT: newSalt, p_PASSWORD: passHashed }})
 return res.send({message: 'Password updated!', status: true})
 }else{
 return res.json({message: 'User does not exist', status: false})

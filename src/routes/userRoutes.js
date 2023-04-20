@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { getAllUsers, login, getGerentes } from "../controllers/userController";
+import { getAllUsers, login, logout } from "../controllers/userController";
+
 const passport = require('passport')
 require('../config/passport')(passport)
 
 
 const UserRouter = Router()
+
+
 
 UserRouter.use((req, res, next) => {
     res.header(
@@ -15,6 +18,8 @@ UserRouter.use((req, res, next) => {
   });
 
   
-UserRouter.get('/', passport.authenticate('jwt', {session: false}), getAllUsers) 
+UserRouter.route('/').get(getAllUsers)
 UserRouter.route('/').post(login)
+UserRouter.post('/logout', logout)
+
 export default UserRouter
