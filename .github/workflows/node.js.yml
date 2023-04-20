@@ -52,5 +52,28 @@ jobs:
       - run: |
           touch .env
           echo DB_DIALECT="mysql" >> .env
+          echo PORT="3002" >> .env
+          echo DB_NAME_CG="pa7_cg" >> .env
+          echo DB_NAME_CG2="pa7" >> .env
+          echo DB_NAME_GF="pa7_gf_test_2" >> .env
+          echo DB_NAME_ALI="pa7" >> .env
+          echo DB_NAME_AUT="pa7" >> .env
+          echo DB_NAME_CH="pa7" >> .env
+          echo DB_NAME_DET="pa7" >> .env
+          echo DB_NAME_ELY="pa7" >> .env
+          echo DB_NAME_LUX="pa7_gf_test_2" >> .env
+          echo DB_USERNAME2="franco" >> .env
+          echo DB_USERNAME="admin" >> .env
+          echo DB_PASSWORD2="password" >> .env
+          echo DB_PASSWORD="Juan_172o" >> .env
+          echo DB_HOST2="giama-db-t3.cojfgn4yxtap.us-west-2.rds.amazonaws.com" >> .env
+          echo DB_HOST="giama-test.cojfgn4yxtap.us-west-2.rds.amazonaws.com" >> .env
+          echo DB_DIALECT="mysql" >> .env
+          echo SECRET="JWT_SECRET" >> .env
+          echo RESET_SECRET="MY_SECRET" >> .env
+          echo HOST="http://localhost:3000" >> .env
+          echo MAIL_HOST="mail.giama.com.ar" >> .env
+          echo MAIL_USER="info@giama.com.ar" >> .env
+          echo MAIL_PASS="Q)9~X-?(5~,o" >> .env
       - run: npm run build --if-present
       - run: sudo pm2 restart 0
