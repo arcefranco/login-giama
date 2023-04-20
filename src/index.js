@@ -49,7 +49,7 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 
 app.listen(3002, () => {
-  console.log(`Our app is running on port 3001`);
+  console.log(`Our app is running on port 3002`);
 });
 
 app.get("/", (req, res) => {
@@ -77,6 +77,3 @@ app.use("/Reportes/efectividadAdj", efectividadAdjRouter);
 app.use("/Reportes/MoraXVendedorYSup", moraXVendedorYSupRouter);
 app.use("/Reportes/MoraXOficial", moraXOficial);
 app.use("/Reportes/AdmPlanes/operacionesPorFecha", operacionesPorFecha);
-app.listen(process.env.PORT, () => {
-  console.log(`App is running on port`, process.env.PORT);
-});
