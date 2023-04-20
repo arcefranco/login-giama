@@ -1,7 +1,5 @@
 import express from "express";
 import db from "./database";
-import GerentesRouter from "./routes/gerentesRoutes";
-const passport = require("passport");
 
 db.sequelize;
 
