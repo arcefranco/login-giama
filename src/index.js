@@ -48,14 +48,13 @@ app.use((req, res, next) => {
 });
 app.use(passport.initialize());
 
-app.get("/", (req, res) => {
-  res.json("Bienvenido al backend de testing de PA7");
-});
-
-app.listen(3001, () => {
+app.listen(3002, () => {
   console.log(`Our app is running on port 3001`);
 });
 
+app.get("/", (req, res) => {
+  res.json("Bienvenido al backend de testing de PA7");
+});
 app.use("/login", UserRouter);
 app.use("/gerentes", GerentesRouter);
 app.use("/reset", resetRouter);
