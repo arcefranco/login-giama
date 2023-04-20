@@ -49,4 +49,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+      - run: |
+          touch .env
+          echo DB_DIALECT="mysql" >> .env
       - run: npm run build --if-present
+      - run: sudo pm2 restart 0
