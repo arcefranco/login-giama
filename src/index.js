@@ -55,7 +55,7 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 
 app.get("/", (req, res) => {
-  res.json("Bienvenido al backend de testing");
+  res.json("Bienvenido al backend de testing de PA7");
 });
 
 app.listen(3001, () => {
