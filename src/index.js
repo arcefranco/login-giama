@@ -1,10 +1,6 @@
 import express from "express";
 import db from "./database";
-import cors from "cors";
-import morgan from "morgan";
-import UserRouter from "./routes/userRoutes";
 import GerentesRouter from "./routes/gerentesRoutes";
-import resetRouter from "./routes/resetRoutes";
 const passport = require("passport");
 
 db.sequelize;
