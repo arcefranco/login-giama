@@ -11,6 +11,31 @@ jobs:
   build:
     runs-on: self-hosted
 
+    env:
+      PORT: "3002"
+      DB_NAME_CG: "pa7_cg"
+      DB_NAME_CG2: "pa7"
+      DB_NAME_GF: "pa7_gf_test_2"
+      DB_NAME_ALI: "pa7"
+      DB_NAME_AUT: "pa7"
+      DB_NAME_CH: "pa7"
+      DB_NAME_DET: "pa7"
+      DB_NAME_ELY: "pa7"
+      DB_NAME_LUX: "pa7_gf_test_2"
+      DB_USERNAME2: "franco"
+      DB_USERNAME: "admin"
+      DB_PASSWORD2: "password"
+      DB_PASSWORD: "Juan_172o"
+      DB_HOST2: "giama-db-t3.cojfgn4yxtap.us-west-2.rds.amazonaws.com"
+      DB_HOST: "giama-test.cojfgn4yxtap.us-west-2.rds.amazonaws.com"
+      DB_DIALECT: "mysql"
+      SECRET: "JWT_SECRET"
+      RESET_SECRET: "MY_SECRET"
+      HOST: "http://localhost:3000"
+      MAIL_HOST: "mail.giama.com.ar"
+      MAIL_USER: "info@giama.com.ar"
+      MAIL_PASS: "Q)9~X-?(5~,o"
+
     strategy:
       matrix:
         node-version: [16.x]
