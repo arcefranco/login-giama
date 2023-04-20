@@ -48,8 +48,8 @@ app.use((req, res, next) => {
 });
 app.use(passport.initialize());
 
-app.listen(3002, () => {
-  console.log(`Our app is running on port 3002`);
+app.listen(process.env.PORT, () => {
+  console.log(`Our app is running on port ${process.env.PORT}`);
 });
 
 app.get("/", (req, res) => {
