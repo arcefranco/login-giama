@@ -25,7 +25,8 @@ import efectividadAdjRouter from "./routes/Reportes/AdmPlanes/efectividadAdjRout
 import moraXVendedorYSupRouter from "./routes/Reportes/Mora/MoraPorVendedorYSup";
 import moraXOficial from "./routes/Reportes/Mora/MoraXOficial";
 import operacionesPorFecha from "./routes/Reportes/AdmPlanes/operacionesPorFecha";
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const passport = require("passport");
 export const app = express();
