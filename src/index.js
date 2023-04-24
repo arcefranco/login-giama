@@ -48,7 +48,9 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 
 app.listen(process.env.PORT, () => {
-  console.log(`Our app is running on port ${process.env.PORT}`);
+  console.log(
+    `Our app is running on port ${process.env.PORT} ${process.env.DB_HOST} ${process.env.DB_USERNAME} ${process.env.DB_PASSWORD}`
+  );
 });
 
 app.get("/", (req, res) => {
