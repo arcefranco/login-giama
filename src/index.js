@@ -48,13 +48,11 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 
 app.listen(process.env.PORT, () => {
-  console.log(
-    `Our app is running on portt ${process.env.PORT} ${process.env.DB_HOST} ${process.env.DB_USERNAME} ${process.env.DB_PASSWORD}`
-  );
+  console.log(`Our app is running on port ${process.env.PORT}}`);
 });
 
 app.get("/", (req, res) => {
-  res.json("Bienvenido al backend de testing de PA7");
+  res.json("Bienvenido al backend de testing de PA7!");
 });
 app.use("/login", UserRouter);
 app.use("/gerentes", GerentesRouter);
