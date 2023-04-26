@@ -76,4 +76,4 @@ jobs:
           echo MAIL_USER="info@giama.com.ar" >> .env
           echo MAIL_PASS="Q)9~X-?(5~,o" >> .env
       - run: npm run build
-#      - run: sudo pm2 restart 0
+      - run: sudo pm2 restart 0
